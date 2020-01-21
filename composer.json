@@ -1,5 +1,5 @@
 {
-    "name": "ghustavh97/laravel-authority",
+    "name": "ghustavh97/laravel-guardian",
     "description": "Permission handling for Laravel 5.8 and up",
     "keywords": [
         "spatie",
@@ -13,7 +13,7 @@
         "ghustavh97",
         "authority"
     ],
-    "homepage": "https://github.com/Ghustavh97/laravel-authority/",
+    "homepage": "https://github.com/Ghustavh97/laravel-guardian/",
     "license": "MIT",
     "authors": [
         {
