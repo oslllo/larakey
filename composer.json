@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-permission",
+    "name": "ghustavh97/laravel-authority",
     "description": "Permission handling for Laravel 5.8 and up",
     "keywords": [
         "spatie",
@@ -9,9 +9,11 @@
         "roles",
         "acl",
         "rbac",
-        "security"
+        "security",
+        "ghustavh97",
+        "authority"
     ],
-    "homepage": "https://github.com/spatie/laravel-permission",
+    "homepage": "https://github.com/Ghustavh97/laravel-authority/",
     "license": "MIT",
     "authors": [
         {
@@ -35,7 +37,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Permission\\": "src"
+            "Ghustavh97\\Permission\\": "src"
         },
         "files": [
             "src/helpers.php"
@@ -43,13 +45,13 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Permission\\Test\\": "tests"
+            "Ghustavh97\\Permission\\Test\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\Permission\\PermissionServiceProvider"
+                "Ghustavh97\\Permission\\PermissionServiceProvider"
             ]
         }
     },
