@@ -1,18 +1,20 @@
 <?php
 
-namespace Spatie\Permission;
+namespace Ghustavh97\Guardian;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Ghustavh97\Guardian\Contracts\Role as RoleContract;
+use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
-class PermissionServiceProvider extends ServiceProvider
+use Ghustavh97\Guardian\Models\PermissionPivot;
+
+class GuardianServiceProvider extends ServiceProvider
 {
-    public function boot(PermissionRegistrar $permissionLoader, Filesystem $filesystem)
+    public function boot(GuardianRegistrar $permissionLoader, Filesystem $filesystem)
     {
         if (isNotLumen()) {
             $this->publishes([
@@ -37,9 +39,18 @@ class PermissionServiceProvider extends ServiceProvider
 
         $permissionLoader->registerPermissions();
 
-        $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {
+        $this->app->singleton(GuardianRegistrar::class, function ($app) use ($permissionLoader) {
             return $permissionLoader;
         });
+
+        PermissionPivot::creating(function ($permission) {
+            $permission->to_id = 0;
+            $permission->to_type = '*';
+        });
+
+        // config('permission.models.role')::creating(function ($role) {
+        //     // $role->level = 0;
+        // });
     }
 
     public function register()

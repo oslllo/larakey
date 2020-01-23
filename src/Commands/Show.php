@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\Permission\Commands;
+namespace Ghustavh97\Guardian\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Ghustavh97\Guardian\Models\Role;
+use Ghustavh97\Guardian\Models\Permission;
 
 class Show extends Command
 {

@@ -1,18 +1,18 @@
 <?php
 
-namespace Spatie\Permission\Models;
+namespace Ghustavh97\Guardian\Models;
 
-use Spatie\Permission\Guard;
+use Ghustavh97\Guardian\Guard;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Traits\HasRoles;
+use Ghustavh97\Guardian\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Ghustavh97\Guardian\Exceptions\PermissionAlreadyExists;
+use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
@@ -20,6 +20,11 @@ class Permission extends Model implements PermissionContract
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
+
+    protected $appends = [
+        'to_type',
+        'to_id'
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -48,12 +53,20 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(
+        // return $this->belongsToMany(
+        //     config('permission.models.role'),
+        //     config('permission.table_names.role_has_permissions'),
+        //     'permission_id',
+        //     'role_id'
+        // );
+
+        return $this->morphedByMany(
             config('permission.models.role'),
-            config('permission.table_names.role_has_permissions'),
+            'model',
+            config('permission.table_names.model_has_permissions'),
             'permission_id',
-            'role_id'
-        );
+            config('permission.column_names.model_morph_key')
+        )->using(config('permission.models.permission_pivot'));
     }
 
     /**
@@ -67,7 +80,7 @@ class Permission extends Model implements PermissionContract
             config('permission.table_names.model_has_permissions'),
             'permission_id',
             config('permission.column_names.model_morph_key')
-        );
+        )->using(config('permission.models.permission_pivot'));
     }
 
     /**
@@ -76,9 +89,9 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
@@ -97,9 +110,9 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
@@ -119,7 +132,7 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
@@ -138,8 +151,18 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = []): Collection
     {
-        return app(PermissionRegistrar::class)
+        return app(GuardianRegistrar::class)
             ->setPermissionClass(static::class)
             ->getPermissions($params);
+    }
+
+    public function getToIdAttribute()
+    {
+        return $this->pivot->to_id;
+    }
+
+    public function getToTypeAttribute()
+    {
+        return $this->pivot->to_type;
     }
 }

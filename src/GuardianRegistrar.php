@@ -1,15 +1,15 @@
 <?php
 
-namespace Spatie\Permission;
+namespace Ghustavh97\Guardian;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
+use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Spatie\Permission\Contracts\Permission;
+use Ghustavh97\Guardian\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 
-class PermissionRegistrar
+class GuardianRegistrar
 {
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
@@ -36,7 +36,7 @@ class PermissionRegistrar
     public static $cacheModelKey;
 
     /**
-     * PermissionRegistrar constructor.
+     * GuardianRegistrar constructor.
      *
      * @param \Illuminate\Cache\CacheManager $cacheManager
      */
@@ -133,7 +133,7 @@ class PermissionRegistrar
     /**
      * Get an instance of the permission class.
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public function getPermissionClass(): Permission
     {
@@ -150,7 +150,7 @@ class PermissionRegistrar
     /**
      * Get an instance of the role class.
      *
-     * @return \Spatie\Permission\Contracts\Role
+     * @return \Ghustavh97\Guardian\Contracts\Role
      */
     public function getRoleClass(): Role
     {

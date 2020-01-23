@@ -1,14 +1,14 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Middlewares\RoleMiddleware;
-use Spatie\Permission\Exceptions\UnauthorizedException;
-use Spatie\Permission\Middlewares\PermissionMiddleware;
-use Spatie\Permission\Middlewares\RoleOrPermissionMiddleware;
+use Ghustavh97\Guardian\Middlewares\RoleMiddleware;
+use Ghustavh97\Guardian\Exceptions\UnauthorizedException;
+use Ghustavh97\Guardian\Middlewares\PermissionMiddleware;
+use Ghustavh97\Guardian\Middlewares\RoleOrPermissionMiddleware;
 
 class MiddlewareTest extends TestCase
 {

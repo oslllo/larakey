@@ -1,8 +1,8 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
-use Spatie\Permission\Models\Permission;
+use Ghustavh97\Guardian\Models\Permission;
 
 class MultipleGuardsTest extends TestCase
 {

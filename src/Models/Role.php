@@ -1,15 +1,15 @@
 <?php
 
-namespace Spatie\Permission\Models;
+namespace Ghustavh97\Guardian\Models;
 
-use Spatie\Permission\Guard;
+use Ghustavh97\Guardian\Guard;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Ghustavh97\Guardian\Traits\HasPermissions;
+use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Guardian\Exceptions\RoleAlreadyExists;
+use Ghustavh97\Guardian\Contracts\Role as RoleContract;
+use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -45,12 +45,19 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(
+        // return $this->belongsToMany(
+        //     config('permission.models.permission'),
+        //     config('permission.table_names.role_has_permissions'),
+        //     'role_id',
+        //     'permission_id'
+        // );
+        return $this->morphToMany(
             config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions'),
-            'role_id',
+            'model',
+            config('permission.table_names.model_has_permissions'),
+            config('permission.column_names.model_morph_key'),
             'permission_id'
-        );
+        )->using(config('permission.models.permission_pivot'));
     }
 
     /**
@@ -73,9 +80,9 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return \Ghustavh97\Guardian\Contracts\Role|\Ghustavh97\Guardian\Models\Role
      *
-     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): RoleContract
     {
@@ -109,7 +116,7 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Role
+     * @return \Ghustavh97\Guardian\Contracts\Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
@@ -131,7 +138,7 @@ class Role extends Model implements RoleContract
      *
      * @return bool
      *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
+     * @throws \Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {

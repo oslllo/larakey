@@ -1,34 +1,34 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
 use Illuminate\Support\Facades\Cache;
-use Spatie\Permission\Contracts\Role;
+use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\Permission\PermissionServiceProvider;
+use Ghustavh97\Guardian\GuardianServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Spatie\Permission\Test\User */
+    /** @var \Ghustavh97\Guardian\Test\User */
     protected $testUser;
 
-    /** @var \Spatie\Permission\Test\Admin */
+    /** @var \Ghustavh97\Guardian\Test\Admin */
     protected $testAdmin;
 
-    /** @var \Spatie\Permission\Models\Role */
+    /** @var \Ghustavh97\Guardian\Models\Role */
     protected $testUserRole;
 
-    /** @var \Spatie\Permission\Models\Role */
+    /** @var \Ghustavh97\Guardian\Models\Role */
     protected $testAdminRole;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Ghustavh97\Guardian\Models\Permission */
     protected $testUserPermission;
 
-    /** @var \Spatie\Permission\Models\Permission */
+    /** @var \Ghustavh97\Guardian\Models\Permission */
     protected $testAdminPermission;
 
     public function setUp(): void
@@ -55,7 +55,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            PermissionServiceProvider::class,
+            GuardianServiceProvider::class,
         ];
     }
 
@@ -82,7 +82,7 @@ abstract class TestCase extends Orchestra
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 
-        $app['config']->set('cache.prefix', 'spatie_tests---');
+        $app['config']->set('cache.prefix', 'guardian_tests---');
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class TestCase extends Orchestra
         });
 
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
-            $app[PermissionRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+            $app[GuardianRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
         }
 
@@ -131,7 +131,7 @@ abstract class TestCase extends Orchestra
      */
     protected function reloadPermissions()
     {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        app(GuardianRegistrar::class)->forgetCachedPermissions();
     }
 
     public function createCacheTable()

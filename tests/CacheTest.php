@@ -1,13 +1,13 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Contracts\Role;
+use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 
 class CacheTest extends TestCase
 {
@@ -22,7 +22,7 @@ class CacheTest extends TestCase
     {
         parent::setUp();
 
-        $this->registrar = app(PermissionRegistrar::class);
+        $this->registrar = app(GuardianRegistrar::class);
 
         $this->registrar->forgetCachedPermissions();
 
@@ -206,7 +206,7 @@ class CacheTest extends TestCase
     public function it_can_reset_the_cache_with_artisan_command()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-        $this->assertCount(1, \Spatie\Permission\Models\Permission::where('name', 'new-permission')->get());
+        $this->assertCount(1, \Ghustavh97\Guardian\Models\Permission::where('name', 'new-permission')->get());
 
         $this->resetQueryCount();
         // retrieve permissions, and assert that the cache had to be loaded

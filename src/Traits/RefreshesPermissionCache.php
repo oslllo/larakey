@@ -1,19 +1,19 @@
 <?php
 
-namespace Spatie\Permission\Traits;
+namespace Ghustavh97\Guardian\Traits;
 
-use Spatie\Permission\PermissionRegistrar;
+use Ghustavh97\Guardian\GuardianRegistrar;
 
 trait RefreshesPermissionCache
 {
     public static function bootRefreshesPermissionCache()
     {
         static::saved(function () {
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
+            app(GuardianRegistrar::class)->forgetCachedPermissions();
         });
 
         static::deleted(function () {
-            app(PermissionRegistrar::class)->forgetCachedPermissions();
+            app(GuardianRegistrar::class)->forgetCachedPermissions();
         });
     }
 }

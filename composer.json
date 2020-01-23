@@ -1,6 +1,6 @@
 {
     "name": "ghustavh97/lara-guardian",
-    "description": "Permission handling for Laravel 5.8 and up",
+    "description": "Permission handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
     "keywords": [
         "spatie",
         "laravel",
@@ -11,7 +11,8 @@
         "rbac",
         "security",
         "ghustavh97",
-        "authority"
+        "authority",
+        "guardian"
     ],
     "homepage": "https://github.com/Ghustavh97/lara-guardian/",
     "license": "MIT",
@@ -37,7 +38,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ghustavh97\\Permission\\": "src"
+            "Ghustavh97\\Guardian\\": "src"
         },
         "files": [
             "src/helpers.php"
@@ -45,13 +46,13 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ghustavh97\\Permission\\Test\\": "tests"
+            "Ghustavh97\\Guardian\\Test\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ghustavh97\\Permission\\PermissionServiceProvider"
+                "Ghustavh97\\Guardian\\GuardianServiceProvider"
             ]
         }
     },

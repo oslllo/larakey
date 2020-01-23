@@ -1,15 +1,15 @@
 <?php
 
-namespace Spatie\Permission\Traits;
+namespace Ghustavh97\Guardian\Traits;
 
-use Spatie\Permission\Guard;
+use Ghustavh97\Guardian\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 
 trait HasPermissions
 {
@@ -29,7 +29,7 @@ trait HasPermissions
     public function getPermissionClass()
     {
         if (! isset($this->permissionClass)) {
-            $this->permissionClass = app(PermissionRegistrar::class)->getPermissionClass();
+            $this->permissionClass = app(GuardianRegistrar::class)->getPermissionClass();
         }
 
         return $this->permissionClass;
@@ -46,14 +46,14 @@ trait HasPermissions
             config('permission.table_names.model_has_permissions'),
             config('permission.column_names.model_morph_key'),
             'permission_id'
-        );
+        )->using(config('permission.models.permission_pivot'));
     }
 
     /**
      * Scope the model query to certain permissions only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
@@ -86,7 +86,7 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return array
      */
@@ -110,7 +110,7 @@ trait HasPermissions
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
      * @param string|null $guardName
      *
      * @return bool
@@ -137,7 +137,7 @@ trait HasPermissions
         if (! $permission instanceof Permission) {
             throw new PermissionDoesNotExist;
         }
-
+        
         return $this->hasDirectPermission($permission) || $this->hasPermissionViaRole($permission);
     }
 
@@ -153,7 +153,7 @@ trait HasPermissions
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
-     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
      * @param string|null $guardName
      *
      * @return bool
@@ -216,7 +216,7 @@ trait HasPermissions
     /**
      * Determine if the model has, via roles, the given permission.
      *
-     * @param \Spatie\Permission\Contracts\Permission $permission
+     * @param \Ghustavh97\Guardian\Contracts\Permission $permission
      *
      * @return bool
      */
@@ -228,7 +228,7 @@ trait HasPermissions
     /**
      * Determine if the model has the given permission.
      *
-     * @param string|int|\Spatie\Permission\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
      *
      * @return bool
      * @throws PermissionDoesNotExist
@@ -281,7 +281,7 @@ trait HasPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -334,7 +334,7 @@ trait HasPermissions
     /**
      * Remove all current permissions and set the given ones.
      *
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -348,7 +348,7 @@ trait HasPermissions
     /**
      * Revoke the given permission.
      *
-     * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|string|string[] $permission
+     * @param \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Permission[]|string|string[] $permission
      *
      * @return $this
      */
@@ -369,9 +369,9 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Spatie\Permission\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Permission[]|\Illuminate\Support\Collection
+     * @return \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Permission[]|\Illuminate\Support\Collection
      */
     protected function getStoredPermission($permissions)
     {
@@ -396,9 +396,9 @@ trait HasPermissions
     }
 
     /**
-     * @param \Spatie\Permission\Contracts\Permission|\Spatie\Permission\Contracts\Role $roleOrPermission
+     * @param \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Role $roleOrPermission
      *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
+     * @throws \Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
@@ -422,6 +422,6 @@ trait HasPermissions
      */
     public function forgetCachedPermissions()
     {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        app(GuardianRegistrar::class)->forgetCachedPermissions();
     }
 }

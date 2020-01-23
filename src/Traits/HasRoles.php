@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\Permission\Traits;
+namespace Ghustavh97\Guardian\Traits;
 
 use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
+use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
+use Ghustavh97\Guardian\GuardianRegistrar;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
@@ -28,7 +28,7 @@ trait HasRoles
     public function getRoleClass()
     {
         if (! isset($this->roleClass)) {
-            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
+            $this->roleClass = app(GuardianRegistrar::class)->getRoleClass();
         }
 
         return $this->roleClass;
@@ -52,7 +52,7 @@ trait HasRoles
      * Scope the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -90,7 +90,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Spatie\Permission\Contracts\Role ...$roles
+     * @param array|string|\Ghustavh97\Guardian\Contracts\Role ...$roles
      *
      * @return $this
      */
@@ -142,7 +142,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|\Spatie\Permission\Contracts\Role $role
+     * @param string|\Ghustavh97\Guardian\Contracts\Role $role
      */
     public function removeRole($role)
     {
@@ -158,7 +158,7 @@ trait HasRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|\Spatie\Permission\Contracts\Role|string  ...$roles
+     * @param  array|\Ghustavh97\Guardian\Contracts\Role|string  ...$roles
      *
      * @return $this
      */
@@ -172,7 +172,7 @@ trait HasRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
      * @return bool
      */
@@ -183,6 +183,7 @@ trait HasRoles
         }
 
         if (is_string($roles)) {
+
             return $guard
                 ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
                 : $this->roles->contains('name', $roles);
@@ -216,7 +217,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -228,7 +229,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @param  string|null  $guard
      * @return bool
      */
