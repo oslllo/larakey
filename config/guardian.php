@@ -2,6 +2,12 @@
 
 return [
 
+    'strict' => [
+        'permission' => [
+            'assignment' => false
+        ]
+    ],
+
     'models' => [
 
         /*

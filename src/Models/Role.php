@@ -26,7 +26,7 @@ class Role extends Model implements RoleContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('permission.table_names.roles'));
+        $this->setTable(config('guardian.table_names.roles'));
     }
 
     public static function create(array $attributes = [])
@@ -45,19 +45,13 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
-        // return $this->belongsToMany(
-        //     config('permission.models.permission'),
-        //     config('permission.table_names.role_has_permissions'),
-        //     'role_id',
-        //     'permission_id'
-        // );
         return $this->morphToMany(
-            config('permission.models.permission'),
+            config('guardian.models.permission'),
             'model',
-            config('permission.table_names.model_has_permissions'),
-            config('permission.column_names.model_morph_key'),
+            config('guardian.table_names.model_has_permissions'),
+            config('guardian.column_names.model_morph_key'),
             'permission_id'
-        )->using(config('permission.models.permission_pivot'));
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -68,9 +62,9 @@ class Role extends Model implements RoleContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('permission.table_names.model_has_roles'),
+            config('guardian.table_names.model_has_roles'),
             'role_id',
-            config('permission.column_names.model_morph_key')
+            config('guardian.column_names.model_morph_key')
         );
     }
 

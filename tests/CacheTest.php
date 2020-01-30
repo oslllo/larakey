@@ -5,6 +5,7 @@ namespace Ghustavh97\Guardian\Test;
 use Illuminate\Support\Facades\DB;
 use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
+use Ghustavh97\Guardian\Test\Models\User;
 use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
@@ -13,7 +14,7 @@ class CacheTest extends TestCase
 {
     protected $cache_init_count = 0;
     protected $cache_load_count = 0;
-    protected $cache_run_count = 2; // roles lookup, permissions lookup
+    protected $cache_run_count = 2; // roles lookup, permissions lookup,
     protected $cache_relations_count = 1;
 
     protected $registrar;
@@ -105,11 +106,11 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_removing_a_role_from_a_user()
     {
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->registrar->getPermissions();
 
-        $this->testUser->removeRole('testRole');
+        $this->testUser->removeRole('testUserRole');
 
         $this->resetQueryCount();
 
@@ -136,6 +137,7 @@ class CacheTest extends TestCase
     /** @test */
     public function it_flushes_the_cache_when_giving_a_permission_to_a_role()
     {
+        // dd($this->testUserPermission);
         $this->testUserRole->givePermissionTo($this->testUserPermission);
 
         $this->resetQueryCount();
@@ -149,10 +151,12 @@ class CacheTest extends TestCase
     public function has_permission_to_should_use_the_cache()
     {
         $this->testUserRole->givePermissionTo(['edit-articles', 'edit-news', 'Edit News']);
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles'));
+        // dd(DB::getQueryLog());
+
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count + $this->cache_relations_count);
 
         $this->resetQueryCount();
@@ -174,7 +178,7 @@ class CacheTest extends TestCase
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUserRole->givePermissionTo(['edit-articles', 'web']);
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->resetQueryCount();
         $this->assertTrue($this->testUser->hasPermissionTo('edit-articles', 'web'));
@@ -189,7 +193,7 @@ class CacheTest extends TestCase
     public function get_all_permissions_should_use_the_cache()
     {
         $this->testUserRole->givePermissionTo($expected = ['edit-articles', 'edit-news']);
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->resetQueryCount();
         $this->registrar->getPermissions();

@@ -32,7 +32,7 @@ class MiddlewareTest extends TestCase
     {
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleOrPermissionMiddleware, 'testRole'
+                $this->roleOrPermissionMiddleware, 'testUserRole'
             ), 403);
     }
 
@@ -41,7 +41,7 @@ class MiddlewareTest extends TestCase
     {
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, 'testRole'
+                $this->roleMiddleware, 'testUserRole'
             ), 403);
     }
 
@@ -50,11 +50,11 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, 'testRole'
+                $this->roleMiddleware, 'testUserRole'
             ), 200);
     }
 
@@ -63,16 +63,16 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, 'testRole|testRole2'
+                $this->roleMiddleware, 'testUserRole|testUserRole2'
             ), 200);
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, ['testRole2', 'testRole']
+                $this->roleMiddleware, ['testUserRole2', 'testUserRole']
             ), 200);
     }
 
@@ -81,11 +81,11 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->testUser->assignRole(['testRole']);
+        $this->testUser->assignRole(['testUserRole']);
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, 'testRole2'
+                $this->roleMiddleware, 'testUserRole2'
             ), 403);
     }
 
@@ -96,7 +96,7 @@ class MiddlewareTest extends TestCase
 
         $this->assertEquals(
             $this->runMiddleware(
-                $this->roleMiddleware, 'testRole|testRole2'
+                $this->roleMiddleware, 'testUserRole|testUserRole2'
             ), 403);
     }
 
@@ -180,31 +180,31 @@ class MiddlewareTest extends TestCase
     {
         Auth::login($this->testUser);
 
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
         $this->testUser->givePermissionTo('edit-articles');
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-news|edit-articles'),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testUserRole|edit-news|edit-articles'),
             200
         );
 
-        $this->testUser->removeRole('testRole');
+        $this->testUser->removeRole('testUserRole');
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testUserRole|edit-articles'),
             200
         );
 
         $this->testUser->revokePermissionTo('edit-articles');
-        $this->testUser->assignRole('testRole');
+        $this->testUser->assignRole('testUserRole');
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testUserRole|edit-articles'),
             200
         );
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, ['testRole', 'edit-articles']),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, ['testUserRole', 'edit-articles']),
             200
         );
     }
@@ -215,7 +215,7 @@ class MiddlewareTest extends TestCase
         Auth::login($this->testUser);
 
         $this->assertEquals(
-            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testRole|edit-articles'),
+            $this->runMiddleware($this->roleOrPermissionMiddleware, 'testUserRole|edit-articles'),
             403
         );
 

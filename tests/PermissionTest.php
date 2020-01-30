@@ -2,6 +2,7 @@
 
 namespace Ghustavh97\Guardian\Test;
 
+use Ghustavh97\Guardian\Test\Models\User;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Ghustavh97\Guardian\Exceptions\PermissionAlreadyExists;
 
@@ -12,14 +13,14 @@ class PermissionTest extends TestCase
     {
         $this->expectException(PermissionAlreadyExists::class);
 
-        app(Permission::class)->create(['name' => 'test-permission']);
-        app(Permission::class)->create(['name' => 'test-permission']);
+        app(Permission::class)->create(['name' => 'test-permission', 'title' => 'Test permission']);
+        app(Permission::class)->create(['name' => 'test-permission', 'title' => 'Test permission']);
     }
 
     /** @test */
     public function it_belongs_to_a_guard()
     {
-        $permission = app(Permission::class)->create(['name' => 'can-edit', 'guard_name' => 'admin']);
+        $permission = app(Permission::class)->create(['name' => 'can-edit', 'title' => 'Can edit', 'guard_name' => 'admin']);
 
         $this->assertEquals('admin', $permission->guard_name);
     }

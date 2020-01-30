@@ -21,10 +21,7 @@ class Permission extends Model implements PermissionContract
 
     protected $guarded = ['id'];
 
-    protected $appends = [
-        'to_type',
-        'to_id'
-    ];
+    protected $appends = [];
 
     public function __construct(array $attributes = [])
     {
@@ -32,7 +29,15 @@ class Permission extends Model implements PermissionContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('permission.table_names.permissions'));
+        $this->setTable(config('guardian.table_names.permissions'));
+
+        $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
+
+        $model = $this->getModel();
+
+        // if($model->pivot)dd($this->getModel());
+        // if($this->pivot) dd($this);
+        // echo get_parent_class($this);
     }
 
     public static function create(array $attributes = [])
@@ -53,20 +58,13 @@ class Permission extends Model implements PermissionContract
      */
     public function roles(): BelongsToMany
     {
-        // return $this->belongsToMany(
-        //     config('permission.models.role'),
-        //     config('permission.table_names.role_has_permissions'),
-        //     'permission_id',
-        //     'role_id'
-        // );
-
         return $this->morphedByMany(
-            config('permission.models.role'),
+            config('guardian.models.role'),
             'model',
-            config('permission.table_names.model_has_permissions'),
+            config('guardian.table_names.model_has_permissions'),
             'permission_id',
-            config('permission.column_names.model_morph_key')
-        )->using(config('permission.models.permission_pivot'));
+            config('guardian.column_names.model_morph_key')
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -77,10 +75,10 @@ class Permission extends Model implements PermissionContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('permission.table_names.model_has_permissions'),
+            config('guardian.table_names.model_has_permissions'),
             'permission_id',
-            config('permission.column_names.model_morph_key')
-        )->using(config('permission.models.permission_pivot'));
+            config('guardian.column_names.model_morph_key')
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -96,7 +94,8 @@ class Permission extends Model implements PermissionContract
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
+        $permission = static::permissionQueryBuilder(['name' => $name, 'guard_name' => $guardName]);
+        
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
         }
@@ -117,13 +116,29 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['id' => $id, 'guard_name' => $guardName])->first();
+        $permission = static::permissionQueryBuilder(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
         }
 
         return $permission;
+    }
+
+    private static function permissionQueryBuilder(array $query)
+    {
+        return static::getPermissions($query)->first();
+
+        // $model = app(GuardianRegistrar::class)->getModelFromAttributes($attributes);
+
+        // if($model) {
+        //     $permission = $permission->wherePivot([
+        //         'to_id' => $model->exists ? $model->id : null,
+        //         'to_type' => get_class($model)
+        //     ]);
+        // }
+
+        // return $permission->first();
     }
 
     /**
@@ -158,11 +173,19 @@ class Permission extends Model implements PermissionContract
 
     public function getToIdAttribute()
     {
-        return $this->pivot->to_id;
+        // return $this->pivot->to_id;
+        // return $this->pivot ? $this->pivot->to_id : null;
+        if($this->pivot) {
+            return $this->pivot->to_id;
+        }
     }
 
     public function getToTypeAttribute()
     {
-        return $this->pivot->to_type;
+        if($this->pivot) {
+            return $this->pivot->to_type;
+        }
+        // return $this->pivot ? $this->pivot->to_type : null;
+        // return $this->pivot->to_type;
     }
 }

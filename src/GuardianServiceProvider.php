@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Ghustavh97\Guardian\Contracts\Role as RoleContract;
+use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
 use Ghustavh97\Guardian\Models\PermissionPivot;
@@ -18,11 +19,11 @@ class GuardianServiceProvider extends ServiceProvider
     {
         if (isNotLumen()) {
             $this->publishes([
-                __DIR__.'/../config/permission.php' => config_path('permission.php'),
+                __DIR__.'/../config/guardian.php' => config_path('guardian.php'),
             ], 'config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
             $this->registerMacroHelpers();
@@ -43,22 +44,30 @@ class GuardianServiceProvider extends ServiceProvider
             return $permissionLoader;
         });
 
-        PermissionPivot::creating(function ($permission) {
-            $permission->to_id = 0;
-            $permission->to_type = '*';
-        });
+        $permissionPivot = app(GuardianRegistrar::class)->getPermissionPivotClass();
 
-        // config('permission.models.role')::creating(function ($role) {
-        //     // $role->level = 0;
-        // });
+        $permissionPivot::creating(function ($permission) {
+            if (! $permission->to_id || ! $permission->to_type) {
+                if (config('guardian.strict.permission.assignment')) {
+                    throw StrictModeRestriction::assignment();
+                }
+                if (! $permission->to_id) {
+                    $permission->to_id = null;
+                }
+
+                if (! $permission->to_type) {
+                    $permission->to_type = '*';
+                }
+            }
+        });
     }
 
     public function register()
     {
         if (isNotLumen()) {
             $this->mergeConfigFrom(
-                __DIR__.'/../config/permission.php',
-                'permission'
+                __DIR__.'/../config/guardian.php',
+                'guardian'
             );
         }
 
@@ -67,7 +76,7 @@ class GuardianServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $config = $this->app->config['permission.models'];
+        $config = $this->app->config['guardian.models'];
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
@@ -167,8 +176,8 @@ class GuardianServiceProvider extends ServiceProvider
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
+                return $filesystem->glob($path.'*_create_guardian_permission_tables.php');
+            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_guardian_permission_tables.php")
             ->first();
     }
 }

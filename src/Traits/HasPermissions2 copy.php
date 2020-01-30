@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 
-trait HasPermissions
+trait HasPermissions2
 {
     private $permissionClass;
 
@@ -119,33 +119,8 @@ trait HasPermissions
      * @return bool
      * @throws PermissionDoesNotExist
      */
-    public function hasPermissionTo(...$arguments): bool
+    public function hasPermissionTo($permission, $attributes = [], $guardName = null): bool
     {
-
-        $argumentsCount = count($arguments);
-
-        if ($argumentsCount > 3) {
-            // TODO: Throw too many arguments exception.
-        }
-
-        $permission = $arguments[0];
-        $attributes = [];
-        $guardName = null;
-
-        if ($argumentsCount == 2) {
-            if(is_array($arguments[1])) {
-                $attributes = $arguments[1];
-            } elseif ((is_string($arguments[1]) && \class_exists($arguments[1])) || $arguments[1] instanceof Model) {
-                $attributes = [$arguments[1]];
-            } else {
-                $guardName = $arguments[1];
-            }
-        } elseif ($argumentsCount == 3) {
-            $attributes = $arguments[1];
-            $guardName = $arguments[2];
-        }
-
-        // dd($arguments);
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
@@ -177,7 +152,7 @@ trait HasPermissions
      */
     public function hasUncachedPermissionTo($permission, $guardName = null): bool
     {
-        return $this->hasPermissionTo($permission, $guardName);
+        return $this->hasPermissionTo($permission, null, $guardName);
     }
 
     /**
@@ -191,7 +166,7 @@ trait HasPermissions
     public function checkPermissionTo($permission, $attributes = [], $guardName = null): bool
     {
         try {
-            return $this->hasPermissionTo($permission, $attributes, $guardName);
+            return $this->hasPermissionTo(func_get_args ());
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
@@ -308,7 +283,7 @@ trait HasPermissions
      */
     public function hasDirectPermission($permission, $attributes = []): bool
     {
-        // dd(\func_get_args());
+        dd(\func_get_args());
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
@@ -390,7 +365,6 @@ trait HasPermissions
     {
         if (is_string($attributes) || $attributes instanceof Model) {
             $attributes = [$attributes];
-            // dd($attributes);
         }
 
         $permissions = $this->permissionsToCollection($permissions)
@@ -416,8 +390,6 @@ trait HasPermissions
             'to' => app(GuardianRegistrar::class)->getModelFromAttributes($attributes)
         ];
 
-        // if($model->to) dd($model);
-
         if(! $model->to && config('guardian.strict.permission.assignment')) {
             throw StrictModeRestriction::assignment();
         }
@@ -426,12 +398,12 @@ trait HasPermissions
             if (! $model->to) {
                 $this->permissions()->detach($permission);
             } elseif ($model->to && ! $model->to->exists) {
-                $this->permissions()->detach($permission, ['to_type' => \get_class($model->to)]);
+                $this->permissions()->detach($permission, ['to_type' => get_class($model->to)]);
             }
             return [
                 $permission => [
                     'to_id' => $model->to && $model->to->exists ? $model->to->id : null,
-                    'to_type' => $model->to ? \get_class($model->to) : '*'
+                    'to_type' => $model->to ? get_class($model->to) : '*'
                 ]
             ];
         })->all();
@@ -445,8 +417,6 @@ trait HasPermissions
         }
 
         $permissions = $temp;
-        
-        // if($model->to) dd($permissions);
         
         if ($model->this->exists) {
             $this->permissions()->attach($permissions);
@@ -466,8 +436,6 @@ trait HasPermissions
                 }
             );
         }
-
-        // if($model->to) dd($this->permissions);
 
         $this->forgetCachedPermissions();
 

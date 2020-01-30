@@ -5,9 +5,11 @@ namespace Ghustavh97\Guardian;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use Ghustavh97\Guardian\Contracts\Role;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
+use Ghustavh97\Guardian\Contracts\PermissionPivot;
 
 class GuardianRegistrar
 {
@@ -19,6 +21,9 @@ class GuardianRegistrar
 
     /** @var string */
     protected $permissionClass;
+
+    /** @var string */
+    protected $permissionPivotClass;
 
     /** @var string */
     protected $roleClass;
@@ -42,8 +47,9 @@ class GuardianRegistrar
      */
     public function __construct(CacheManager $cacheManager)
     {
-        $this->permissionClass = config('permission.models.permission');
-        $this->roleClass = config('permission.models.role');
+        $this->permissionClass = config('guardian.models.permission');
+        $this->permissionPivotClass = config('guardian.models.permission_pivot');
+        $this->roleClass = config('guardian.models.role');
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();
@@ -51,10 +57,10 @@ class GuardianRegistrar
 
     protected function initializeCache()
     {
-        self::$cacheExpirationTime = config('permission.cache.expiration_time', config('permission.cache_expiration_time'));
+        self::$cacheExpirationTime = config('guardian.cache.expiration_time', config('guardian.cache_expiration_time'));
 
-        self::$cacheKey = config('permission.cache.key');
-        self::$cacheModelKey = config('permission.cache.model_key');
+        self::$cacheKey = config('guardian.cache.key');
+        self::$cacheModelKey = config('guardian.cache.model_key');
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
@@ -62,7 +68,7 @@ class GuardianRegistrar
     protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
     {
         // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
-        $cacheDriver = config('permission.cache.store', 'default');
+        $cacheDriver = config('guardian.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
@@ -85,9 +91,14 @@ class GuardianRegistrar
      */
     public function registerPermissions(): bool
     {
-        app(Gate::class)->before(function (Authorizable $user, string $ability) {
+        app(Gate::class)->before(function (Authorizable $user, string $ability, $attributes = []) {
+
+            // if(! \is_array($attributes)) {
+                
+            // }
+            $guardName = array_key_exists(1, $attributes) ? $attributes[1] : null;
             if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability) ?: null;
+                return $user->checkPermissionTo($ability, $attributes, $guardName) ?: null;
             }
         });
 
@@ -138,6 +149,33 @@ class GuardianRegistrar
     public function getPermissionClass(): Permission
     {
         return app($this->permissionClass);
+    }
+
+    /**
+     * Get an instance of the permissionPivot class.
+     *
+     * @return \Ghustavh97\Guardian\Contracts\PermissionPivot
+     */
+    public function getPermissionPivotClass(): PermissionPivot
+    {
+        return app($this->permissionPivotClass);
+    }
+
+    public function getModelFromAttributes($attributes = [])
+    {
+        if(count($attributes)) {
+            $model = $attributes[0];
+
+            if(is_string($model)) {
+                return new $model;
+            }
+
+            if($model instanceof Model) {
+                return $model;
+            }
+        }
+
+        return null;
     }
 
     public function setPermissionClass($permissionClass)
