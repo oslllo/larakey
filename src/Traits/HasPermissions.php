@@ -13,6 +13,7 @@ use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
 
 trait HasPermissions
 {
@@ -50,6 +51,28 @@ trait HasPermissions
             config('guardian.column_names.model_morph_key'),
             'permission_id'
         )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
+    }
+
+    protected function convertPipeToArray(string $pipeString)
+    {
+        $pipeString = trim($pipeString);
+
+        if (strlen($pipeString) <= 2) {
+            return $pipeString;
+        }
+
+        $quoteCharacter = substr($pipeString, 0, 1);
+        $endCharacter = substr($quoteCharacter, -1, 1);
+
+        if ($quoteCharacter !== $endCharacter) {
+            return explode('|', $pipeString);
+        }
+
+        if (! in_array($quoteCharacter, ["'", '"'])) {
+            return explode('|', $pipeString);
+        }
+
+        return explode('|', trim($pipeString, $quoteCharacter));
     }
 
     /**
@@ -110,6 +133,111 @@ trait HasPermissions
         }, $permissions);
     }
 
+    private function getArguments(array $arguments): array
+    {
+        $argumentCount = count($arguments);
+
+        if ($argumentCount > 3) {
+            // TODO: Throw too many arguments exception.
+        }
+
+        $permissions = $arguments[0];
+        $model = null;
+        $guardName = null;
+
+        if (is_string($permissions) && false !== strpos($permissions, '|')) {
+            $permissions = $this->convertPipeToArray($permissions);
+        }
+
+        if (is_string($permissions) || is_object($permissions)) {
+            $permissions = [$permissions];
+        }
+
+        if ($argumentCount >= 2) {
+            $secondArgument = $arguments[1];
+        }
+        
+        if ($argumentCount == 2) {
+            if ((\is_string($secondArgument) && \class_exists($secondArgument)) || $secondArgument instanceof Model) {
+                $model = $this->getPermissionModel($secondArgument);
+            } else {
+                $guardName = $secondArgument;
+            }
+        }
+
+        if ($argumentCount >= 3) {
+            $thirdArgument = $arguments[2];
+        }
+
+        if ($argumentCount == 3) {
+            if ($argumentCount == 3) {
+                $model = $this->getPermissionModel($secondArgument);
+                $guardName = $thirdArgument;
+            }
+        }
+
+        $data = [
+            'permissions' => $permissions,
+            'model' => $model,
+            'guard' => $guardName
+        ];
+
+        return $data;
+    }
+
+    private function getPermissionModel($to)
+    {
+        if (is_string($to)) {
+            if (! class_exists($to)) {
+                throw ClassDoesNotExist::check($to);
+            }
+            return new $to;
+        }
+
+        if ($to instanceof Model) {
+            return $to;
+        }
+
+        return null;
+    }
+
+    private function getPivot($model): Array
+    {
+        $toId = $model && $model->exists ? $model->id : null;
+        $toType = $model ? get_class($model) : '*';
+        return ['to_id' => $toId, 'to_type' => $toType];
+    }
+
+    // get one permission only
+    private function getPermission($permission, $guard = null): Permission
+    {
+        $permissionClass = $this->getPermissionClass();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
+
+        if (is_array($permission)) {
+            $permission = $permission[0];
+        }
+
+        if (is_string($permission)) {
+            $permission = $permissionClass->findByName($permission, $guard);
+        }
+
+        if (is_int($permission)) {
+            $permission = $permissionClass->findById($permission, $guard);
+        }
+
+        if (! $permission instanceof Permission) {
+            throw new PermissionDoesNotExist;
+        }
+
+        return $permission;
+    }
+
+    private function getGuard($guard): String
+    {
+        return $guard ? $guard : $this->getDefaultGuardName();
+    }
+
     /**
      * Determine if the model may perform the given permission.
      *
@@ -121,54 +249,8 @@ trait HasPermissions
      */
     public function hasPermissionTo(...$arguments): bool
     {
-
-        $argumentsCount = count($arguments);
-
-        if ($argumentsCount > 3) {
-            // TODO: Throw too many arguments exception.
-        }
-
-        $permission = $arguments[0];
-        $attributes = [];
-        $guardName = null;
-
-        if ($argumentsCount == 2) {
-            if(is_array($arguments[1])) {
-                $attributes = $arguments[1];
-            } elseif ((is_string($arguments[1]) && \class_exists($arguments[1])) || $arguments[1] instanceof Model) {
-                $attributes = [$arguments[1]];
-            } else {
-                $guardName = $arguments[1];
-            }
-        } elseif ($argumentsCount == 3) {
-            $attributes = $arguments[1];
-            $guardName = $arguments[2];
-        }
-
-        // dd($arguments);
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName(),
-            );
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById(
-                $permission,
-                $guardName ?? $this->getDefaultGuardName(),
-            );
-        }
-
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
-        }
-
-        //TODO: Get permission with attribute
-    
-        return $this->hasDirectPermission($permission, $attributes) || $this->hasPermissionViaRole($permission, $attributes);
+        return call_user_func_array(array($this, 'hasDirectPermission'), func_get_args())
+            || call_user_func_array(array($this, 'hasPermissionViaRole'), func_get_args());
     }
 
     /**
@@ -263,39 +345,17 @@ trait HasPermissions
      *
      * @return bool
      */
-    protected function hasPermissionViaRole(Permission $permission, $attributes = []): bool
+    protected function hasPermissionViaRole(...$arguments): bool
     {
+        $arguments = collect($this->getArguments($arguments));
+        $guard = $this->getGuard($arguments->get('guard'));
+        $permission = $this->getPermission($arguments->get('permissions'), $guard);
 
-        // $this->roles->get()
-        // $test = $this->roles->contains(function ($modelRole, $key) use ($permission) {
-        //     return $permission->roles->contatins(function ($permissionRole, $key) {
-        //         return 
-        //     });
-        // });
-
-        if(! $role = $this->hasRoleAndReturn($permission->roles)) {
+        if (! $role = $this->hasRole($permission->roles, $guard, true)) {
             return false;
         }
 
-        // return true;
-
-        return $role->hasDirectPermission($permission);
-        
-        // if(count($permission->roles))dd($permission->roles);
-        // if (! $this->hasRole($permission->roles)) {
-        //     return false;
-        // } else {
-
-        //     $role = $this->getPermissionRole($permission);
-
-        //     if(! $role->exists) {
-        //         return false;
-        //     }
-        //     return true;
-        //     return $role->permissions->contains(function ($rolePermission, $key) use ($permission) {
-        //         // return $rolePermission->id;
-        //     });
-        // }
+        return call_user_func_array(array($role, 'hasDirectPermission'), func_get_args());
     }
 
     /**
@@ -306,34 +366,23 @@ trait HasPermissions
      * @return bool
      * @throws PermissionDoesNotExist
      */
-    public function hasDirectPermission($permission, $attributes = []): bool
+    public function hasDirectPermission(...$arguments): bool
     {
-        // dd(\func_get_args());
-        $permissionClass = $this->getPermissionClass();
+        $arguments = collect($this->getArguments($arguments));
 
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
-        }
+        $guard = $this->getGuard($arguments->get('guard'));
+        $permission = $this->getPermission($arguments->get('permissions'), $guard);
+        $model = $arguments->get('model');
 
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
-        }
+        $pivot = $this->getPivot($model);
 
-        if (! $permission instanceof Permission) {
-            throw new PermissionDoesNotExist;
-        }
+        //TODO: fix id types issue.
 
-        $model = app(GuardianRegistrar::class)->getModelFromAttributes($attributes);
-        
-        $to = [
-            'id' => $model && $model->exists ? $model->id : null,
-            'type' => $model ? get_class($model) : '*'
-        ];
-
-        return $this->permissions->contains(function ($modelPermission, $key) use($model, $permission, $to) {
-            return $modelPermission->id === $permission->id 
-                && $modelPermission->to_id === $to['id'] 
-                && $modelPermission->to_type === $to['type'];
+        return $this->permissions->contains(function ($modelPermission, $key) use($model, $permission, $pivot) {
+            $modelPermissionId = ($model && $model->incrementing) ? (int) $modelPermission->id : $modelPermission->id;
+            return $modelPermissionId === $permission->id 
+                && (string) $modelPermission->to_id === (string) $pivot['to_id']
+                && (string) $modelPermission->to_type === (string) $pivot['to_type'];
         });
     }
 
@@ -371,12 +420,6 @@ trait HasPermissions
             $permissions = [$permissions];
         }
 
-        // if(is_string($permissions) || $permissions instanceof Permission) {
-        //     $permissions = [$permissions];
-        // } elseif (! is_array($permissions) && $permissions != null && ! $permissions instanceof Collection) {
-        //     // dd($permissions);
-        // }
-
         return collect($permissions);
     }
     /**
@@ -386,20 +429,18 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function givePermissionTo($permissions, $attributes = [])
+    public function givePermissionTo(...$arguments)
     {
-        if (is_string($attributes) || $attributes instanceof Model) {
-            $attributes = [$attributes];
-            // dd($attributes);
-        }
+        $arguments = collect($this->getArguments($arguments));
+        $permissions = $arguments->get('permissions');
+        $model = $arguments->get('model');
 
-        $permissions = $this->permissionsToCollection($permissions)
+        $permissions = collect($permissions)
             ->flatten()
-            ->map(function ($permission) {
+            ->map(function ($permission) use ($model) {
                 if (empty($permission)) {
                     return false;
                 }
-
                 return $this->getStoredPermission($permission);
             })
             ->filter(function ($permission) {
@@ -413,10 +454,8 @@ trait HasPermissions
 
         $model = (object) [
             'this' => $this->getModel(),
-            'to' => app(GuardianRegistrar::class)->getModelFromAttributes($attributes)
+            'to' => $model
         ];
-
-        // if($model->to) dd($model);
 
         if(! $model->to && config('guardian.strict.permission.assignment')) {
             throw StrictModeRestriction::assignment();
@@ -446,8 +485,6 @@ trait HasPermissions
 
         $permissions = $temp;
         
-        // if($model->to) dd($permissions);
-        
         if ($model->this->exists) {
             $this->permissions()->attach($permissions);
             $model->this->load('permissions');
@@ -467,11 +504,14 @@ trait HasPermissions
             );
         }
 
-        // if($model->to) dd($this->permissions);
-
         $this->forgetCachedPermissions();
 
         return $this;
+    }
+
+    private function getPermissionAttributes(array $attributes): array
+    {
+
     }
 
     /**
@@ -495,9 +535,21 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function revokePermissionTo($permission)
+    public function revokePermissionTo($permission, $attributes = [])
     {
-        $this->permissions()->detach($this->getStoredPermission($permission));
+        if(is_string($attributes)) {
+            $attributes = [$attributes];
+        }
+
+        $permission = $this->getStoredPermission($permission, $attributes);
+
+        if (count($attributes)) {
+            $detach = $this->permissions->where('to_type', $attributes[0])->where('to_id', null)->where('id', $permission->id);
+        } else {
+            $detach = $permission;
+        }
+
+        $this->permissions()->detach($detach);
 
         $this->forgetCachedPermissions();
 
@@ -516,26 +568,34 @@ trait HasPermissions
      *
      * @return \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Permission[]|\Illuminate\Support\Collection
      */
-    protected function getStoredPermission($permissions)
+    protected function getStoredPermission($permission)
     {
         $permissionClass = $this->getPermissionClass();
 
-        if (is_numeric($permissions)) {
-            return $permissionClass->findById($permissions, $this->getDefaultGuardName());
+        if ($permission instanceof Permission) {
+            return $permission;
         }
 
-        if (is_string($permissions)) {
-            return $permissionClass->findByName($permissions, $this->getDefaultGuardName());
+        if (is_numeric($permission)) {
+            return $permissionClass->findById(
+                $permission, 
+                $this->getDefaultGuardName(), 
+            );
         }
 
-        if (is_array($permissions)) {
+        if (is_string($permission)) {
+            return $permissionClass->findByName(
+                $permission, 
+                $this->getDefaultGuardName(),
+            );
+        }
+
+        if (is_array($permission)) {
             return $permissionClass
-                ->whereIn('name', $permissions)
-                ->whereIn('guard_name', $this->getGuardNames())
-                ->get();
+            ->whereIn('name', $permission)
+            ->whereIn('guard_name', $this->getGuardNames())
+            ->get();
         }
-
-        return $permissions;
     }
 
     /**

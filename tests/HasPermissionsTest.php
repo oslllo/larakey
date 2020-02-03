@@ -7,6 +7,7 @@ use Ghustavh97\Guardian\Test\Models\User;
 use Ghustavh97\Guardian\Test\Models\Post;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 
 class HasPermissionsTest extends TestCase
@@ -17,12 +18,57 @@ class HasPermissionsTest extends TestCase
         $this->testUser->givePermissionTo($this->testUserPermission);
 
         $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+        // $this->testUser->givePermissionTo('test|test|test|qweq');
 
+        // $this->testUser->givePermissionTo($this->testUserPermission);
+        // dd('done');
+
+        // $this->testUser->givePermissionTo('manage', Post::class);
+
+        // $this->testUserRole->givePermissionTo('manage', Post::class);
+
+        // $this->testUserRole->givePermissionTo($this->testUserPermission);
+        // $this->testUser->assignRole($this->testUserRole);
+
+        // dd($this->testUser->roles[0]->permissions);
+
+        // dd($this->testUserRole->permissions);
+        // dd($this->testUser->permissions);
+        // $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class));
+        // dd($this->testUserRole->permissions);
+        // dd($this->testUser->hasPermissionTo('manage', Post::class));
+        // dd($this->testUserRole);
+        // dd($this->testUserRole->hasPermissionTo('manage', User::class));
+
+        // dd($this->testUser->hasPermissionTo($this->testUserPermission));
+
+        // $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+
+        // dd()
+    }
+
+    /** @test */
+    public function it_can_assign_permission_with_class_to_a_user()
+    {
         $this->testUser->givePermissionTo('manage', Post::class);
 
-        // dd($this->testUser->permissions);
-
         $this->assertTrue($this->testUser->hasPermissionTo('manage',  Post::class));
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_assigning_a_permission_with_class_that_does_not_exist()
+    {
+        $this->expectException(ClassDoesNotExist::class);
+
+        $this->testUser->givePermissionTo('manage', '\Class\That\Does\Not\Exist');
+    }
+
+    /** @test */
+    public function it_can_assign_permission_with_model_to_a_user()
+    {
+        $this->testUser->givePermissionTo('manage', $this->testUserPost);
+
+        $this->assertTrue($this->testUser->hasPermissionTo('manage', $this->testUserPost));
     }
 
     /** @test */
@@ -37,12 +83,24 @@ class HasPermissionsTest extends TestCase
     public function it_throws_an_exception_when_assigning_a_permission_to_a_user_from_a_different_guard()
     {
         $this->expectException(GuardDoesNotMatch::class);
-
+        // dd($this->testAdminPermission);
         $this->testUser->givePermissionTo($this->testAdminPermission);
 
         $this->expectException(PermissionDoesNotExist::class);
 
         $this->testUser->givePermissionTo('admin-permission');
+    }
+
+    /** @test */
+    public function it_can_revoke_a_permission_with_class_from_a_user()
+    {
+        $this->testUser->givePermissionTo('manage', Post::class);
+
+        $this->assertTrue($this->testUser->hasPermissionTo('manage',  Post::class));
+
+        $this->testUser->revokePermissionTo('manage', Post::class);
+
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', Post::class));
     }
 
     /** @test */

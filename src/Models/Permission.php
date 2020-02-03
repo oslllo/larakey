@@ -34,10 +34,6 @@ class Permission extends Model implements PermissionContract
         $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
 
         $model = $this->getModel();
-
-        // if($model->pivot)dd($this->getModel());
-        // if($this->pivot) dd($this);
-        // echo get_parent_class($this);
     }
 
     public static function create(array $attributes = [])
@@ -51,6 +47,10 @@ class Permission extends Model implements PermissionContract
         }
 
         return static::query()->create($attributes);
+    }
+
+    public function setIdAttribute($value) {
+        $this->attributes['id'] = (int) $value;
     }
 
     /**
@@ -127,18 +127,9 @@ class Permission extends Model implements PermissionContract
 
     private static function permissionQueryBuilder(array $query)
     {
-        return static::getPermissions($query)->first();
+        $permission = static::getPermissions($query);
 
-        // $model = app(GuardianRegistrar::class)->getModelFromAttributes($attributes);
-
-        // if($model) {
-        //     $permission = $permission->wherePivot([
-        //         'to_id' => $model->exists ? $model->id : null,
-        //         'to_type' => get_class($model)
-        //     ]);
-        // }
-
-        // return $permission->first();
+        return $permission->first();
     }
 
     /**
@@ -173,8 +164,6 @@ class Permission extends Model implements PermissionContract
 
     public function getToIdAttribute()
     {
-        // return $this->pivot->to_id;
-        // return $this->pivot ? $this->pivot->to_id : null;
         if($this->pivot) {
             return $this->pivot->to_id;
         }
@@ -185,7 +174,5 @@ class Permission extends Model implements PermissionContract
         if($this->pivot) {
             return $this->pivot->to_type;
         }
-        // return $this->pivot ? $this->pivot->to_type : null;
-        // return $this->pivot->to_type;
     }
 }

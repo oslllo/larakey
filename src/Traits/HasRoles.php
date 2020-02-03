@@ -176,51 +176,15 @@ trait HasRoles
      * @param string|null $guard
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+
+    public function hasRole($roles, string $guard = null, bool $returnRole = false)
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
-
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
-        }
-
-        if (is_int($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
-        }
-
-        if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
-        }
-
-        if (is_array($roles)) {
-            foreach ($roles as $role) {
-                if ($this->hasRole($role, $guard)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
-        
-    }
-
-    public function hasRoleAndReturn($roles, string $guard = null)
-    {
-        if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->convertPipeToArray($roles);
-        }
-
-        if (is_string($roles)) {
-            $query = $this->$roles->where('name', $roles);
+            $query = $this->roles->where('name', $roles);
 
             if($guard) {
                 $query = $query->where('guard_name', $guard);
@@ -228,7 +192,7 @@ trait HasRoles
         }
 
         if (is_int($roles)) {
-            $query = $this->$roles->where('id', $roles);
+            $query = $this->roles->where('id', $roles);
 
             if($guard) {
                 $query = $query->where('guard_name', $guard);
@@ -243,25 +207,17 @@ trait HasRoles
 
         if (! $role && is_array($roles)) {
             collect($roles)->each(function($value) use(&$role, $guard) {
-                if ($role = $this->hasRole($role, $guard)) {
+                if ($role = $this->hasRole($value, $guard, true)) {
                     return false;
                 }
             });
         }
 
-        if ($role) {
-            return $role;
+        if (! $role && $roles instanceof Collection) {
+            $role = $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->first();
         }
 
-        // if (is_array($roles)) {
-        //     foreach ($roles as $role) {
-        //         if ($role = $this->hasRole($role, $guard)) {
-        //             break;;
-        //         }
-        //     }
-        // }
-
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->first();
+        return $returnRole ? $role : boolval($role);
 
     }
 
@@ -299,7 +255,6 @@ trait HasRoles
         }
 
         return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
-        
     }
 
     /**

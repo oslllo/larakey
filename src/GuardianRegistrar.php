@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Ghustavh97\Guardian\Contracts\PermissionPivot;
+use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
 
 class GuardianRegistrar
 {
@@ -163,14 +164,17 @@ class GuardianRegistrar
 
     public function getModelFromAttributes($attributes = [])
     {
-        if(count($attributes)) {
+        if (count($attributes)) {
             $model = $attributes[0];
 
-            if(is_string($model)) {
+            if (is_string($model)) {
+                if (! class_exists($model)) {
+                    throw ClassDoesNotExist::check($model);
+                }
                 return new $model;
             }
 
-            if($model instanceof Model) {
+            if ($model instanceof Model) {
                 return $model;
             }
         }
