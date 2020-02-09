@@ -93,10 +93,6 @@ class GuardianRegistrar
     public function registerPermissions(): bool
     {
         app(Gate::class)->before(function (Authorizable $user, string $ability, $attributes = []) {
-
-            // if(! \is_array($attributes)) {
-                
-            // }
             $guardName = array_key_exists(1, $attributes) ? $attributes[1] : null;
             if (method_exists($user, 'checkPermissionTo')) {
                 return $user->checkPermissionTo($ability, $attributes, $guardName) ?: null;

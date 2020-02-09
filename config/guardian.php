@@ -8,6 +8,8 @@ return [
         ]
     ],
 
+    'revoke_recursion' => false,
+
     'models' => [
 
         /*

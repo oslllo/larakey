@@ -23,9 +23,6 @@ class MultipleGuardsTest extends TestCase
 
         $this->testUser->givePermissionTo($doThat);
 
-        // dd($this->testUser->permissions);
-
-        // $this->assertTrue($this->testUser->hasPermissionTo('do_this', 'web'));
         $this->assertTrue($this->testUser->hasPermissionTo('do_that', 'api'));
     }
 

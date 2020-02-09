@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Guardian\Models\PermissionPivot;
 use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\PermissionNotAssigned;
 use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
 
 trait HasPermissions
@@ -83,32 +85,54 @@ trait HasPermissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopePermission(Builder $query, $permissions): Builder
+    public function scopePermission(Builder $query, $permissions, $pivot = null): Builder
     {
+        $pivot = $this->getPivot($pivot);
+
         $permissions = $this->convertToPermissionModels($permissions);
 
         $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
             return array_merge($result, $permission->roles->all());
         }, []));
 
-        return $query->where(function ($query) use ($permissions, $rolesWithPermissions) {
-            $query->whereHas('permissions', function ($query) use ($permissions) {
+        $query = $query->where(function ($query) use ($permissions, $rolesWithPermissions, $pivot) {
+
+            $query->whereHas('permissions', function ($query) use ($permissions, $pivot) {
+
+                $query->where(config('guardian.table_names.model_has_permissions').'.to_id', $pivot['to_id']);
+                $query->where(config('guardian.table_names.model_has_permissions').'.to_type', $pivot['to_type']);
+
                 $query->where(function ($query) use ($permissions) {
                     foreach ($permissions as $permission) {
                         $query->orWhere(config('guardian.table_names.permissions').'.id', $permission->id);
                     }
                 });
             });
+            
             if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions) {
-                    $query->where(function ($query) use ($rolesWithPermissions) {
+                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions, $permissions, $pivot) {
+                    $query->where(function ($query) use ($rolesWithPermissions, $permissions, $pivot) {
                         foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('guardian.table_names.roles').'.id', $role->id);
+                            $query->orWhere(config('guardian.table_names.roles').'.id', $role->id)
+                            ->whereHas('permissions', function ($query) use ($permissions, $pivot) {
+
+                                $query->where(config('guardian.table_names.model_has_permissions').'.to_id', $pivot['to_id']);
+                                $query->where(config('guardian.table_names.model_has_permissions').'.to_type', $pivot['to_type']);
+
+
+                                $query->where(function ($query) use ($permissions) {
+                                    foreach ($permissions as $permission) {
+                                        $query->orWhere(config('guardian.table_names.permissions').'.id', $permission->id);
+                                    }
+                                });
+                            });
                         }
                     });
                 });
             }
         });
+
+        return $query;
     }
 
     /**
@@ -135,52 +159,57 @@ trait HasPermissions
 
     private function getArguments(array $arguments): array
     {
-        $argumentCount = count($arguments);
 
-        if ($argumentCount > 3) {
+        if (count($arguments) > 4) {
             // TODO: Throw too many arguments exception.
-        }
-
-        $permissions = $arguments[0];
-        $model = null;
-        $guardName = null;
-
-        if (is_string($permissions) && false !== strpos($permissions, '|')) {
-            $permissions = $this->convertPipeToArray($permissions);
-        }
-
-        if (is_string($permissions) || is_object($permissions)) {
-            $permissions = [$permissions];
-        }
-
-        if ($argumentCount >= 2) {
-            $secondArgument = $arguments[1];
-        }
-        
-        if ($argumentCount == 2) {
-            if ((\is_string($secondArgument) && \class_exists($secondArgument)) || $secondArgument instanceof Model) {
-                $model = $this->getPermissionModel($secondArgument);
-            } else {
-                $guardName = $secondArgument;
-            }
-        }
-
-        if ($argumentCount >= 3) {
-            $thirdArgument = $arguments[2];
-        }
-
-        if ($argumentCount == 3) {
-            if ($argumentCount == 3) {
-                $model = $this->getPermissionModel($secondArgument);
-                $guardName = $thirdArgument;
-            }
+            throw new \Exception('Too many arguments');
         }
 
         $data = [
-            'permissions' => $permissions,
-            'model' => $model,
-            'guard' => $guardName
+            'permissions' => null,
+            'model' => null,
+            'guard' => null,
+            'recursive' => null
         ];
+
+        foreach ($arguments as $key => $value) {
+            if ($data['permissions'] === null && $key === 0) {
+
+                $permissions = $value;
+
+                if (is_string($permissions) && false !== strpos($permissions, '|')) {
+                    $permissions = $this->convertPipeToArray($permissions);
+                }
+        
+                if (is_string($permissions) || is_object($permissions)) {
+                    $permissions = [$permissions];
+                }
+                
+                $data['permissions'] = $permissions;
+
+                continue;
+            }
+
+            if ($data['model'] === null
+                &&  (\is_string($value) && \strpos($value, '\\') !== false) 
+                || $value instanceof Model) {
+                    $data['model'] = $this->getPermissionModel($value);
+            }
+
+            if ($data['guard'] === null && is_string($value) 
+                && !is_bool($value) 
+                && !\strpos($value, '\\') !== false) {
+                $data['guard'] = $value;
+            }
+
+            if ($data['recursive'] === null && \is_bool($value)) {
+                $data['recursive'] = $value;
+            }
+        }
+
+        if($data['recursive'] === null) {
+            $data['recursive'] = config('guardian.revoke_recursion');
+        }
 
         return $data;
     }
@@ -203,8 +232,22 @@ trait HasPermissions
 
     private function getPivot($model): Array
     {
-        $toId = $model && $model->exists ? $model->id : null;
-        $toType = $model ? get_class($model) : '*';
+        if ($model instanceof Model && $model->exists) {
+            $toId = $model->id;
+            $toType = \get_class($model);
+        } elseif ($model instanceof Model && ! $model->exists) {
+            $toId = '*';
+            $toType = \get_class($model);
+        } elseif (is_string($model)) {
+            if (! class_exists($model)) {
+                throw ClassDoesNotExist::check($model);
+            }
+            $toId = '*';
+            $toType = $model;
+        } else {
+            $toId = '*';
+            $toType = '*';
+        }
         return ['to_id' => $toId, 'to_type' => $toType];
     }
 
@@ -373,16 +416,12 @@ trait HasPermissions
         $guard = $this->getGuard($arguments->get('guard'));
         $permission = $this->getPermission($arguments->get('permissions'), $guard);
         $model = $arguments->get('model');
-
         $pivot = $this->getPivot($model);
 
-        //TODO: fix id types issue.
-
-        return $this->permissions->contains(function ($modelPermission, $key) use($model, $permission, $pivot) {
-            $modelPermissionId = ($model && $model->incrementing) ? (int) $modelPermission->id : $modelPermission->id;
-            return $modelPermissionId === $permission->id 
-                && (string) $modelPermission->to_id === (string) $pivot['to_id']
-                && (string) $modelPermission->to_type === (string) $pivot['to_type'];
+        return $this->permissions->contains(function ($thisPermission, $key) use($model, $permission, $pivot) {
+            return (string) $thisPermission->id === (string) $permission->id
+                && ((string) $thisPermission->to_id === (string) $pivot['to_id'] || (string) $thisPermission->to_id === '*')
+                && ((string) $thisPermission->to_type === (string) $pivot['to_type'] || (string) $thisPermission->to_type === '*');
         });
     }
 
@@ -462,18 +501,22 @@ trait HasPermissions
         }
 
         $permissions = collect($permissions)->map(function ($permission, $key) use($model) {
-            if (! $model->to) {
-                $this->permissions()->detach($permission);
-            } elseif ($model->to && ! $model->to->exists) {
-                $this->permissions()->detach($permission, ['to_type' => \get_class($model->to)]);
+            $pivot = $this->getPivot($model->to);
+
+            if ($this->permissions()
+                    ->where('id', $permission)
+                    ->wherePivot('to_id', $pivot['to_id'])
+                    ->wherePivot('to_type', $pivot['to_type'])
+                    ->first()) {
+                return false;
             }
-            return [
-                $permission => [
-                    'to_id' => $model->to && $model->to->exists ? $model->to->id : null,
-                    'to_type' => $model->to ? \get_class($model->to) : '*'
-                ]
-            ];
-        })->all();
+
+            return array($permission => $pivot);
+        })
+        ->reject(function ($value) {
+            return $value === false;
+        })
+        ->all();
         
         $temp = [];
 
@@ -528,6 +571,13 @@ trait HasPermissions
         return $this->givePermissionTo($permissions);
     }
 
+    private function pivotIs($level)
+    {
+        switch ($level) {
+
+        }
+    }
+
     /**
      * Revoke the given permission.
      *
@@ -535,21 +585,49 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function revokePermissionTo($permission, $attributes = [])
+    public function revokePermissionTo(...$arguments)
     {
-        if(is_string($attributes)) {
-            $attributes = [$attributes];
+        $arguments = collect($this->getArguments($arguments));
+        $permissions = $arguments->get('permissions');
+        $model = $arguments->get('model');
+        $recursive = $arguments->get('recursive');
+        $pivot = $this->getPivot($model);
+
+        foreach ($permissions as $permission) {
+
+            if (! $permission instanceof Permission) {
+                $permission = $this->getPermission($permission);
+            }
+
+            $id = $permission->id;
+
+            if ($pivot['to_type'] === '*' && $pivot['to_id'] === '*') {
+                $permission = $this->permissions()->where('id', $permission->id);
+                if (! $recursive) {
+                    $permission = $permission->wherePivot('to_type', '*')
+                                             ->wherePivot('to_type', '*');
+                }
+            } elseif (($pivot['to_type'] !== '*' && $pivot['to_id'] === '*')) {
+                $permission = $this->permissions()
+                                ->where('id', $permission->id)
+                                ->wherePivot('to_type', $pivot['to_type']);
+                if(! $recursive) {
+                    $permission = $permission->wherePivot('to_id', '*');
+                }
+
+            } else {
+                $permission = $this->permissions()
+                                ->where('id', $permission->id)
+                                ->wherePivot('to_type', $pivot['to_type'])
+                                ->wherePivot('to_id', $pivot['to_id']);
+            }
+
+            if (! $permission->first()) {
+                throw new PermissionNotAssigned;
+            }
+
+            $permission->detach($id);
         }
-
-        $permission = $this->getStoredPermission($permission, $attributes);
-
-        if (count($attributes)) {
-            $detach = $this->permissions->where('to_type', $attributes[0])->where('to_id', null)->where('id', $permission->id);
-        } else {
-            $detach = $permission;
-        }
-
-        $this->permissions()->detach($detach);
 
         $this->forgetCachedPermissions();
 

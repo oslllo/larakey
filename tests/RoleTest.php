@@ -80,15 +80,6 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    // public function it_can_be_given_multiple_permissions_using_multiple_arguments()
-    // {
-    //     $this->testUserRole->givePermissionTo('edit-articles', 'edit-news');
-
-    //     $this->assertTrue($this->testUserRole->hasPermissionTo('edit-articles'));
-    //     $this->assertTrue($this->testUserRole->hasPermissionTo('edit-news'));
-    // }
-
-    /** @test */
     public function it_can_sync_permissions()
     {
         $this->testUserRole->givePermissionTo('edit-articles');

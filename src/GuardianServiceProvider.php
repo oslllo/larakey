@@ -51,8 +51,9 @@ class GuardianServiceProvider extends ServiceProvider
                 if (config('guardian.strict.permission.assignment')) {
                     throw StrictModeRestriction::assignment();
                 }
+
                 if (! $permission->to_id) {
-                    $permission->to_id = null;
+                    $permission->to_id = '*';
                 }
 
                 if (! $permission->to_type) {

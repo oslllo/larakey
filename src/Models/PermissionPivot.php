@@ -13,9 +13,11 @@ class PermissionPivot extends MorphPivot implements PermissionPivotContract
 
     protected $guarded = [];
 
+    protected $table;
+
     public function __construct(array $attributes = [])
     {
-        $attributes['table'] = config('guardian.table_names.model_has_permissions');
+        $this->table = config('guardian.table_names.model_has_permissions');
         parent::__construct($attributes);
     }
 }
