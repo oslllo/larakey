@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Ghustavh97\Guardian\Contracts\PermissionPivot;
+use Ghustavh97\Guardian\Contracts\ModelHasPermission;
 use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
 
 class GuardianRegistrar
@@ -24,7 +24,7 @@ class GuardianRegistrar
     protected $permissionClass;
 
     /** @var string */
-    protected $permissionPivotClass;
+    protected $ModelHasPermissionClass;
 
     /** @var string */
     protected $roleClass;
@@ -32,11 +32,17 @@ class GuardianRegistrar
     /** @var \Illuminate\Support\Collection */
     protected $permissions;
 
+    /** @var \Illuminate\Support\Collection */
+    protected $roles;
+
     /** @var DateInterval|int */
     public static $cacheExpirationTime;
 
     /** @var string */
-    public static $cacheKey;
+    public static $cachePermissionKey;
+
+    /** @var string */
+    public static $cacheRoleKey;
 
     /** @var string */
     public static $cacheModelKey;
@@ -49,7 +55,7 @@ class GuardianRegistrar
     public function __construct(CacheManager $cacheManager)
     {
         $this->permissionClass = config('guardian.models.permission');
-        $this->permissionPivotClass = config('guardian.models.permission_pivot');
+        $this->ModelHasPermissionClass = config('guardian.models.permission_pivot');
         $this->roleClass = config('guardian.models.role');
 
         $this->cacheManager = $cacheManager;
@@ -60,7 +66,10 @@ class GuardianRegistrar
     {
         self::$cacheExpirationTime = config('guardian.cache.expiration_time', config('guardian.cache_expiration_time'));
 
-        self::$cacheKey = config('guardian.cache.key');
+        self::$cachePermissionKey = config('guardian.cache.permission_key');
+
+        self::$cacheRoleKey = config('guardian.cache.role_key');
+        
         self::$cacheModelKey = config('guardian.cache.model_key');
 
         $this->cache = $this->getCacheStoreFromConfig();
@@ -103,13 +112,19 @@ class GuardianRegistrar
     }
 
     /**
-     * Flush the cache.
+     * Flush the cache permissions.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions($reload = false)
     {
         $this->permissions = null;
 
-        return $this->cache->forget(self::$cacheKey);
+        $forgotten = $this->cache->forget(self::$cachePermissionKey);
+
+        if ($reload) {
+            $this->getPermissions();
+        }
+
+        return $forgotten;
     }
 
     /**
@@ -122,7 +137,7 @@ class GuardianRegistrar
     public function getPermissions(array $params = []): Collection
     {
         if ($this->permissions === null) {
-            $this->permissions = $this->cache->remember(self::$cacheKey, self::$cacheExpirationTime, function () {
+            $this->permissions = $this->cache->remember(self::$cachePermissionKey, self::$cacheExpirationTime, function () {
                 return $this->getPermissionClass()
                     ->with('roles')
                     ->get();
@@ -139,6 +154,52 @@ class GuardianRegistrar
     }
 
     /**
+     * Flush the cache roles.
+     */
+    public function forgetCachedRoles($reload = false)
+    {
+        $this->roles = null;
+
+        $forgotten = $this->cache->forget(self::$cacheRoleKey);
+
+        if ($reload) {
+            $this->getRoles();
+        }
+
+        return $forgotten;
+    }
+
+    public function getRoles(array $params = []): Collection
+    {   
+        if ($this->roles === null) {
+            $this->roles = $this->cache->remember(self::$cacheRoleKey, self::$cacheExpirationTime, function () {
+                return $this->getRoleClass()
+                    ->with('permissions')
+                    ->get();
+            });
+        }
+
+        $roles = clone $this->roles;
+
+        foreach ($params as $attr => $value) {
+            $roles = $roles->where($attr, $value);
+        }
+
+        return $roles;
+    }
+
+    public function loadCache()
+    {
+        $this->getPermissions();
+        $this->getRoles();
+    }
+
+    public function flushCache()
+    {
+        return $this->forgetCachedPermissions() && $this->forgetCachedRoles();
+    }
+
+    /**
      * Get an instance of the permission class.
      *
      * @return \Ghustavh97\Guardian\Contracts\Permission
@@ -149,13 +210,23 @@ class GuardianRegistrar
     }
 
     /**
-     * Get an instance of the permissionPivot class.
+     * Get an instance of the role class.
      *
-     * @return \Ghustavh97\Guardian\Contracts\PermissionPivot
+     * @return \Ghustavh97\Guardian\Contracts\Role
      */
-    public function getPermissionPivotClass(): PermissionPivot
+    public function getRoleClass(): Role
     {
-        return app($this->permissionPivotClass);
+        return app($this->roleClass);
+    }
+
+    /**
+     * Get an instance of the ModelHasPermission class.
+     *
+     * @return \Ghustavh97\Guardian\Contracts\ModelHasPermission
+     */
+    public function getModelHasPermissionClass(): ModelHasPermission
+    {
+        return app($this->ModelHasPermissionClass);
     }
 
     public function getModelFromAttributes($attributes = [])
@@ -185,14 +256,11 @@ class GuardianRegistrar
         return $this;
     }
 
-    /**
-     * Get an instance of the role class.
-     *
-     * @return \Ghustavh97\Guardian\Contracts\Role
-     */
-    public function getRoleClass(): Role
+    public function setRoleClass($roleClass)
     {
-        return app($this->roleClass);
+        $this->roleClass = $roleClass;
+
+        return $this;
     }
 
     /**

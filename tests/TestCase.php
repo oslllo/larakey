@@ -44,15 +44,17 @@ abstract class TestCase extends Orchestra
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
 
+        // dd($this->testUserPermission = app(Role::class)->all());
+
         $this->testUser = User::email('testUser@test.com')->first();
         $this->testUserPost = $this->testUser->posts()->create(['title' => 'Test Title', 'description' => 'Test description']);
-        $this->testUserRole = app(Role::class)->findByName('testUserRole');
+        $this->testUserRole = app(Role::class)->where(['name' => 'testUserRole'])->first();
         // TODO: A test fails if permission is not ->first()
         $this->testUserPermission = app(Permission::class)->where(['name' => 'edit-articles'])->first();
         // dd($this->testUserPermission);
 
         $this->testAdmin = Admin::email('testAdmin@test.com')->first();
-        $this->testAdminRole = app(Role::class)->findByName('testAdminRole', 'admin');
+        $this->testAdminRole = app(Role::class)->where(['name' => 'testAdminRole', 'guard_name' => 'admin'])->first();
         $this->testAdminPermission = app(Permission::class)->where(['name' => 'admin-permission', 'guard_name' => 'admin'])->first();
     }
 
@@ -162,6 +164,8 @@ abstract class TestCase extends Orchestra
         // $app[Permission::class]->create(['name' => 'view-post']);
 
         $app[Permission::class]->create(['name' => 'create-comment']);
+        // dd($app[Role::class]->all());
+        // dd($app[Permission::class]->findByName('testUserRole'), 'test');
     }
 
     /**

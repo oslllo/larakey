@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Contracts\Permission;
-use Ghustavh97\Guardian\Models\PermissionPivot;
+use Ghustavh97\Guardian\Models\ModelHasPermission;
 use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 use Ghustavh97\Guardian\Exceptions\PermissionNotAssigned;
 use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
+
+use Illuminate\Support\Facades\DB;
 
 trait HasPermissions
 {
@@ -159,7 +161,6 @@ trait HasPermissions
 
     private function getArguments(array $arguments): array
     {
-
         if (count($arguments) > 4) {
             // TODO: Throw too many arguments exception.
             throw new \Exception('Too many arguments');
@@ -297,15 +298,6 @@ trait HasPermissions
     }
 
     /**
-     * @deprecated since 2.35.0
-     * @alias of hasPermissionTo()
-     */
-    public function hasUncachedPermissionTo($permission, $guardName = null): bool
-    {
-        return $this->hasPermissionTo($permission, $guardName);
-    }
-
-    /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
      * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
@@ -394,9 +386,18 @@ trait HasPermissions
         $guard = $this->getGuard($arguments->get('guard'));
         $permission = $this->getPermission($arguments->get('permissions'), $guard);
 
-        if (! $role = $this->hasRole($permission->roles, $guard, true)) {
-            return false;
+        if ($this instanceof Role) {
+            $role = $this;
         }
+
+        if (! isset($role)) {
+            if (! $role = $this->hasRole($permission->roles, $guard, true)) {
+                return false;
+            }
+        }
+
+        // Get same role but with permissions
+        $role = $this->getRole($role->id, $role->guard_name);
 
         return call_user_func_array(array($role, 'hasDirectPermission'), func_get_args());
     }
@@ -411,6 +412,7 @@ trait HasPermissions
      */
     public function hasDirectPermission(...$arguments): bool
     {
+        // var_dump('Checking direct permission');
         $arguments = collect($this->getArguments($arguments));
 
         $guard = $this->getGuard($arguments->get('guard'));
@@ -549,6 +551,10 @@ trait HasPermissions
 
         $this->forgetCachedPermissions();
 
+        if (\method_exists($this, 'forgetCachedRoles') && $this instanceof Role) {
+            $this->forgetCachedRoles();
+        }
+
         return $this;
     }
 
@@ -631,6 +637,10 @@ trait HasPermissions
 
         $this->forgetCachedPermissions();
 
+        if (\method_exists($this, 'forgetCachedRoles')) {
+            $this->forgetCachedRoles();
+        }
+
         $this->load('permissions');
 
         return $this;
@@ -701,8 +711,8 @@ trait HasPermissions
     /**
      * Forget the cached permissions.
      */
-    public function forgetCachedPermissions()
+    public function forgetCachedPermissions($reload = false)
     {
-        app(GuardianRegistrar::class)->forgetCachedPermissions();
+        app(GuardianRegistrar::class)->forgetCachedPermissions($reload);
     }
 }

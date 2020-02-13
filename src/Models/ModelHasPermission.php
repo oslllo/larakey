@@ -2,10 +2,10 @@
 
 namespace Ghustavh97\Guardian\Models;
 
-use Ghustavh97\Guardian\Contracts\PermissionPivot as PermissionPivotContract;
+use Ghustavh97\Guardian\Contracts\ModelHasPermission as ModelHasPermissionContract;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 
-class PermissionPivot extends MorphPivot implements PermissionPivotContract
+class ModelHasPermission extends MorphPivot implements ModelHasPermissionContract
 {
     public $incrementing = false;
 

@@ -11,7 +11,7 @@ use Ghustavh97\Guardian\Contracts\Role as RoleContract;
 use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
 use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
-use Ghustavh97\Guardian\Models\PermissionPivot;
+use Ghustavh97\Guardian\Models\ModelHasPermission;
 
 class GuardianServiceProvider extends ServiceProvider
 {
@@ -44,9 +44,9 @@ class GuardianServiceProvider extends ServiceProvider
             return $permissionLoader;
         });
 
-        $permissionPivot = app(GuardianRegistrar::class)->getPermissionPivotClass();
+        $ModelHasPermission = app(GuardianRegistrar::class)->getModelHasPermissionClass();
 
-        $permissionPivot::creating(function ($permission) {
+        $ModelHasPermission::creating(function ($permission) {
             if (! $permission->to_id || ! $permission->to_type) {
                 if (config('guardian.strict.permission.assignment')) {
                     throw StrictModeRestriction::assignment();

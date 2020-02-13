@@ -13,7 +13,7 @@ class CacheReset extends Command
 
     public function handle()
     {
-        if (app(GuardianRegistrar::class)->forgetCachedPermissions()) {
+        if (app(GuardianRegistrar::class)->flushCache()) {
             $this->info('Permission cache flushed.');
         } else {
             $this->error('Unable to flush cache.');

@@ -99,7 +99,7 @@ class Permission extends Model implements PermissionContract
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::permissionQueryBuilder(['name' => $name, 'guard_name' => $guardName]);
+        $permission = static::findPermissionByQuery(['name' => $name, 'guard_name' => $guardName]);
         
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
@@ -121,7 +121,7 @@ class Permission extends Model implements PermissionContract
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::permissionQueryBuilder(['id' => $id, 'guard_name' => $guardName]);
+        $permission = static::findPermissionByQuery(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
@@ -130,7 +130,7 @@ class Permission extends Model implements PermissionContract
         return $permission;
     }
 
-    private static function permissionQueryBuilder(array $query)
+    private static function findPermissionByQuery(array $query)
     {
         $permission = static::getPermissions($query);
 

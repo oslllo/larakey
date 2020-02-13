@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRoles
@@ -134,7 +135,13 @@ trait HasRoles
                 });
         }
 
+        //! I don't see the use of this
+
         $this->forgetCachedPermissions();
+
+        // $this->forgetCachedRoles(true);
+        $this->forgetCachedRoles();
+
 
         return $this;
     }
@@ -151,6 +158,8 @@ trait HasRoles
         $this->load('roles');
 
         $this->forgetCachedPermissions();
+
+        $this->forgetCachedRoles();
 
         return $this;
     }
@@ -169,6 +178,30 @@ trait HasRoles
         return $this->assignRole($roles);
     }
 
+    public function getRole($role, $guard = null): Role
+    {
+        $roleClass = $this->getRoleClass();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
+
+        if (is_array($role)) {
+            $role = $role[0];
+        }
+
+        if (is_string($role)) {
+            $role = $roleClass->findByName($role, $guard);
+        }
+
+        if (is_int($role)) {
+            $role = $roleClass->findById($role, $guard);
+        }
+
+        if (! $role instanceof Role) {
+            throw new RoleDoesNotExist;
+        }
+
+        return $role;
+    }
+
     /**
      * Determine if the model has (one of) the given role(s).
      *
@@ -179,28 +212,27 @@ trait HasRoles
 
     public function hasRole($roles, string $guard = null, bool $returnRole = false)
     {
+        $roleClass = $this->getRoleClass();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
+
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
             $query = $this->roles->where('name', $roles);
-
-            if($guard) {
-                $query = $query->where('guard_name', $guard);
-            }
         }
 
         if (is_int($roles)) {
             $query = $this->roles->where('id', $roles);
-
-            if($guard) {
-                $query = $query->where('guard_name', $guard);
-            }
         }
 
         if ($roles instanceof Role) {
             $query = $this->roles->where('id', $roles->id);
+        }
+
+        if (isset($query)) {
+            $query = $query->where('guard_name', $guard);
         }
 
         $role = isset($query) ? $query->first() : null;
@@ -219,42 +251,6 @@ trait HasRoles
 
         return $returnRole ? $role : boolval($role);
 
-    }
-
-    public function hasRoleWithPermission($roles, string $guard = null, $model = null): bool
-    {
-        if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->convertPipeToArray($roles);
-        }
-
-        if (is_string($roles)) {
-
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
-        }
-
-        if (is_int($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
-        }
-
-        if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
-        }
-
-        if (is_array($roles)) {
-            foreach ($roles as $role) {
-                if ($this->hasRole($role, $guard)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
     }
 
     /**
@@ -352,5 +348,13 @@ trait HasRoles
         }
 
         return explode('|', trim($pipeString, $quoteCharacter));
+    }
+
+    /**
+     * Forget the cached roles.
+     */
+    public function forgetCachedRoles($reload = false)
+    {
+        app(GuardianRegistrar::class)->forgetCachedRoles($reload);
     }
 }

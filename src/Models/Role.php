@@ -3,7 +3,9 @@
 namespace Ghustavh97\Guardian\Models;
 
 use Ghustavh97\Guardian\Guard;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Traits\HasPermissions;
 use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
 use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
@@ -33,7 +35,9 @@ class Role extends Model implements RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+        $role = static::getRoles(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
+
+        if ($role) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
@@ -82,7 +86,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::findRoleByQuery(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -95,13 +99,20 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('id', $id)->where('guard_name', $guardName)->first();
+        $role = static::findRoleByQuery(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
         }
 
         return $role;
+    }
+
+    private static function findRoleByQuery(array $query)
+    {
+        $role = static::getRoles($query);
+        
+        return $role->first();
     }
 
     /**
@@ -116,13 +127,23 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::getRoles(['name' => $name, 'guard_name' => $guardName])->first();
 
         if (! $role) {
             return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
         }
 
         return $role;
+    }
+
+    /**
+     * Get the current cached roles.
+     */
+    protected static function getRoles(array $params = []): Collection
+    {
+        return app(GuardianRegistrar::class)
+            ->setRoleClass(static::class)
+            ->getRoles($params);
     }
 
     /**
@@ -149,7 +170,7 @@ class Role extends Model implements RoleContract
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
-
-        return $this->permissions->contains('id', $permission->id);
+        
+        return $this->hasDirectPermission($permission);
     }
 }

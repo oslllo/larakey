@@ -23,7 +23,7 @@ return [
 
         'permission' => Ghustavh97\Guardian\Models\Permission::class,
 
-        'permission_pivot' => Ghustavh97\Guardian\Models\PermissionPivot::class,
+        'permission_pivot' => Ghustavh97\Guardian\Models\ModelHasPermission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -115,7 +115,9 @@ return [
          * The cache key used to store all permissions.
          */
 
-        'key' => 'spatie.permission.cache',
+        'permission_key' => 'guardian.permission.cache',
+
+        'role_key' => 'guardian.role.cache',
 
         /*
          * When checking for a permission against a model by passing a Permission

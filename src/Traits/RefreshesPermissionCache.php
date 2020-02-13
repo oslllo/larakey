@@ -10,10 +10,13 @@ trait RefreshesPermissionCache
     {
         static::saved(function () {
             app(GuardianRegistrar::class)->forgetCachedPermissions();
+            app(GuardianRegistrar::class)->forgetCachedRoles();
         });
 
         static::deleted(function () {
             app(GuardianRegistrar::class)->forgetCachedPermissions();
+            app(GuardianRegistrar::class)->forgetCachedRoles();
         });
+        
     }
 }
