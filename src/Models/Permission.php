@@ -1,25 +1,32 @@
 <?php
 
-namespace Spatie\Permission\Models;
+namespace Ghustavh97\Guardian\Models;
 
-use Spatie\Permission\Guard;
+use Ghustavh97\Guardian\Guard;
 use Illuminate\Support\Collection;
-use Spatie\Permission\Traits\HasRoles;
+use Ghustavh97\Guardian\Traits\GuardianRoles;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Exceptions\PermissionAlreadyExists;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Ghustavh97\Guardian\Exceptions\PermissionAlreadyExists;
+use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
-    use HasRoles;
+    use GuardianRoles;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
+
+    protected $appends = [];
+
+    const DEFAULT = [
+        'TO_ID' => '*',
+        'TO_TYPE' => '*'
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -27,14 +34,23 @@ class Permission extends Model implements PermissionContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('permission.table_names.permissions'));
+        $this->setTable(config('guardian.table_names.permissions'));
+
+        $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
+
+        $model = $this->getModel();
     }
 
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
+        $permission = static::getPermissions(
+            [
+                'name' => $attributes['name'],
+                'guard_name' => $attributes['guard_name']
+            ]
+        )->first();
 
         if ($permission) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
@@ -43,17 +59,23 @@ class Permission extends Model implements PermissionContract
         return static::query()->create($attributes);
     }
 
+    public function setIdAttribute($value)
+    {
+        $this->attributes['id'] = (int) $value;
+    }
+
     /**
      * A permission can be applied to roles.
      */
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(
-            config('permission.models.role'),
-            config('permission.table_names.role_has_permissions'),
+        return $this->morphedByMany(
+            config('guardian.models.role'),
+            'model',
+            config('guardian.table_names.model_has_permissions'),
             'permission_id',
-            'role_id'
-        );
+            config('guardian.column_names.model_morph_key')
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -64,10 +86,10 @@ class Permission extends Model implements PermissionContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('permission.table_names.model_has_permissions'),
+            config('guardian.table_names.model_has_permissions'),
             'permission_id',
-            config('permission.column_names.model_morph_key')
-        );
+            config('guardian.column_names.model_morph_key')
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -76,14 +98,15 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['name' => $name, 'guard_name' => $guardName])->first();
+        $permission = static::findPermissionByQuery(['name' => $name, 'guard_name' => $guardName]);
+        
         if (! $permission) {
             throw PermissionDoesNotExist::create($name, $guardName);
         }
@@ -97,14 +120,14 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Spatie\Permission\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
-        $permission = static::getPermissions(['id' => $id, 'guard_name' => $guardName])->first();
+        $permission = static::findPermissionByQuery(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $permission) {
             throw PermissionDoesNotExist::withId($id, $guardName);
@@ -113,13 +136,20 @@ class Permission extends Model implements PermissionContract
         return $permission;
     }
 
+    private static function findPermissionByQuery(array $query)
+    {
+        $permission = static::getPermissions($query);
+
+        return $permission->first();
+    }
+
     /**
      * Find or create permission by its name (and optionally guardName).
      *
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Permission
+     * @return \Ghustavh97\Guardian\Contracts\Permission
      */
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
@@ -138,8 +168,22 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = []): Collection
     {
-        return app(PermissionRegistrar::class)
+        return app(GuardianRegistrar::class)
             ->setPermissionClass(static::class)
             ->getPermissions($params);
+    }
+
+    public function getToIdAttribute()
+    {
+        if ($this->pivot) {
+            return $this->pivot->to_id;
+        }
+    }
+
+    public function getToTypeAttribute()
+    {
+        if ($this->pivot) {
+            return $this->pivot->to_type;
+        }
     }
 }

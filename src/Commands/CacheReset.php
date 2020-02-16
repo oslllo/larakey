@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\Permission\Commands;
+namespace Ghustavh97\Guardian\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\Permission\PermissionRegistrar;
+use Ghustavh97\Guardian\GuardianRegistrar;
 
 class CacheReset extends Command
 {
@@ -13,7 +13,7 @@ class CacheReset extends Command
 
     public function handle()
     {
-        if (app(PermissionRegistrar::class)->forgetCachedPermissions()) {
+        if (app(GuardianRegistrar::class)->flushCache()) {
             $this->info('Permission cache flushed.');
         } else {
             $this->error('Unable to flush cache.');

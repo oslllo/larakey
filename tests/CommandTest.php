@@ -1,10 +1,10 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
-use Spatie\Permission\Models\Role;
+use Ghustavh97\Guardian\Models\Role;
 use Illuminate\Support\Facades\Artisan;
-use Spatie\Permission\Models\Permission;
+use Ghustavh97\Guardian\Models\Permission;
 
 class CommandTest extends TestCase
 {
@@ -94,13 +94,13 @@ class CommandTest extends TestCase
         $this->assertTrue(strpos($output, 'Guard: web') !== false);
         $this->assertTrue(strpos($output, 'Guard: admin') !== false);
 
-        // |               | testRole | testRole2 |
-        $this->assertRegExp('/\|\s+\|\s+testRole\s+\|\s+testRole2\s+\|/', $output);
+        // |               | testUserRole | testUserRole2 |
+        $this->assertRegExp('/\|\s+\|\s+testUserRole\s+\|\s+testUserRole2\s+\|/', $output);
 
         // | edit-articles |  ·       |  ·        |
         $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
 
-        Role::findByName('testRole')->givePermissionTo('edit-articles');
+        Role::findByName('testUserRole')->givePermissionTo('edit-articles');
         $this->reloadPermissions();
 
         Artisan::call('permission:show');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Test;
+namespace Ghustavh97\Guardian\Test;
 
 use Illuminate\Http\Response;
 

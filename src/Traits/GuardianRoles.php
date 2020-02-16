@@ -1,20 +1,21 @@
 <?php
 
-namespace Spatie\Permission\Traits;
+namespace Ghustavh97\Guardian\Traits;
 
 use Illuminate\Support\Collection;
-use Spatie\Permission\Contracts\Role;
+use Ghustavh97\Guardian\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-trait HasRoles
+trait GuardianRoles
 {
-    use HasPermissions;
+    use GuardianPermissions;
 
     private $roleClass;
 
-    public static function bootHasRoles()
+    public static function bootGuardianRoles()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -28,7 +29,7 @@ trait HasRoles
     public function getRoleClass()
     {
         if (! isset($this->roleClass)) {
-            $this->roleClass = app(PermissionRegistrar::class)->getRoleClass();
+            $this->roleClass = app(GuardianRegistrar::class)->getRoleClass();
         }
 
         return $this->roleClass;
@@ -40,19 +41,19 @@ trait HasRoles
     public function roles(): MorphToMany
     {
         return $this->morphToMany(
-            config('permission.models.role'),
+            config('guardian.models.role'),
             'model',
-            config('permission.table_names.model_has_roles'),
-            config('permission.column_names.model_morph_key'),
+            config('guardian.table_names.model_has_roles'),
+            config('guardian.column_names.model_morph_key'),
             'role_id'
-        );
+        )->withTimestamps();
     }
 
     /**
      * Scope the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -81,7 +82,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
+                    $query->orWhere(config('guardian.table_names.roles').'.id', $role->id);
                 }
             });
         });
@@ -90,7 +91,7 @@ trait HasRoles
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Spatie\Permission\Contracts\Role ...$roles
+     * @param array|string|\Ghustavh97\Guardian\Contracts\Role ...$roles
      *
      * @return $this
      */
@@ -131,10 +132,17 @@ trait HasRoles
                     $object->roles()->sync($roles, false);
                     $object->load('roles');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
+        //! I don't see the use of this
+
         $this->forgetCachedPermissions();
+
+        // $this->forgetCachedRoles(true);
+        $this->forgetCachedRoles();
+
 
         return $this;
     }
@@ -142,7 +150,7 @@ trait HasRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|\Spatie\Permission\Contracts\Role $role
+     * @param string|\Ghustavh97\Guardian\Contracts\Role $role
      */
     public function removeRole($role)
     {
@@ -152,13 +160,15 @@ trait HasRoles
 
         $this->forgetCachedPermissions();
 
+        $this->forgetCachedRoles();
+
         return $this;
     }
 
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|\Spatie\Permission\Contracts\Role|string  ...$roles
+     * @param  array|\Ghustavh97\Guardian\Contracts\Role|string  ...$roles
      *
      * @return $this
      */
@@ -169,46 +179,78 @@ trait HasRoles
         return $this->assignRole($roles);
     }
 
+    public function getRole($role, $guard = null): Role
+    {
+        $roleClass = $this->getRoleClass();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
+
+        if (is_array($role)) {
+            $role = $role[0];
+        }
+
+        if (is_string($role)) {
+            $role = $roleClass->findByName($role, $guard);
+        }
+
+        if (is_int($role)) {
+            $role = $roleClass->findById($role, $guard);
+        }
+
+        if (! $role instanceof Role) {
+            throw new RoleDoesNotExist;
+        }
+
+        return $role;
+    }
+
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
      * @return bool
      */
-    public function hasRole($roles, string $guard = null): bool
+
+    public function hasRole($roles, string $guard = null, bool $returnRole = false)
     {
+        $roleClass = $this->getRoleClass();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
+
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('name', $roles)
-                : $this->roles->contains('name', $roles);
+            $query = $this->roles->where('name', $roles);
         }
 
         if (is_int($roles)) {
-            return $guard
-                ? $this->roles->where('guard_name', $guard)->contains('id', $roles)
-                : $this->roles->contains('id', $roles);
+            $query = $this->roles->where('id', $roles);
         }
 
         if ($roles instanceof Role) {
-            return $this->roles->contains('id', $roles->id);
+            $query = $this->roles->where('id', $roles->id);
         }
 
-        if (is_array($roles)) {
-            foreach ($roles as $role) {
-                if ($this->hasRole($role, $guard)) {
-                    return true;
+        if (isset($query)) {
+            $query = $query->where('guard_name', $guard);
+        }
+
+        $role = isset($query) ? $query->first() : null;
+
+        if (! $role && is_array($roles)) {
+            collect($roles)->each(function ($value) use (&$role, $guard) {
+                if ($role = $this->hasRole($value, $guard, true)) {
+                    return false;
                 }
-            }
-
-            return false;
+            });
         }
 
-        return $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->isNotEmpty();
+        if (! $role && $roles instanceof Collection) {
+            $role = $roles->intersect($guard ? $this->roles->where('guard_name', $guard) : $this->roles)->first();
+        }
+
+        return $returnRole ? $role : boolval($role);
     }
 
     /**
@@ -216,7 +258,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param string|int|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -228,7 +270,7 @@ trait HasRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|\Spatie\Permission\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @param  string|null  $guard
      * @return bool
      */
@@ -255,7 +297,8 @@ trait HasRoles
         return $roles->intersect(
             $guard
                 ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()) == $roles;
+                : $this->getRoleNames()
+        ) == $roles;
     }
 
     /**
@@ -286,25 +329,11 @@ trait HasRoles
         return $role;
     }
 
-    protected function convertPipeToArray(string $pipeString)
+    /**
+     * Forget the cached roles.
+     */
+    public function forgetCachedRoles($reload = false)
     {
-        $pipeString = trim($pipeString);
-
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
-
-        $quoteCharacter = substr($pipeString, 0, 1);
-        $endCharacter = substr($quoteCharacter, -1, 1);
-
-        if ($quoteCharacter !== $endCharacter) {
-            return explode('|', $pipeString);
-        }
-
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return explode('|', $pipeString);
-        }
-
-        return explode('|', trim($pipeString, $quoteCharacter));
+        app(GuardianRegistrar::class)->forgetCachedRoles($reload);
     }
 }

@@ -1,21 +1,23 @@
 <?php
 
-namespace Spatie\Permission\Models;
+namespace Ghustavh97\Guardian\Models;
 
-use Spatie\Permission\Guard;
+use Ghustavh97\Guardian\Guard;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Exceptions\RoleDoesNotExist;
-use Spatie\Permission\Exceptions\GuardDoesNotMatch;
-use Spatie\Permission\Exceptions\RoleAlreadyExists;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Traits\RefreshesPermissionCache;
+use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Guardian\Traits\GuardianPermissions;
+use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
+use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Guardian\Exceptions\RoleAlreadyExists;
+use Ghustavh97\Guardian\Contracts\Role as RoleContract;
+use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use HasPermissions;
+    use GuardianPermissions;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
@@ -26,14 +28,16 @@ class Role extends Model implements RoleContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('permission.table_names.roles'));
+        $this->setTable(config('guardian.table_names.roles'));
     }
 
     public static function create(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        if (static::where('name', $attributes['name'])->where('guard_name', $attributes['guard_name'])->first()) {
+        $role = static::getRoles(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
+
+        if ($role) {
             throw RoleAlreadyExists::create($attributes['name'], $attributes['guard_name']);
         }
 
@@ -45,12 +49,13 @@ class Role extends Model implements RoleContract
      */
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(
-            config('permission.models.permission'),
-            config('permission.table_names.role_has_permissions'),
-            'role_id',
+        return $this->morphToMany(
+            config('guardian.models.permission'),
+            'model',
+            config('guardian.table_names.model_has_permissions'),
+            config('guardian.column_names.model_morph_key'),
             'permission_id'
-        );
+        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -61,9 +66,9 @@ class Role extends Model implements RoleContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('permission.table_names.model_has_roles'),
+            config('guardian.table_names.model_has_roles'),
             'role_id',
-            config('permission.column_names.model_morph_key')
+            config('guardian.column_names.model_morph_key')
         );
     }
 
@@ -73,15 +78,15 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Role|\Spatie\Permission\Models\Role
+     * @return \Ghustavh97\Guardian\Contracts\Role|\Ghustavh97\Guardian\Models\Role
      *
-     * @throws \Spatie\Permission\Exceptions\RoleDoesNotExist
+     * @throws \Ghustavh97\Guardian\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::findRoleByQuery(['name' => $name, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::named($name);
@@ -94,7 +99,7 @@ class Role extends Model implements RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('id', $id)->where('guard_name', $guardName)->first();
+        $role = static::findRoleByQuery(['id' => $id, 'guard_name' => $guardName]);
 
         if (! $role) {
             throw RoleDoesNotExist::withId($id);
@@ -103,19 +108,26 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
+    private static function findRoleByQuery(array $query)
+    {
+        $role = static::getRoles($query);
+        
+        return $role->first();
+    }
+
     /**
      * Find or create role by its name (and optionally guardName).
      *
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Spatie\Permission\Contracts\Role
+     * @return \Ghustavh97\Guardian\Contracts\Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
 
-        $role = static::where('name', $name)->where('guard_name', $guardName)->first();
+        $role = static::getRoles(['name' => $name, 'guard_name' => $guardName])->first();
 
         if (! $role) {
             return static::query()->create(['name' => $name, 'guard_name' => $guardName]);
@@ -125,13 +137,23 @@ class Role extends Model implements RoleContract
     }
 
     /**
+     * Get the current cached roles.
+     */
+    protected static function getRoles(array $params = []): Collection
+    {
+        return app(GuardianRegistrar::class)
+            ->setRoleClass(static::class)
+            ->getRoles($params);
+    }
+
+    /**
      * Determine if the user may perform the given permission.
      *
      * @param string|Permission $permission
      *
      * @return bool
      *
-     * @throws \Spatie\Permission\Exceptions\GuardDoesNotMatch
+     * @throws \Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {
@@ -148,7 +170,7 @@ class Role extends Model implements RoleContract
         if (! $this->getGuardNames()->contains($permission->guard_name)) {
             throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
-
-        return $this->permissions->contains('id', $permission->id);
+        
+        return $this->hasDirectPermission($permission);
     }
 }

@@ -1,26 +1,31 @@
 <?php
 
-namespace Spatie\Permission;
+namespace Ghustavh97\Guardian;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Spatie\Permission\Contracts\Role as RoleContract;
-use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Ghustavh97\Guardian\Contracts\Role as RoleContract;
+use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
+use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
-class PermissionServiceProvider extends ServiceProvider
+use Ghustavh97\Guardian\Models\ModelHasPermission;
+
+class GuardianServiceProvider extends ServiceProvider
 {
-    public function boot(PermissionRegistrar $permissionLoader, Filesystem $filesystem)
+    public function boot(GuardianRegistrar $permissionLoader, Filesystem $filesystem)
     {
         if (isNotLumen()) {
             $this->publishes([
-                __DIR__.'/../config/permission.php' => config_path('permission.php'),
+                __DIR__.'/../config/guardian.php' => config_path('guardian.php'),
             ], 'config');
 
+            $guardianPermissionsTable = __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub';
+
             $this->publishes([
-                __DIR__.'/../database/migrations/create_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                $guardianPermissionsTable => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
             $this->registerMacroHelpers();
@@ -37,8 +42,26 @@ class PermissionServiceProvider extends ServiceProvider
 
         $permissionLoader->registerPermissions();
 
-        $this->app->singleton(PermissionRegistrar::class, function ($app) use ($permissionLoader) {
+        $this->app->singleton(GuardianRegistrar::class, function ($app) use ($permissionLoader) {
             return $permissionLoader;
+        });
+
+        $ModelHasPermission = app(GuardianRegistrar::class)->getModelHasPermissionClass();
+
+        $ModelHasPermission::creating(function ($permission) {
+            if (! $permission->to_id || ! $permission->to_type) {
+                if (config('guardian.strict.permission.assignment')) {
+                    throw StrictModeRestriction::assignment();
+                }
+
+                if (! $permission->to_id) {
+                    $permission->to_id = '*';
+                }
+
+                if (! $permission->to_type) {
+                    $permission->to_type = '*';
+                }
+            }
         });
     }
 
@@ -46,8 +69,8 @@ class PermissionServiceProvider extends ServiceProvider
     {
         if (isNotLumen()) {
             $this->mergeConfigFrom(
-                __DIR__.'/../config/permission.php',
-                'permission'
+                __DIR__.'/../config/guardian.php',
+                'guardian'
             );
         }
 
@@ -56,7 +79,7 @@ class PermissionServiceProvider extends ServiceProvider
 
     protected function registerModelBindings()
     {
-        $config = $this->app->config['permission.models'];
+        $config = $this->app->config['guardian.models'];
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
@@ -156,8 +179,8 @@ class PermissionServiceProvider extends ServiceProvider
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_permission_tables.php")
+                return $filesystem->glob($path.'*_create_guardian_permission_tables.php');
+            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_guardian_permission_tables.php")
             ->first();
     }
 }

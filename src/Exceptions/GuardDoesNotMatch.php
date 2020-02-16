@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission\Exceptions;
+namespace Ghustavh97\Guardian\Exceptions;
 
 use InvalidArgumentException;
 use Illuminate\Support\Collection;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\Permission;
+namespace Ghustavh97\Guardian;
 
 use Illuminate\Support\Collection;
 
