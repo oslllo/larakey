@@ -6,7 +6,7 @@ use Ghustavh97\Guardian\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Traits\HasPermissions;
+use Ghustavh97\Guardian\Traits\GuardianPermissions;
 use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
 use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
 use Ghustavh97\Guardian\Exceptions\RoleAlreadyExists;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use HasPermissions;
+    use GuardianPermissions;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];

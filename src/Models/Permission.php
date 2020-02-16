@@ -4,7 +4,7 @@ namespace Ghustavh97\Guardian\Models;
 
 use Ghustavh97\Guardian\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Traits\HasRoles;
+use Ghustavh97\Guardian\Traits\GuardianRoles;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
@@ -16,7 +16,7 @@ use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
-    use HasRoles;
+    use GuardianRoles;
     use RefreshesPermissionCache;
 
     protected $guarded = ['id'];
@@ -26,7 +26,7 @@ class Permission extends Model implements PermissionContract
     const DEFAULT = [
         'TO_ID' => '*',
         'TO_TYPE' => '*'
-    ]; 
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -45,7 +45,12 @@ class Permission extends Model implements PermissionContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
-        $permission = static::getPermissions(['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']])->first();
+        $permission = static::getPermissions(
+            [
+                'name' => $attributes['name'],
+                'guard_name' => $attributes['guard_name']
+            ]
+        )->first();
 
         if ($permission) {
             throw PermissionAlreadyExists::create($attributes['name'], $attributes['guard_name']);
@@ -54,7 +59,8 @@ class Permission extends Model implements PermissionContract
         return static::query()->create($attributes);
     }
 
-    public function setIdAttribute($value) {
+    public function setIdAttribute($value)
+    {
         $this->attributes['id'] = (int) $value;
     }
 
@@ -169,14 +175,14 @@ class Permission extends Model implements PermissionContract
 
     public function getToIdAttribute()
     {
-        if($this->pivot) {
+        if ($this->pivot) {
             return $this->pivot->to_id;
         }
     }
 
     public function getToTypeAttribute()
     {
-        if($this->pivot) {
+        if ($this->pivot) {
             return $this->pivot->to_type;
         }
     }

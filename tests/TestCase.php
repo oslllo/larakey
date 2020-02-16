@@ -44,18 +44,37 @@ abstract class TestCase extends Orchestra
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
 
-        // dd($this->testUserPermission = app(Role::class)->all());
-
         $this->testUser = User::email('testUser@test.com')->first();
-        $this->testUserPost = $this->testUser->posts()->create(['title' => 'Test Title', 'description' => 'Test description']);
-        $this->testUserRole = app(Role::class)->where(['name' => 'testUserRole'])->first();
+
+        $this->testUserPost = $this->testUser->posts()->create([
+            'title' => 'Test Title',
+            'description' => 'Test description'
+        ]);
+
+        $this->testUserRole = app(Role::class)->where([
+            'name' => 'testUserRole'
+        ])
+        ->first();
+
         // TODO: A test fails if permission is not ->first()
-        $this->testUserPermission = app(Permission::class)->where(['name' => 'edit-articles'])->first();
-        // dd($this->testUserPermission);
+        $this->testUserPermission = app(Permission::class)->where([
+            'name' => 'edit-articles'
+        ])
+        ->first();
 
         $this->testAdmin = Admin::email('testAdmin@test.com')->first();
-        $this->testAdminRole = app(Role::class)->where(['name' => 'testAdminRole', 'guard_name' => 'admin'])->first();
-        $this->testAdminPermission = app(Permission::class)->where(['name' => 'admin-permission', 'guard_name' => 'admin'])->first();
+
+        $this->testAdminRole = app(Role::class)->where([
+            'name' => 'testAdminRole',
+            'guard_name' => 'admin'
+        ])
+        ->first();
+
+        $this->testAdminPermission = app(Permission::class)->where([
+            'name' => 'admin-permission',
+            'guard_name' => 'admin'
+        ])
+        ->first();
     }
 
     /**

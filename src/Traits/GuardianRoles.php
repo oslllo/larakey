@@ -9,13 +9,13 @@ use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-trait HasRoles
+trait GuardianRoles
 {
-    use HasPermissions;
+    use GuardianPermissions;
 
     private $roleClass;
 
-    public static function bootHasRoles()
+    public static function bootGuardianRoles()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -46,7 +46,7 @@ trait HasRoles
             config('guardian.table_names.model_has_roles'),
             config('guardian.column_names.model_morph_key'),
             'role_id'
-        );
+        )->withTimestamps();
     }
 
     /**
@@ -132,7 +132,8 @@ trait HasRoles
                     $object->roles()->sync($roles, false);
                     $object->load('roles');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
         //! I don't see the use of this
@@ -238,7 +239,7 @@ trait HasRoles
         $role = isset($query) ? $query->first() : null;
 
         if (! $role && is_array($roles)) {
-            collect($roles)->each(function($value) use(&$role, $guard) {
+            collect($roles)->each(function ($value) use (&$role, $guard) {
                 if ($role = $this->hasRole($value, $guard, true)) {
                     return false;
                 }
@@ -250,7 +251,6 @@ trait HasRoles
         }
 
         return $returnRole ? $role : boolval($role);
-
     }
 
     /**
@@ -297,7 +297,8 @@ trait HasRoles
         return $roles->intersect(
             $guard
                 ? $this->roles->where('guard_name', $guard)->pluck('name')
-                : $this->getRoleNames()) == $roles;
+                : $this->getRoleNames()
+        ) == $roles;
     }
 
     /**
@@ -326,28 +327,6 @@ trait HasRoles
         }
 
         return $role;
-    }
-
-    protected function convertPipeToArray(string $pipeString)
-    {
-        $pipeString = trim($pipeString);
-
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
-
-        $quoteCharacter = substr($pipeString, 0, 1);
-        $endCharacter = substr($quoteCharacter, -1, 1);
-
-        if ($quoteCharacter !== $endCharacter) {
-            return explode('|', $pipeString);
-        }
-
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return explode('|', $pipeString);
-        }
-
-        return explode('|', trim($pipeString, $quoteCharacter));
     }
 
     /**

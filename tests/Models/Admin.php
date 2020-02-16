@@ -3,7 +3,7 @@
 namespace Ghustavh97\Guardian\Test\Models;
 
 use Illuminate\Auth\Authenticatable;
-use Ghustavh97\Guardian\Traits\HasRoles;
+use Ghustavh97\Guardian\Traits\Guardian;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Admin extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use HasRoles, Authorizable, Authenticatable;
+    use Guardian, Authorizable, Authenticatable;
 
     protected $fillable = ['email'];
 

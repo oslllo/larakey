@@ -77,7 +77,10 @@ class GuardianRegistrar
 
     protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
     {
-        // the 'default' fallback here is from the permission.php config file, where 'default' means to use config(cache.default)
+        /**
+         * The'default' fallback here is from the permission.php config file,
+         * where 'default' means to use config(cache.default)
+         */
         $cacheDriver = config('guardian.cache.store', 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
@@ -137,11 +140,15 @@ class GuardianRegistrar
     public function getPermissions(array $params = []): Collection
     {
         if ($this->permissions === null) {
-            $this->permissions = $this->cache->remember(self::$cachePermissionKey, self::$cacheExpirationTime, function () {
-                return $this->getPermissionClass()
+            $this->permissions = $this->cache->remember(
+                self::$cachePermissionKey,
+                self::$cacheExpirationTime,
+                function () {
+                    return $this->getPermissionClass()
                     ->with('roles')
                     ->get();
-            });
+                }
+            );
         }
 
         $permissions = clone $this->permissions;
@@ -170,7 +177,7 @@ class GuardianRegistrar
     }
 
     public function getRoles(array $params = []): Collection
-    {   
+    {
         if ($this->roles === null) {
             $this->roles = $this->cache->remember(self::$cacheRoleKey, self::$cacheExpirationTime, function () {
                 return $this->getRoleClass()

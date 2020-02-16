@@ -11,4 +11,3 @@ class StrictModeRestriction extends InvalidArgumentException
         return new static("Permission field to_id and to_type should be set in strict mode.");
     }
 }
-

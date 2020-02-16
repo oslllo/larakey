@@ -17,6 +17,5 @@ trait RefreshesPermissionCache
             app(GuardianRegistrar::class)->forgetCachedPermissions();
             app(GuardianRegistrar::class)->forgetCachedRoles();
         });
-        
     }
 }

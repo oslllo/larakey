@@ -50,6 +50,8 @@ class CreateGuardianPermissionTables extends Migration
 
             $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type','to_id', 'to_type'],
                     'model_has_permissions_permission_model_type_to_id_to_type_primary');
+
+            $table->timestamps();
         });
 
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
@@ -66,6 +68,8 @@ class CreateGuardianPermissionTables extends Migration
 
             $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'],
                     'model_has_roles_role_model_type_primary');
+
+            $table->timestamps();
         });
 
         app('cache')

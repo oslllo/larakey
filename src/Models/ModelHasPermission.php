@@ -18,6 +18,9 @@ class ModelHasPermission extends MorphPivot implements ModelHasPermissionContrac
     public function __construct(array $attributes = [])
     {
         $this->table = config('guardian.table_names.model_has_permissions');
+        // $this->setModelIdAttribute = function ($value) {
+        //     $this->attributes['model_id'] = (int) $value;
+        // };
         parent::__construct($attributes);
     }
 }

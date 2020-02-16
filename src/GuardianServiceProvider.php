@@ -22,8 +22,10 @@ class GuardianServiceProvider extends ServiceProvider
                 __DIR__.'/../config/guardian.php' => config_path('guardian.php'),
             ], 'config');
 
+            $guardianPermissionsTable = __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub';
+
             $this->publishes([
-                __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub' => $this->getMigrationFileName($filesystem),
+                $guardianPermissionsTable => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
             $this->registerMacroHelpers();

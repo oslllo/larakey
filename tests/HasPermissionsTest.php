@@ -32,10 +32,10 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('manage', Post::class);
 
-        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
-
         $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class));
         $this->assertTrue($this->testUser->hasPermissionTo('manage', $this->testUserPost));
+
+        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
     }
 
     /** @test */
