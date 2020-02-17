@@ -561,14 +561,14 @@ trait GuardianPermissions
         if (is_numeric($permission)) {
             return $permissionClass->findById(
                 $permission,
-                $this->getDefaultGuardName(),
+                $this->getDefaultGuardName()
             );
         }
 
         if (is_string($permission)) {
             return $permissionClass->findByName(
                 $permission,
-                $this->getDefaultGuardName(),
+                $this->getDefaultGuardName()
             );
         }
 
