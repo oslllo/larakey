@@ -37,7 +37,7 @@ class CreateGuardianPermissionTables extends Migration
             $table->unsignedBigInteger('permission_id');
 
             $table->string('model_type');
-            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->string($columnNames['model_morph_key']);
             $table->string('to_id');
             $table->string('to_type');
             $table->index([$columnNames['model_morph_key'], 'model_type', 'to_id', 'to_type'], 
@@ -49,7 +49,7 @@ class CreateGuardianPermissionTables extends Migration
                 ->onDelete('cascade');
 
             $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type','to_id', 'to_type'],
-                    'model_has_permissions_permission_model_type_to_id_to_type_primary');
+                    'model_has_permissions_model_type_to_id_to_type_primary');
 
             $table->timestamps();
         });
@@ -58,7 +58,7 @@ class CreateGuardianPermissionTables extends Migration
             $table->unsignedBigInteger('role_id');
 
             $table->string('model_type');
-            $table->unsignedBigInteger($columnNames['model_morph_key']);
+            $table->string($columnNames['model_morph_key']);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
 
             $table->foreign('role_id')
