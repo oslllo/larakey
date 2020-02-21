@@ -100,6 +100,7 @@ trait GuardianHelpers
             }
 
             if ($data['guard'] === null && is_string($value)
+                && $value != '*'
                 && !is_bool($value)
                 && !\strpos($value, '\\') !== false) {
                 $data['guard'] = $value;
