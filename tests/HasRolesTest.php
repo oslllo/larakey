@@ -288,19 +288,23 @@ class HasRolesTest extends TestCase
         $user->assignRole('testUserRole');
         $user->givePermissionTo('edit-articles');
 
-        $this->assertDatabaseHas('model_has_permissions', [
+        $this->assertDatabaseHas(
+            config('guardian.table_names.model_has_permissions'), [
             config('guardian.column_names.model_morph_key') => $user->id
         ]);
-        $this->assertDatabaseHas('model_has_roles', [
+        $this->assertDatabaseHas(
+            config('guardian.table_names.model_has_roles'), [
             config('guardian.column_names.model_morph_key') => $user->id
         ]);
 
         $user->delete();
 
-        $this->assertDatabaseMissing('model_has_permissions', [
+        $this->assertDatabaseMissing(
+            config('guardian.table_names.model_has_permissions'), [
             config('guardian.column_names.model_morph_key') => $user->id
         ]);
-        $this->assertDatabaseMissing('model_has_roles', [
+        $this->assertDatabaseMissing(
+            config('guardian.table_names.model_has_roles'), [
             config('guardian.column_names.model_morph_key') => $user->id
         ]);
     }

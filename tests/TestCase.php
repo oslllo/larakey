@@ -13,6 +13,7 @@ use Ghustavh97\Guardian\GuardianRegistrar;
 use Ghustavh97\Guardian\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Ghustavh97\Guardian\GuardianServiceProvider;
+use Ghustavh97\Guardian\Test\Providers\RouteServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
@@ -86,6 +87,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             GuardianServiceProvider::class,
+            RouteServiceProvider::class
         ];
     }
 
@@ -113,6 +115,8 @@ abstract class TestCase extends Orchestra
         $app['config']->set('auth.providers.users.model', User::class);
 
         $app['config']->set('cache.prefix', 'guardian_tests---');
+
+        $app['config']->set('app.key', 'Idgz1PE3zO9iNc0E3oeH3CHDPX9MzZe3');
     }
 
     /**
@@ -174,17 +178,8 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'Edit News']);
 
         $app[Permission::class]->create(['name' => 'manage']);
-
-        // $app[Permission::class]->create(['name' => 'edit-any-post']);
-        // $app[Permission::class]->create(['name' => 'edit-any-post']);
-        // $app[Permission::class]->create(['name' => 'create-post']);
-        // $app[Permission::class]->create(['name' => 'delete-post']);
-        // $app[Permission::class]->create(['name' => 'edit-post']);
-        // $app[Permission::class]->create(['name' => 'view-post']);
-
-        $app[Permission::class]->create(['name' => 'create-comment']);
-        // dd($app[Role::class]->all());
-        // dd($app[Permission::class]->findByName('testUserRole'), 'test');
+        $app[Permission::class]->create(['name' => 'view']);
+        $app[Permission::class]->create(['name' => 'comment']);
     }
 
     /**

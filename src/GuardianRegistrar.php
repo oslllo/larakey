@@ -104,10 +104,13 @@ class GuardianRegistrar
      */
     public function registerPermissions(): bool
     {
-        app(Gate::class)->before(function (Authorizable $user, string $ability, $attributes = []) {
-            $guardName = array_key_exists(1, $attributes) ? $attributes[1] : null;
+        app(Gate::class)->before(function (Authorizable $user, $permission, $arguments = []) {
+
             if (method_exists($user, 'checkPermissionTo')) {
-                return $user->checkPermissionTo($ability, $attributes, $guardName) ?: null;
+
+                $arguments = array_merge([$permission], $arguments);
+
+                return call_user_func_array(array($user, 'checkPermissionTo'), $arguments) ?: null;
             }
         });
 

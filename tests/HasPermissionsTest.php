@@ -544,6 +544,30 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_user_has_permission_via_multiple_roles()
+    {
+        $roleModel = app(Role::class);
+        $roleWithPermissions = $roleModel->create(['name' => 'withPermissions']);
+        $rolewithoutPermissions = $roleModel->create(['name' => 'withoutPermissions']);
+        $roleWithPermissions->givePermissionTo('edit-articles');
+
+        $newUser = new User;
+        $newUser->email = 'someuser@app.com';
+        $newUser->save();
+        
+        $newUser->assignRole($rolewithoutPermissions);
+
+        $newUser->email = 'someuser@app.com2';
+        $newUser->save();
+
+        $newUser->assignRole($this->testUserRole, 'withPermissions');
+
+        $this->assertEquals(3, $newUser->roles->count());
+
+        $this->assertTrue($newUser->hasPermissionTo('edit-articles'));
+    }
+
+    /** @test */
     public function it_can_list_all_the_coupled_permissions_both_directly_and_via_roles()
     {
         $this->testUser->givePermissionTo('edit-news');

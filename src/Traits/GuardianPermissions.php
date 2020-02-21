@@ -209,10 +209,10 @@ trait GuardianPermissions
      *
      * @return bool
      */
-    public function checkPermissionTo($permission, $attributes = [], $guardName = null): bool
+    public function checkPermissionTo(...$arguments): bool
     {
         try {
-            return $this->hasPermissionTo($permission, $attributes, $guardName);
+            return call_user_func_array(array($this, 'hasPermissionTo'), func_get_args());
         } catch (PermissionDoesNotExist $e) {
             return false;
         }
