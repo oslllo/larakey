@@ -1,12 +1,12 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
-use Ghustavh97\Guardian\Contracts\Role;
-use Ghustavh97\Guardian\Test\Models\User;
-use Ghustavh97\Guardian\Test\Models\Admin;
-use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
-use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Larakey\Contracts\Role;
+use Ghustavh97\Larakey\Test\Models\User;
+use Ghustavh97\Larakey\Test\Models\Admin;
+use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
 
 class HasRolesTest extends TestCase
 {
@@ -289,24 +289,26 @@ class HasRolesTest extends TestCase
         $user->givePermissionTo('edit-articles');
 
         $this->assertDatabaseHas(
-            config('guardian.table_names.model_has_permissions'), [
-            config('guardian.column_names.model_morph_key') => $user->id
-        ]);
+            config('larakey.table_names.model_has_permissions'),
+            [config('larakey.column_names.model_morph_key') => $user->id]
+        );
+
         $this->assertDatabaseHas(
-            config('guardian.table_names.model_has_roles'), [
-            config('guardian.column_names.model_morph_key') => $user->id
-        ]);
+            config('larakey.table_names.model_has_roles'),
+            [config('larakey.column_names.model_morph_key') => $user->id]
+        );
 
         $user->delete();
 
         $this->assertDatabaseMissing(
-            config('guardian.table_names.model_has_permissions'), [
-            config('guardian.column_names.model_morph_key') => $user->id
-        ]);
+            config('larakey.table_names.model_has_permissions'),
+            [config('larakey.column_names.model_morph_key') => $user->id]
+        );
+
         $this->assertDatabaseMissing(
-            config('guardian.table_names.model_has_roles'), [
-            config('guardian.column_names.model_morph_key') => $user->id
-        ]);
+            config('larakey.table_names.model_has_roles'),
+            [config('larakey.column_names.model_morph_key') => $user->id]
+        );
     }
 
     /** @test */

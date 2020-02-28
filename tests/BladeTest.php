@@ -1,9 +1,11 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Artisan;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
+use Ghustavh97\Larakey\Test\Models\Post;
+use Ghustavh97\Larakey\Test\Models\User;
 
 class BladeTest extends TestCase
 {
@@ -77,11 +79,47 @@ class BladeTest extends TestCase
     {
         $user = $this->getWriter();
 
-        $user->givePermissionTo('edit-articles');
+        $user->givePermissionTo('view');
 
         auth()->setUser($user);
 
-        $this->assertEquals('has permission', $this->renderView('can', ['permission' => 'edit-articles']));
+        $this->assertEquals('has permission', $this->renderView('can', ['permission' => 'view']));
+    }
+
+    /** @test */
+    public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission_with_wildcard_token()
+    {
+        $user = $this->getWriter();
+
+        $user->givePermissionTo('view', '*');
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('can', ['permission' => ['view', '*']]));
+    }
+
+    /** @test */
+    public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission_with_class_scope()
+    {
+        $user = $this->getWriter();
+
+        $user->givePermissionTo('view', Post::class);
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('can', ['permission' => ['view', Post::class]]));
+    }
+
+    /** @test */
+    public function the_can_directive_will_evaluate_true_when_the_logged_in_user_has_the_permission_with_model_instance_scope()
+    {
+        $user = $this->getWriter();
+
+        $user->givePermissionTo('view', $this->testUserPost);
+
+        auth()->setUser($user);
+
+        $this->assertEquals('has permission', $this->renderView('can', ['permission' => ['view', $this->testUserPost]]));
     }
 
     /** @test */
@@ -286,8 +324,12 @@ class BladeTest extends TestCase
     protected function renderView($view, $parameters)
     {
         Artisan::call('view:clear');
-
+        
         if (is_string($view)) {
+            if ($view === 'can') {
+                $parameters['permission'] = is_array($parameters['permission']) ? $parameters['permission'] : [$parameters['permission']];
+            }
+            
             $view = view($view)->with($parameters);
         }
 

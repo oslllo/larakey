@@ -1,32 +1,29 @@
 <?php
 
-namespace Ghustavh97\Guardian\Models;
+namespace Ghustavh97\Larakey\Models;
 
-use Ghustavh97\Guardian\Guard;
+use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Traits\GuardianRoles;
+use Ghustavh97\Larakey\Traits\HasLarakeyRoles;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Ghustavh97\Guardian\Exceptions\PermissionAlreadyExists;
-use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
+use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
+use Ghustavh97\Larakey\LarakeyPermissionScope;
+use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
-    use GuardianRoles;
-    use RefreshesPermissionCache;
+    use HasLarakeyRoles;
+    use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];
 
     protected $appends = [];
-
-    const DEFAULT = [
-        'TO_ID' => '*',
-        'TO_TYPE' => '*'
-    ];
 
     public function __construct(array $attributes = [])
     {
@@ -34,11 +31,9 @@ class Permission extends Model implements PermissionContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('guardian.table_names.permissions'));
+        $this->setTable(config(Larakey::$permissionsTableName));
 
         $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
-
-        $model = $this->getModel();
     }
 
     public static function create(array $attributes = [])
@@ -46,10 +41,7 @@ class Permission extends Model implements PermissionContract
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
         $permission = static::getPermissions(
-            [
-                'name' => $attributes['name'],
-                'guard_name' => $attributes['guard_name']
-            ]
+            ['name' => $attributes['name'], 'guard_name' => $attributes['guard_name']]
         )->first();
 
         if ($permission) {
@@ -70,12 +62,21 @@ class Permission extends Model implements PermissionContract
     public function roles(): BelongsToMany
     {
         return $this->morphedByMany(
-            config('guardian.models.role'),
+            config('larakey.models.role'),
             'model',
-            config('guardian.table_names.model_has_permissions'),
+            config('larakey.table_names.model_has_permissions'),
             'permission_id',
-            config('guardian.column_names.model_morph_key')
-        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
+            config('larakey.column_names.model_morph_key')
+        )->using(config('larakey.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
+    }
+
+    public function matches(self $permission, LarakeyPermissionScope $permissionScope)
+    {
+        return (string) $this->id === (string) $permission->id
+            && ((string) $this->to_id === (string) $permissionScope->to_id
+            || (string) $this->to_id === Larakey::WILDCARD_TOKEN)
+            && ((string) $this->to_type === (string) $permissionScope->to_type
+            || (string) $this->to_type === Larakey::WILDCARD_TOKEN);
     }
 
     /**
@@ -86,10 +87,10 @@ class Permission extends Model implements PermissionContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('guardian.table_names.model_has_permissions'),
+            config('larakey.table_names.model_has_permissions'),
             'permission_id',
-            config('guardian.column_names.model_morph_key')
-        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
+            config('larakey.column_names.model_morph_key')
+        )->using(config('larakey.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -98,9 +99,9 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      *
-     * @return \Ghustavh97\Guardian\Contracts\Permission
+     * @return \Ghustavh97\Larakey\Contracts\Permission
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
@@ -120,9 +121,9 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      *
-     * @return \Ghustavh97\Guardian\Contracts\Permission
+     * @return \Ghustavh97\Larakey\Contracts\Permission
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
@@ -149,7 +150,7 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Guardian\Contracts\Permission
+     * @return \Ghustavh97\Larakey\Contracts\Permission
      */
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {
@@ -168,7 +169,7 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = []): Collection
     {
-        return app(GuardianRegistrar::class)
+        return app(LarakeyRegistrar::class)
             ->setPermissionClass(static::class)
             ->getPermissions($params);
     }

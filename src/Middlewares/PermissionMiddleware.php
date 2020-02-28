@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Guardian\Middlewares;
+namespace Ghustavh97\Larakey\Middlewares;
 
 use Closure;
-use Ghustavh97\Guardian\Exceptions\UnauthorizedException;
+use Ghustavh97\Larakey\Exceptions\UnauthorizedException;
 
 class PermissionMiddleware
 {

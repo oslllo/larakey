@@ -1,5 +1,5 @@
 {
-    "name": "ghustavh97/lara-guardian",
+    "name": "ghustavh97/larakey",
     "description": "Permission handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
     "keywords": [
         "spatie",
@@ -12,9 +12,9 @@
         "security",
         "ghustavh97",
         "authority",
-        "guardian"
+        "larakey"
     ],
-    "homepage": "https://github.com/Ghustavh97/lara-guardian/",
+    "homepage": "https://github.com/Ghustavh97/larakey/",
     "license": "MIT",
     "authors": [
         {
@@ -38,21 +38,21 @@
     },
     "autoload": {
         "psr-4": {
-            "Ghustavh97\\Guardian\\": "src"
+            "Ghustavh97\\Larakey\\": "src"
         },
         "files": [
-            "src/helpers.php"
+            "src/Helpers.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Ghustavh97\\Guardian\\Test\\": "tests"
+            "Ghustavh97\\Larakey\\Test\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ghustavh97\\Guardian\\GuardianServiceProvider"
+                "Ghustavh97\\Larakey\\LarakeyServiceProvider"
             ]
         }
     },

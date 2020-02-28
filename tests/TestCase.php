@@ -1,41 +1,41 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
-use Ghustavh97\Guardian\Test\Models\Post;
-use Ghustavh97\Guardian\Test\Models\User;
-use Ghustavh97\Guardian\Test\Models\Admin;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Larakey\Test\Models\Post;
+use Ghustavh97\Larakey\Test\Models\User;
+use Ghustavh97\Larakey\Test\Models\Admin;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Ghustavh97\Guardian\GuardianServiceProvider;
-use Ghustavh97\Guardian\Test\Providers\RouteServiceProvider;
+use Ghustavh97\Larakey\LarakeyServiceProvider;
+use Ghustavh97\Larakey\Test\Providers\RouteServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Ghustavh97\Guardian\Test\Models\User */
+    /** @var \Ghustavh97\Larakey\Test\Models\User */
     protected $testUser;
 
-    /** @var \Ghustavh97\Guardian\Test\Models\Post */
+    /** @var \Ghustavh97\Larakey\Test\Models\Post */
     protected $testUserPost;
 
-    /** @var \Ghustavh97\Guardian\Test\Models\Admin */
+    /** @var \Ghustavh97\Larakey\Test\Models\Admin */
     protected $testAdmin;
 
-    /** @var \Ghustavh97\Guardian\Models\Role */
+    /** @var \Ghustavh97\Larakey\Models\Role */
     protected $testUserRole;
 
-    /** @var \Ghustavh97\Guardian\Models\Role */
+    /** @var \Ghustavh97\Larakey\Models\Role */
     protected $testAdminRole;
 
-    /** @var \Ghustavh97\Guardian\Models\Permission */
+    /** @var \Ghustavh97\Larakey\Models\Permission */
     protected $testUserPermission;
 
-    /** @var \Ghustavh97\Guardian\Models\Permission */
+    /** @var \Ghustavh97\Larakey\Models\Permission */
     protected $testAdminPermission;
 
     public function setUp(): void
@@ -86,7 +86,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            GuardianServiceProvider::class,
+            LarakeyServiceProvider::class,
             RouteServiceProvider::class
         ];
     }
@@ -114,7 +114,7 @@ abstract class TestCase extends Orchestra
         // Use test User model for users provider
         $app['config']->set('auth.providers.users.model', User::class);
 
-        $app['config']->set('cache.prefix', 'guardian_tests---');
+        $app['config']->set('cache.prefix', 'larakey_tests---');
 
         $app['config']->set('app.key', 'Idgz1PE3zO9iNc0E3oeH3CHDPX9MzZe3');
     }
@@ -126,7 +126,7 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        $app['config']->set('guardian.column_names.model_morph_key', 'model_id');
+        $app['config']->set('larakey.column_names.model_morph_key', 'model_id');
 
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -156,13 +156,13 @@ abstract class TestCase extends Orchestra
         });
 
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
-            $app[GuardianRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+            $app[LarakeyRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
         }
 
-        include_once __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub';
+        include_once __DIR__.'/../database/migrations/create_larakey_permission_tables.php.stub';
 
-        (new \CreateGuardianPermissionTables())->up();
+        (new \CreateLarakeyPermissionTables())->up();
 
         User::create(['email' => 'testUser@test.com']);
         Admin::create(['email' => 'testAdmin@test.com']);
@@ -187,7 +187,7 @@ abstract class TestCase extends Orchestra
      */
     protected function reloadPermissions()
     {
-        app(GuardianRegistrar::class)->forgetCachedPermissions();
+        app(LarakeyRegistrar::class)->forgetCachedPermissions();
     }
 
     public function createCacheTable()

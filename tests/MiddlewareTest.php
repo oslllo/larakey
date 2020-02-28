@@ -1,14 +1,14 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Ghustavh97\Guardian\Middlewares\RoleMiddleware;
-use Ghustavh97\Guardian\Exceptions\UnauthorizedException;
-use Ghustavh97\Guardian\Middlewares\PermissionMiddleware;
-use Ghustavh97\Guardian\Middlewares\RoleOrPermissionMiddleware;
+use Ghustavh97\Larakey\Middlewares\RoleMiddleware;
+use Ghustavh97\Larakey\Exceptions\UnauthorizedException;
+use Ghustavh97\Larakey\Middlewares\PermissionMiddleware;
+use Ghustavh97\Larakey\Middlewares\RoleOrPermissionMiddleware;
 
 class MiddlewareTest extends TestCase
 {

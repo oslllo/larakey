@@ -1,14 +1,14 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Illuminate\Support\Facades\DB;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Ghustavh97\Guardian\Test\Models\User;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Contracts\Permission;
-use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Larakey\Test\Models\User;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Contracts\Permission;
+use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 
 class CacheTest extends TestCase
 {
@@ -25,7 +25,7 @@ class CacheTest extends TestCase
     {
         parent::setUp();
 
-        $this->registrar = app(GuardianRegistrar::class);
+        $this->registrar = app(LarakeyRegistrar::class);
 
         $this->registrar->forgetCachedPermissions();
 
@@ -242,7 +242,7 @@ class CacheTest extends TestCase
     public function it_can_reset_the_cache_with_artisan_command()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-        $this->assertCount(1, \Ghustavh97\Guardian\Models\Permission::where('name', 'new-permission')->get());
+        $this->assertCount(1, \Ghustavh97\Larakey\Models\Permission::where('name', 'new-permission')->get());
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded
@@ -252,7 +252,7 @@ class CacheTest extends TestCase
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         Artisan::call('permission:create-role', ['name' => 'new-role']);
-        $this->assertCount(1, \Ghustavh97\Guardian\Models\Role::where('name', 'new-role')->get());
+        $this->assertCount(1, \Ghustavh97\Larakey\Models\Role::where('name', 'new-role')->get());
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded

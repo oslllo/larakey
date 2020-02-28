@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian\Exceptions;
+namespace Ghustavh97\Larakey\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -14,7 +14,7 @@ class UnauthorizedException extends HttpException
     {
         $message = 'User does not have the right roles.';
 
-        if (config('guardian.display_permission_in_exception')) {
+        if (config('larakey.display_permission_in_exception')) {
             $permStr = implode(', ', $roles);
             $message = 'User does not have the right roles. Necessary roles are '.$permStr;
         }
@@ -29,7 +29,7 @@ class UnauthorizedException extends HttpException
     {
         $message = 'User does not have the right permissions.';
 
-        if (config('guardian.display_permission_in_exception')) {
+        if (config('larakey.display_permission_in_exception')) {
             $permStr = implode(', ', $permissions);
             $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
         }
@@ -44,7 +44,7 @@ class UnauthorizedException extends HttpException
     {
         $message = 'User does not have any of the necessary access rights.';
 
-        if (config('guardian.display_permission_in_exception') && config('guardian.display_role_in_exception')) {
+        if (config('larakey.display_permission_in_exception') && config('larakey.display_role_in_exception')) {
             $permStr = implode(', ', $rolesOrPermissions);
             $message = 'User does not have the right permissions. Necessary permissions are '.$permStr;
         }

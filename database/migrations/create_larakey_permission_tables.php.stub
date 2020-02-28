@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateGuardianPermissionTables extends Migration
+class CreateLarakeyPermissionTables extends Migration
 {
     /**
      * Run the migrations.
@@ -13,23 +13,25 @@ class CreateGuardianPermissionTables extends Migration
      */
     public function up()
     {
-        $tableNames = config('guardian.table_names');
-        $columnNames = config('guardian.column_names');
+        $tableNames = config('larakey.table_names');
+        $columnNames = config('larakey.column_names');
 
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('guard_name');
             $table->string('title')->nullable();
+            $table->unique(['name', 'guard_name']);
             $table->timestamps();
         });
 
         Schema::create($tableNames['roles'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('level')->default(1);
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('title')->nullable();
             $table->string('guard_name');
+            $table->unique(['name', 'guard_name']);
             $table->timestamps();
         });
 
@@ -73,8 +75,8 @@ class CreateGuardianPermissionTables extends Migration
         });
 
         app('cache')
-            ->store(config('guardian.cache.store') != 'default' ? config('guardian.cache.store') : null)
-            ->forget(config('guardian.cache.key'));
+            ->store(config('larakey.cache.store') != 'default' ? config('larakey.cache.store') : null)
+            ->forget(config('larakey.cache.key'));
     }
 
     /**
@@ -84,7 +86,7 @@ class CreateGuardianPermissionTables extends Migration
      */
     public function down()
     {
-        $tableNames = config('guardian.table_names');
+        $tableNames = config('larakey.table_names');
 
         Schema::drop($tableNames['model_has_roles']);
         Schema::drop($tableNames['model_has_permissions']);

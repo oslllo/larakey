@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test\Controllers;
+namespace Ghustavh97\Larakey\Test\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use Ghustavh97\Guardian\Test\Models\Post;
+use Ghustavh97\Larakey\Test\Models\Post;
 
 class AuthorizeController extends Controller
 {

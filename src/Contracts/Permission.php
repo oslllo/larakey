@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian\Contracts;
+namespace Ghustavh97\Larakey\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -19,7 +19,7 @@ interface Permission
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      *
      * @return Permission
      */
@@ -31,7 +31,7 @@ interface Permission
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      *
      * @return Permission
      */

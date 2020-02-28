@@ -1,11 +1,11 @@
 <?php
 
-namespace Ghustavh97\Guardian\Commands;
+namespace Ghustavh97\Larakey\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Models\Role;
-use Ghustavh97\Guardian\Models\Permission;
+use Ghustavh97\Larakey\Models\Role;
+use Ghustavh97\Larakey\Models\Permission;
 
 class Show extends Command
 {

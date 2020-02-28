@@ -1,18 +1,19 @@
 <?php
 
-namespace Ghustavh97\Guardian;
+namespace Ghustavh97\Larakey\Padlock;
 
+use Ghustavh97\Larakey\Larakey;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Larakey\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Ghustavh97\Guardian\Contracts\ModelHasPermission;
-use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\Contracts\ModelHasPermission;
+use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
-class GuardianRegistrar
+class Cache
 {
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
@@ -24,7 +25,7 @@ class GuardianRegistrar
     protected $permissionClass;
 
     /** @var string */
-    protected $ModelHasPermissionClass;
+    protected $modelHasPermissionClass;
 
     /** @var string */
     protected $roleClass;
@@ -48,15 +49,15 @@ class GuardianRegistrar
     public static $cacheModelKey;
 
     /**
-     * GuardianRegistrar constructor.
+     * LarakeyRegistrar constructor.
      *
      * @param \Illuminate\Cache\CacheManager $cacheManager
      */
     public function __construct(CacheManager $cacheManager)
     {
-        $this->permissionClass = config('guardian.models.permission');
-        $this->ModelHasPermissionClass = config('guardian.models.permission_pivot');
-        $this->roleClass = config('guardian.models.role');
+        $this->permissionClass = config(Larakey::$permissionClass);
+        $this->modelHasPermissionClass = config(Larakey::$modelHasPermissionClass);
+        $this->roleClass = config(Larakey::$roleClass);
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();
@@ -64,13 +65,13 @@ class GuardianRegistrar
 
     protected function initializeCache()
     {
-        self::$cacheExpirationTime = config('guardian.cache.expiration_time', config('guardian.cache_expiration_time'));
+        self::$cacheExpirationTime = config(Larakey::$cacheExpirationTime);
 
-        self::$cachePermissionKey = config('guardian.cache.permission_key');
+        self::$cachePermissionKey = config(Larakey::$cachePermissionKey);
 
-        self::$cacheRoleKey = config('guardian.cache.role_key');
+        self::$cacheRoleKey = config(Larakey::$cacheRoleKey);
         
-        self::$cacheModelKey = config('guardian.cache.model_key');
+        self::$cacheModelKey = config(Larakey::$cacheModelKey);
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
@@ -81,7 +82,7 @@ class GuardianRegistrar
          * The'default' fallback here is from the permission.php config file,
          * where 'default' means to use config(cache.default)
          */
-        $cacheDriver = config('guardian.cache.store', 'default');
+        $cacheDriver = config(Larakey::$cacheStore, 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
@@ -96,26 +97,25 @@ class GuardianRegistrar
         return $this->cacheManager->store($cacheDriver);
     }
 
-    /**
-     * Register the permission check method on the gate.
-     * We resolve the Gate fresh here, for benefit of long-running instances.
-     *
-     * @return bool
-     */
-    public function registerPermissions(): bool
-    {
-        app(Gate::class)->before(function (Authorizable $user, $permission, $arguments = []) {
+    // /**
+    //  * Register the permission check method on the gate.
+    //  * We resolve the Gate fresh here, for benefit of long-running instances.
+    //  *
+    //  * @return bool
+    //  */
+    // public function registerPermissions(): bool
+    // {
+    //     app(Gate::class)->before(function (Authorizable $user, $permission, $arguments = []) {
 
-            if (method_exists($user, 'checkPermissionTo')) {
+    //         if (method_exists($user, 'checkPermissionTo')) {
+    //             $arguments = array_merge([$permission], $arguments);
 
-                $arguments = array_merge([$permission], $arguments);
+    //             return call_user_func_array(array($user, 'checkPermissionTo'), $arguments) ?: null;
+    //         }
+    //     });
 
-                return call_user_func_array(array($user, 'checkPermissionTo'), $arguments) ?: null;
-            }
-        });
-
-        return true;
-    }
+    //     return true;
+    // }
 
     /**
      * Flush the cache permissions.
@@ -140,7 +140,7 @@ class GuardianRegistrar
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getPermissions(array $params = []): Collection
+    public function getPermissions(array $params = []): Collection //!GetcachedPermissions
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(
@@ -212,7 +212,7 @@ class GuardianRegistrar
     /**
      * Get an instance of the permission class.
      *
-     * @return \Ghustavh97\Guardian\Contracts\Permission
+     * @return \Ghustavh97\Larakey\Contracts\Permission
      */
     public function getPermissionClass(): Permission
     {
@@ -222,7 +222,7 @@ class GuardianRegistrar
     /**
      * Get an instance of the role class.
      *
-     * @return \Ghustavh97\Guardian\Contracts\Role
+     * @return \Ghustavh97\Larakey\Contracts\Role
      */
     public function getRoleClass(): Role
     {
@@ -232,11 +232,11 @@ class GuardianRegistrar
     /**
      * Get an instance of the ModelHasPermission class.
      *
-     * @return \Ghustavh97\Guardian\Contracts\ModelHasPermission
+     * @return \Ghustavh97\Larakey\Contracts\ModelHasPermission
      */
-    public function getModelHasPermissionClass(): ModelHasPermission
+    public function getmodelHasPermissionClass(): ModelHasPermission
     {
-        return app($this->ModelHasPermissionClass);
+        return app($this->modelHasPermissionClass);
     }
 
     public function getModelFromAttributes($attributes = [])

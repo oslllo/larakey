@@ -1,30 +1,62 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
-use Ghustavh97\Guardian\Contracts\Role;
-use Ghustavh97\Guardian\Test\Models\User;
-use Ghustavh97\Guardian\Test\Models\Post;
-use Ghustavh97\Guardian\Contracts\Permission;
-use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
-use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
-use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
-use Ghustavh97\Guardian\Exceptions\PermissionNotAssigned;
+use Ghustavh97\Larakey\Contracts\Role;
+use Ghustavh97\Larakey\Test\Models\User;
+use Ghustavh97\Larakey\Test\Models\Post;
+use Ghustavh97\Larakey\Contracts\Permission;
+use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\PermissionNotAssigned;
+use Ghustavh97\Larakey\Exceptions\StrictPermission;
+use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 
 class HasPermissionsTest extends TestCase
 {
     /** @test */
-    public function it_can_assign_a_permission_to_a_user()
+    public function user_only_has_permission_assigned_to_them()
     {
-        $this->testUser->givePermissionTo($this->testUserPermission);
+        $this->testUser->givePermissionTo('view');
 
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, Post::class));
-        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo('view'));
 
         $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', '*'));
         $this->assertFalse($this->testUser->hasPermissionTo('manage', Post::class));
         $this->assertFalse($this->testUser->hasPermissionTo('manage', $this->testUserPost));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', Post::class, $this->testUserPost->id));
+    }
+
+    /** @test */
+    public function it_can_assign_a_permission_to_a_user()
+    {
+        $this->testUser->givePermissionTo('view');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('view'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', '*'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, $this->testUserPost->id));
+
+        $this->assertTrue($this->testUser->hasPermissionTo('view', 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', '*', 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', $this->testUserPost, 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, $this->testUserPost->id, 'web'));
+    }
+
+    /** @test */
+    public function it_can_assign_a_permission_to_a_user_with_wildcard_token()
+    {
+        $this->testUser->givePermissionTo('view', '*');
+
+        $this->assertTrue($this->testUser->hasPermissionTo('view'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', '*'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, $this->testUserPost->id));
     }
 
     /** @test */
@@ -32,21 +64,38 @@ class HasPermissionsTest extends TestCase
     {
         $this->testUser->givePermissionTo('manage', Post::class);
 
+        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', '*'));
+
         $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class));
         $this->assertTrue($this->testUser->hasPermissionTo('manage', $this->testUserPost));
-
-        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+        $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class, $this->testUserPost->id));
     }
 
     /** @test */
-    public function it_can_assign_permission_with_model_to_a_user()
+    public function it_can_assign_permission_with_model_instance_to_a_user()
     {
         $this->testUser->givePermissionTo('manage', $this->testUserPost);
 
+        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', '*'));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', Post::class));
+
         $this->assertTrue($this->testUser->hasPermissionTo('manage', $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class, $this->testUserPost->id));
+    }
+
+    /** @test */
+    public function it_can_assign_permission_with_model_class_and_id_to_a_user()
+    {
+        $this->testUser->givePermissionTo('manage', Post::class, $this->testUserPost->id);
 
         $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+        $this->assertFalse($this->testUser->hasPermissionTo('manage', '*'));
         $this->assertFalse($this->testUser->hasPermissionTo('manage', Post::class));
+
+        $this->assertTrue($this->testUser->hasPermissionTo('manage', $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo('manage', Post::class, $this->testUserPost->id));
     }
 
     /** @test */
@@ -85,6 +134,28 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_an_exception_when_strict_permission_assigment_true_and_no_permission_scope_is_provided()
+    {
+        $config = app('config');
+
+        $config->set('larakey.strict.permission.assignment', true);
+
+        $this->expectException(StrictPermission::class);
+
+        $this->testUser->givePermissionTo('view');
+    }
+
+    /** @test */
+    public function it_throws_an_exception_when_too_many_arguments_are_passed()
+    {
+        $this->expectException(InvalidArguments::class);
+
+        $this->testUser->hasPermissionTo('manage', Post::class, 'api', true, true);
+
+        $this->assertFalse($this->testUser->hasPermissionTo('manage'));
+    }
+
+    /** @test */
     public function it_can_revoke_a_permission_from_a_user()
     {
         $this->testUser->givePermissionTo($this->testUserPermission);
@@ -113,6 +184,22 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_revoke_a_permission_from_a_user_without_recursion()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission);
+        $this->testUser->givePermissionTo($this->testUserPermission, Post::class);
+        $this->testUser->givePermissionTo($this->testUserPermission, $this->testUserPost);
+
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission));
+
+        $this->testUser->revokePermissionTo($this->testUserPermission);
+
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testUserPost));
+    }
+
+    /** @test */
     public function it_can_revoke_a_permission_with_class_from_a_user_with_recursion()
     {
         $this->testUser->givePermissionTo($this->testUserPermission, Post::class);
@@ -126,6 +213,22 @@ class HasPermissionsTest extends TestCase
 
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission, Post::class));
         $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission, $this->testUserPost));
+    }
+
+    /** @test */
+    public function it_can_revoke_a_permission_with_class_from_a_user_without_recursion()
+    {
+        $this->testUser->givePermissionTo($this->testUserPermission, Post::class);
+        $this->testUser->givePermissionTo($this->testUserPermission, $this->testUserPost);
+
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testUserPost));
+        
+        $this->testUser->revokePermissionTo($this->testUserPermission, Post::class);
+
+        $this->assertFalse($this->testUser->hasPermissionTo($this->testUserPermission, Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo($this->testUserPermission, $this->testUserPost));
     }
 
     /** @test */
@@ -197,7 +300,9 @@ class HasPermissionsTest extends TestCase
     {
         $user1 = User::create(['email' => 'user1@test.com']);
         $user2 = User::create(['email' => 'user2@test.com']);
+
         $user1->givePermissionTo(['edit-articles', 'edit-news'], Post::class);
+        $user1->givePermissionTo('edit-articles', $this->testUser);
         $this->testUserRole->givePermissionTo('edit-articles', Post::class);
         $user2->assignRole('testUserRole');
 

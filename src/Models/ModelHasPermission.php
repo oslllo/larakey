@@ -1,9 +1,11 @@
 <?php
 
-namespace Ghustavh97\Guardian\Models;
+namespace Ghustavh97\Larakey\Models;
 
-use Ghustavh97\Guardian\Contracts\ModelHasPermission as ModelHasPermissionContract;
+use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Contracts\ModelHasPermission as ModelHasPermissionContract;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
+use Ghustavh97\Larakey\Exceptions\StrictPermission;
 
 class ModelHasPermission extends MorphPivot implements ModelHasPermissionContract
 {
@@ -13,14 +15,31 @@ class ModelHasPermission extends MorphPivot implements ModelHasPermissionContrac
 
     protected $guarded = [];
 
-    protected $table;
-
     public function __construct(array $attributes = [])
     {
-        $this->table = config('guardian.table_names.model_has_permissions');
-        // $this->setModelIdAttribute = function ($value) {
-        //     $this->attributes['model_id'] = (int) $value;
-        // };
+        $this->setTable(config('larakey.table_names.model_has_permissions'));
+
         parent::__construct($attributes);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($permission) {
+            if (! $permission->to_id || ! $permission->to_type) {
+                if (config(Larakey::$strictPermissionAssignment)) {
+                    throw StrictPermission::assignment();
+                }
+
+                if (! $permission->to_id) {
+                    $permission->to_id = Larakey::WILDCARD_TOKEN;
+                }
+
+                if (! $permission->to_type) {
+                    $permission->to_type = Larakey::WILDCARD_TOKEN;
+                }
+            }
+        });
     }
 }

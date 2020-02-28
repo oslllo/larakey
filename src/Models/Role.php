@@ -1,24 +1,24 @@
 <?php
 
-namespace Ghustavh97\Guardian\Models;
+namespace Ghustavh97\Larakey\Models;
 
-use Ghustavh97\Guardian\Guard;
+use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Traits\GuardianPermissions;
-use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
-use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
-use Ghustavh97\Guardian\Exceptions\RoleAlreadyExists;
-use Ghustavh97\Guardian\Contracts\Role as RoleContract;
-use Ghustavh97\Guardian\Traits\RefreshesPermissionCache;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Traits\HasLarakeyPermissions;
+use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Larakey\Exceptions\RoleAlreadyExists;
+use Ghustavh97\Larakey\Contracts\Role as RoleContract;
+use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use GuardianPermissions;
-    use RefreshesPermissionCache;
+    use HasLarakeyPermissions;
+    use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];
 
@@ -28,7 +28,7 @@ class Role extends Model implements RoleContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config('guardian.table_names.roles'));
+        $this->setTable(config('larakey.table_names.roles'));
     }
 
     public static function create(array $attributes = [])
@@ -50,12 +50,12 @@ class Role extends Model implements RoleContract
     public function permissions(): BelongsToMany
     {
         return $this->morphToMany(
-            config('guardian.models.permission'),
+            config('larakey.models.permission'),
             'model',
-            config('guardian.table_names.model_has_permissions'),
-            config('guardian.column_names.model_morph_key'),
+            config('larakey.table_names.model_has_permissions'),
+            config('larakey.column_names.model_morph_key'),
             'permission_id'
-        )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
+        )->using(config('larakey.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
     /**
@@ -66,9 +66,9 @@ class Role extends Model implements RoleContract
         return $this->morphedByMany(
             getModelForGuard($this->attributes['guard_name']),
             'model',
-            config('guardian.table_names.model_has_roles'),
+            config('larakey.table_names.model_has_roles'),
             'role_id',
-            config('guardian.column_names.model_morph_key')
+            config('larakey.column_names.model_morph_key')
         );
     }
 
@@ -78,9 +78,9 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Guardian\Contracts\Role|\Ghustavh97\Guardian\Models\Role
+     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\RoleDoesNotExist
+     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): RoleContract
     {
@@ -121,7 +121,7 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Guardian\Contracts\Role
+     * @return \Ghustavh97\Larakey\Contracts\Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
@@ -141,7 +141,7 @@ class Role extends Model implements RoleContract
      */
     protected static function getRoles(array $params = []): Collection
     {
-        return app(GuardianRegistrar::class)
+        return app(LarakeyRegistrar::class)
             ->setRoleClass(static::class)
             ->getRoles($params);
     }
@@ -153,7 +153,7 @@ class Role extends Model implements RoleContract
      *
      * @return bool
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch
+     * @throws \Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {

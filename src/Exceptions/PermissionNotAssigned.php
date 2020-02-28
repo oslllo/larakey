@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Guardian\Exceptions;
+namespace Ghustavh97\Larakey\Exceptions;
 
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Guardian\Contracts\Permission;
+use Ghustavh97\Larakey\Contracts\Permission;
 
 class PermissionNotAssigned extends InvalidArgumentException
 {

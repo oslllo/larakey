@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Illuminate\Support\Facades\Auth;
-use Ghustavh97\Guardian\Test\Models\Post;
+use Ghustavh97\Larakey\Test\Models\Post;
 
 class ControllerTest extends TestCase
 {

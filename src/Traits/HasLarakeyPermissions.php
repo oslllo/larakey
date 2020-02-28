@@ -1,29 +1,33 @@
 <?php
 
-namespace Ghustavh97\Guardian\Traits;
+namespace Ghustavh97\Larakey\Traits;
 
-use Ghustavh97\Guardian\Guard;
+use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Contracts\Permission;
-use Ghustavh97\Guardian\Models\ModelHasPermission;
-use Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Contracts\Permission;
+use Ghustavh97\Larakey\Models\ModelHasPermission;
+use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
-use Ghustavh97\Guardian\Exceptions\PermissionDoesNotExist;
-use Ghustavh97\Guardian\Exceptions\PermissionNotAssigned;
-use Ghustavh97\Guardian\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\StrictPermission;
+use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
+use Ghustavh97\Larakey\Exceptions\PermissionNotAssigned;
+use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\LarakeyPermissionScope;
+use Ghustavh97\Larakey\Larakey;
 
-trait GuardianPermissions
+use Ghustavh97\Larakey\Cache;
+
+trait HasLarakeyPermissions
 {
-    use GuardianHelpers;
+    use LarakeyHelpers;
 
     private $permissionClass;
 
-    public static function bootGuardianPermissions()
+    public static function bootHasLarakeyPermissions()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -37,7 +41,7 @@ trait GuardianPermissions
     public function getPermissionClass()
     {
         if (! isset($this->permissionClass)) {
-            $this->permissionClass = app(GuardianRegistrar::class)->getPermissionClass();
+            $this->permissionClass = app(LarakeyRegistrar::class)->getPermissionClass();
         }
 
         return $this->permissionClass;
@@ -49,33 +53,25 @@ trait GuardianPermissions
     public function permissions(): MorphToMany
     {
         return $this->morphToMany(
-            config('guardian.models.permission'),
+            config('larakey.models.permission'),
             'model',
-            config('guardian.models.permission_pivot'),
-            config('guardian.column_names.model_morph_key'),
+            config('larakey.models.permission_pivot'),
+            config('larakey.column_names.model_morph_key'),
             'permission_id'
         )->withPivot(['to_type', 'to_id'])->withTimestamps();
-
-        // return $this->morphToMany(
-        //     config('guardian.models.permission'),
-        //     'model',
-        //     config('guardian.table_names.model_has_permissions'),
-        //     config('guardian.column_names.model_morph_key'),
-        //     'permission_id'
-        // )->using(config('guardian.models.permission_pivot'))->withPivot(['to_type', 'to_id'])->withTimestamps();
     }
 
     /**
      * Scope the model query to certain permissions only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopePermission(Builder $query, $permissions, $pivot = null): Builder
+    public function scopePermission(Builder $query, $permissions, $model = null): Builder
     {
-        $pivot = $this->getPivot($pivot);
+        $permissionScope = $this->getPermissionScope($model);
 
         $permissions = $this->convertToPermissionModels($permissions);
 
@@ -83,38 +79,21 @@ trait GuardianPermissions
             return array_merge($result, $permission->roles->all());
         }, []));
 
-        $query = $query->where(function ($query) use ($permissions, $rolesWithPermissions, $pivot) {
-            $query->whereHas('permissions', function ($query) use ($permissions, $pivot) {
-                $query->where(config('guardian.table_names.model_has_permissions').'.to_id', $pivot['to_id']);
-                $query->where(config('guardian.table_names.model_has_permissions').'.to_type', $pivot['to_type']);
-
-                $query->where(function ($query) use ($permissions) {
-                    foreach ($permissions as $permission) {
-                        $query->orWhere(config('guardian.table_names.permissions').'.id', $permission->id);
-                    }
-                });
+        $query = $query->where(function ($query) use ($permissions, $rolesWithPermissions, $permissionScope) {
+            $query->whereHas('permissions', function ($query) use ($permissions, $permissionScope) {
+                $query->where(config(Larakey::$modelHasPermissionTableName).'.to_id', $permissionScope->to_id)
+                    ->where(config(Larakey::$modelHasPermissionTableName).'.to_type', $permissionScope->to_type)
+                    ->whereIn(config(Larakey::$permissionsTableName).'.id', \array_column($permissions, 'id'));
             });
             
             if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions, $permissions, $pivot) {
-                    $query->where(function ($query) use ($rolesWithPermissions, $permissions, $pivot) {
-                        foreach ($rolesWithPermissions as $role) {
-                            $query->orWhere(config('guardian.table_names.roles').'.id', $role->id)
-                            ->whereHas('permissions', function ($query) use ($permissions, $pivot) {
-                                $query->where(config('guardian.table_names.model_has_permissions')
-                                .'.to_id', $pivot['to_id']);
-                                $query->where(config('guardian.table_names.model_has_permissions')
-                                .'.to_type', $pivot['to_type']);
-
-
-                                $query->where(function ($query) use ($permissions) {
-                                    foreach ($permissions as $permission) {
-                                        $query->orWhere(config('guardian.table_names.permissions')
-                                        .'.id', $permission->id);
-                                    }
-                                });
-                            });
-                        }
+                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions, $permissions, $permissionScope) {
+                    $query->where(function ($query) use ($rolesWithPermissions, $permissions, $permissionScope) {
+                        $query->whereIn(config(Larakey::$rolesTableName).'.id', \array_column($rolesWithPermissions, 'id'))
+                        ->whereHas('permissions', function ($query) use ($permissions, $permissionScope) {
+                            $query->where(config(Larakey::$modelHasPermissionTableName).'.to_id', $permissionScope->to_id)
+                                ->where(config(Larakey::$modelHasPermissionTableName).'.to_type', $permissionScope->to_type);
+                        });
                     });
                 });
             }
@@ -124,7 +103,7 @@ trait GuardianPermissions
     }
 
     /**
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return array
      */
@@ -145,27 +124,11 @@ trait GuardianPermissions
         }, $permissions);
     }
 
-    private function getPermissionModel($to)
-    {
-        if (is_string($to)) {
-            if (! class_exists($to)) {
-                throw ClassDoesNotExist::check($to);
-            }
-            return new $to;
-        }
-
-        if ($to instanceof Model) {
-            return $to;
-        }
-
-        return null;
-    }
-
     // get one permission only
     private function getPermission($permission, $guard = null): Permission
     {
         $permissionClass = $this->getPermissionClass();
-        $guard = $guard ? $guard : $this->getDefaultGuardName();
+        $guard = $this->getGuard($guard);
 
         if (is_array($permission)) {
             $permission = $permission[0];
@@ -189,7 +152,7 @@ trait GuardianPermissions
     /**
      * Determine if the model may perform the given permission.
      *
-     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Larakey\Contracts\Permission $permission
      * @param string|null $guardName
      *
      * @return bool
@@ -204,7 +167,7 @@ trait GuardianPermissions
     /**
      * An alias to hasPermissionTo(), but avoids throwing an exception.
      *
-     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Larakey\Contracts\Permission $permission
      * @param string|null $guardName
      *
      * @return bool
@@ -280,15 +243,17 @@ trait GuardianPermissions
     /**
      * Determine if the model has, via roles, the given permission.
      *
-     * @param \Ghustavh97\Guardian\Contracts\Permission $permission
+     * @param \Ghustavh97\Larakey\Contracts\Permission $permission
      *
      * @return bool
      */
     protected function hasPermissionViaRole(...$arguments): bool
     {
-        $arguments = collect($this->getArguments($arguments));
-        $guard = $this->getGuard($arguments->get('guard'));
-        $permission = $this->getPermission($arguments->get('permissions'), $guard);
+        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
+                ->only(['permissions', 'guard'])
+                ->all());
+
+        $permission = $this->getPermission($permissions, $guard);
 
         if ($this instanceof Role) {
             $role = $this;
@@ -309,27 +274,23 @@ trait GuardianPermissions
     /**
      * Determine if the model has the given permission.
      *
-     * @param string|int|\Ghustavh97\Guardian\Contracts\Permission $permission
+     * @param string|int|\Ghustavh97\Larakey\Contracts\Permission $permission
      *
      * @return bool
      * @throws PermissionDoesNotExist
      */
     public function hasDirectPermission(...$arguments): bool
     {
-        // var_dump('Checking direct permission');
-        $arguments = collect($this->getArguments($arguments));
+        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
+                ->only(['permissions', 'model', 'recursive', 'guard'])
+                ->all());
 
-        $guard = $this->getGuard($arguments->get('guard'));
-        $permission = $this->getPermission($arguments->get('permissions'), $guard);
-        $model = $arguments->get('model');
-        $pivot = $this->getPivot($model);
+        $permission = $this->getPermission($permissions, $guard);
 
-        return $this->permissions->contains(function ($thisPermission, $key) use ($model, $permission, $pivot) {
-            return (string) $thisPermission->id === (string) $permission->id
-                && ((string) $thisPermission->to_id === (string) $pivot['to_id'] ||
-                    (string) $thisPermission->to_id === '*')
-                && ((string) $thisPermission->to_type === (string) $pivot['to_type'] ||
-                    (string) $thisPermission->to_type === '*');
+        $permissionScope = $this->getPermissionScope($model);
+
+        return $this->permissions->contains(function ($value) use ($permission, $permissionScope) {
+            return $value->matches($permission, $permissionScope);
         });
     }
 
@@ -372,15 +333,15 @@ trait GuardianPermissions
     /**
      * Grant the given permission(s) to a role.
      *
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param mixed| $arguments
      *
      * @return $this
      */
     public function givePermissionTo(...$arguments)
     {
-        $arguments = collect($this->getArguments($arguments));
-        $permissions = $arguments->get('permissions');
-        $model = $arguments->get('model');
+        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
+        ->only(['permissions', 'model'])
+        ->all());
 
         $permissions = collect($permissions)
             ->flatten()
@@ -399,27 +360,22 @@ trait GuardianPermissions
             ->map->id
             ->all();
 
-        $model = (object) [
-            'this' => $this->getModel(),
-            'to' => $model
-        ];
-
-        if (! $model->to && config('guardian.strict.permission.assignment')) {
-            throw StrictModeRestriction::assignment();
+        if (! $model && config(Larakey::$strictPermissionAssignment)) {
+            throw StrictPermission::assignment();
         }
 
         $permissions = collect($permissions)->map(function ($permission, $key) use ($model) {
-            $pivot = $this->getPivot($model->to);
+            $permissionScope = $this->getPermissionScope($model);
 
             if ($this->permissions()
                     ->where('id', $permission)
-                    ->wherePivot('to_id', $pivot['to_id'])
-                    ->wherePivot('to_type', $pivot['to_type'])
+                    ->wherePivot('to_id', $permissionScope->to_id)
+                    ->wherePivot('to_type', $permissionScope->to_type)
                     ->first()) {
                 return false;
             }
 
-            return array($permission => $pivot);
+            return array($permission => $permissionScope->getPivot());
         })
         ->reject(function ($value) {
             return $value === false;
@@ -435,17 +391,19 @@ trait GuardianPermissions
         }
 
         $permissions = $temp;
+
+        $self = $this->getModel();
         
-        if ($model->this->exists) {
+        if ($self->exists) {
             $this->permissions()->attach($permissions);
-            $model->this->load('permissions');
+            $self->load('permissions');
         } else {
-            $class = \get_class($model->this);
+            $class = \get_class($self);
 
             $class::saved(
-                function ($object) use ($permissions, $model) {
+                function ($object) use ($permissions, $self) {
                     static $modelLastFiredOn;
-                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $model->this) {
+                    if ($modelLastFiredOn !== null && $modelLastFiredOn === $self) {
                         return;
                     }
                     $object->permissions()->attach($permissions);
@@ -467,7 +425,7 @@ trait GuardianPermissions
     /**
      * Remove all current permissions and set the given ones.
      *
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -481,53 +439,56 @@ trait GuardianPermissions
     /**
      * Revoke the given permission.
      *
-     * @param \Ghustavh97\Guardian\Contracts\Permission
-     * |\Ghustavh97\Guardian\Contracts\Permission[]
+     * @param \Ghustavh97\Larakey\Contracts\Permission
+     * |\Ghustavh97\Larakey\Contracts\Permission[]
      * |string|string[] $permission
      *
      * @return $this
      */
     public function revokePermissionTo(...$arguments)
     {
-        $arguments = collect($this->getArguments($arguments));
-        $permissions = $arguments->get('permissions');
-        $model = $arguments->get('model');
-        $recursive = $arguments->get('recursive');
-        $pivot = $this->getPivot($model);
+        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
+                ->only(['permissions', 'model', 'recursive'])
+                ->all());
 
-        foreach ($permissions as $permission) {
+        $permissionScope = $this->getPermissionScope($model);
+
+        collect($permissions)->each(function ($permission) use ($recursive, $permissionScope) {
+
             if (! $permission instanceof Permission) {
                 $permission = $this->getPermission($permission);
             }
 
-            $id = $permission->id;
+            $detach = $permission->id;
 
-            if ($pivot['to_type'] === '*' && $pivot['to_id'] === '*') {
+            if ($permissionScope->hasFullRange()) {
                 $permission = $this->permissions()->where('id', $permission->id);
+
                 if (! $recursive) {
-                    $permission = $permission->wherePivot('to_type', '*')
-                                             ->wherePivot('to_type', '*');
+                    $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN)
+                                             ->wherePivot('to_type', Larakey::WILDCARD_TOKEN);
                 }
-            } elseif (($pivot['to_type'] !== '*' && $pivot['to_id'] === '*')) {
+            } elseif ($permissionScope->hasClassRange()) {
                 $permission = $this->permissions()
                                 ->where('id', $permission->id)
-                                ->wherePivot('to_type', $pivot['to_type']);
+                                ->wherePivot('to_type', $permissionScope->to_type);
+
                 if (! $recursive) {
-                    $permission = $permission->wherePivot('to_id', '*');
+                    $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN);
                 }
             } else {
                 $permission = $this->permissions()
                                 ->where('id', $permission->id)
-                                ->wherePivot('to_type', $pivot['to_type'])
-                                ->wherePivot('to_id', $pivot['to_id']);
+                                ->wherePivot('to_id', $permissionScope->to_id)
+                                ->wherePivot('to_type', $permissionScope->to_type);
             }
 
             if (! $permission->first()) {
                 throw new PermissionNotAssigned;
             }
 
-            $permission->detach($id);
-        }
+            $permission->detach($detach);
+        });
 
         $this->forgetCachedPermissions();
 
@@ -546,9 +507,9 @@ trait GuardianPermissions
     }
 
     /**
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Permission[]|\Illuminate\Support\Collection
+     * @return \Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Contracts\Permission[]|\Illuminate\Support\Collection
      */
     protected function getStoredPermission($permission)
     {
@@ -581,9 +542,9 @@ trait GuardianPermissions
     }
 
     /**
-     * @param \Ghustavh97\Guardian\Contracts\Permission|\Ghustavh97\Guardian\Contracts\Role $roleOrPermission
+     * @param \Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Contracts\Role $roleOrPermission
      *
-     * @throws \Ghustavh97\Guardian\Exceptions\GuardDoesNotMatch
+     * @throws \Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
@@ -597,6 +558,6 @@ trait GuardianPermissions
      */
     public function forgetCachedPermissions($reload = false)
     {
-        app(GuardianRegistrar::class)->forgetCachedPermissions($reload);
+        app(LarakeyRegistrar::class)->forgetCachedPermissions($reload);
     }
 }

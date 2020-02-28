@@ -1,21 +1,22 @@
 <?php
 
-namespace Ghustavh97\Guardian\Traits;
+namespace Ghustavh97\Larakey\Traits;
 
+use Ghustavh97\Larakey\Larakey;
 use Illuminate\Support\Collection;
-use Ghustavh97\Guardian\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Guardian\GuardianRegistrar;
-use Ghustavh97\Guardian\Exceptions\RoleDoesNotExist;
+use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-trait GuardianRoles
+trait HasLarakeyRoles
 {
-    use GuardianPermissions;
+    use HasLarakeyPermissions;
 
     private $roleClass;
 
-    public static function bootGuardianRoles()
+    public static function bootHasLarakeyRoles()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -29,7 +30,7 @@ trait GuardianRoles
     public function getRoleClass()
     {
         if (! isset($this->roleClass)) {
-            $this->roleClass = app(GuardianRegistrar::class)->getRoleClass();
+            $this->roleClass = app(LarakeyRegistrar::class)->getRoleClass();
         }
 
         return $this->roleClass;
@@ -41,10 +42,10 @@ trait GuardianRoles
     public function roles(): MorphToMany
     {
         return $this->morphToMany(
-            config('guardian.models.role'),
+            config('larakey.models.role'),
             'model',
-            config('guardian.table_names.model_has_roles'),
-            config('guardian.column_names.model_morph_key'),
+            config('larakey.table_names.model_has_roles'),
+            config('larakey.column_names.model_morph_key'),
             'role_id'
         )->withTimestamps();
     }
@@ -53,7 +54,7 @@ trait GuardianRoles
      * Scope the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -80,18 +81,14 @@ trait GuardianRoles
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
-            $query->where(function ($query) use ($roles) {
-                foreach ($roles as $role) {
-                    $query->orWhere(config('guardian.table_names.roles').'.id', $role->id);
-                }
-            });
+            $query->whereIn(config(Larakey::$rolesTableName).'.id', \array_column($roles, 'id'));
         });
     }
 
     /**
      * Assign the given role to the model.
      *
-     * @param array|string|\Ghustavh97\Guardian\Contracts\Role ...$roles
+     * @param array|string|\Ghustavh97\Larakey\Contracts\Role ...$roles
      *
      * @return $this
      */
@@ -150,7 +147,7 @@ trait GuardianRoles
     /**
      * Revoke the given role from the model.
      *
-     * @param string|\Ghustavh97\Guardian\Contracts\Role $role
+     * @param string|\Ghustavh97\Larakey\Contracts\Role $role
      */
     public function removeRole($role)
     {
@@ -168,7 +165,7 @@ trait GuardianRoles
     /**
      * Remove all current roles and set the given ones.
      *
-     * @param  array|\Ghustavh97\Guardian\Contracts\Role|string  ...$roles
+     * @param  array|\Ghustavh97\Larakey\Contracts\Role|string  ...$roles
      *
      * @return $this
      */
@@ -206,7 +203,7 @@ trait GuardianRoles
     /**
      * Determine if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
      * @return bool
      */
@@ -258,7 +255,7 @@ trait GuardianRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param string|int|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -270,7 +267,7 @@ trait GuardianRoles
     /**
      * Determine if the model has all of the given role(s).
      *
-     * @param  string|array|\Ghustavh97\Guardian\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @param  string|null  $guard
      * @return bool
      */
@@ -334,6 +331,6 @@ trait GuardianRoles
      */
     public function forgetCachedRoles($reload = false)
     {
-        app(GuardianRegistrar::class)->forgetCachedRoles($reload);
+        app(LarakeyRegistrar::class)->forgetCachedRoles($reload);
     }
 }
