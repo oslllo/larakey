@@ -303,7 +303,9 @@ class HasPermissionsTest extends TestCase
 
         $user1->givePermissionTo(['edit-articles', 'edit-news'], Post::class);
         $user1->givePermissionTo('edit-articles', $this->testUser);
+
         $this->testUserRole->givePermissionTo('edit-articles', Post::class);
+        
         $user2->assignRole('testUserRole');
 
         $scopedUsers1 = User::permission('edit-articles', Post::class)->get();

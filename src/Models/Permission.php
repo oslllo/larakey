@@ -15,7 +15,6 @@ use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Padlock\Access;
 use Ghustavh97\Larakey\Padlock\Cache;
 
 
@@ -75,14 +74,14 @@ class Permission extends Model implements PermissionContract
         )->using(config('larakey.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
-    public function matches(self $permission, Access $key)
-    {
-        return (string) $this->id === (string) $permission->id
-            && ((string) $this->to_id === (string) $key->to_id
-            || (string) $this->to_id === Larakey::WILDCARD_TOKEN)
-            && ((string) $this->to_type === (string) $key->to_type
-            || (string) $this->to_type === Larakey::WILDCARD_TOKEN);
-    }
+    // public function matches(self $permission, Key $key)
+    // {
+    //     return (string) $this->id === (string) $permission->id
+    //         && ((string) $this->to_id === (string) $key->to_id
+    //         || (string) $this->to_id === Larakey::WILDCARD_TOKEN)
+    //         && ((string) $this->to_type === (string) $key->to_type
+    //         || (string) $this->to_type === Larakey::WILDCARD_TOKEN);
+    // }
 
     /**
      * A permission belongs to some users of the model associated with its guard.

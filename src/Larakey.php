@@ -5,9 +5,10 @@ namespace Ghustavh97\Larakey;
 use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\LarakeyPermissionScope;
 use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+
+use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Config;
 
 use Ghustavh97\Larakey\Contracts\Role;
@@ -20,38 +21,6 @@ class Larakey
     const HAS_DIRECT_PERMISSION_FUNCTION = ['NAME' => 'hasDirectPermission', 'ARGUMENT_LIMIT' => 4];
 
     const GIVE_PERMISSION_TO_FUNCTION = ['NAME' => 'givePermissionTo', 'ARGUMENT_LIMIT' => 3];
-
-    // public static $permissionClass = 'larakey.models.permission';
-
-    // public static $modelHasPermissionClass = 'larakey.models.permission_pivot';
-
-    // public static $roleClass = 'larakey.models.role';
-
-    // public static $rolesTableName = 'larakey.table_names.roles';
-
-    // public static $permissionsTableName = 'larakey.table_names.permissions';
-
-    // public static $modelHasPermissionTableName = 'larakey.table_names.model_has_permissions';
-
-    // public static $modelMorphKeyColumnName = 'larakey.column_names.model_morph_key';
-
-    // public static $displayPermissionInException = 'larakey.display_permission_in_exception';
-
-    // public static $cacheExpirationTime = 'larakey.cache.expiration_time';
-
-    // public static $cachePermissionKey = 'larakey.cache.permission_key';
-
-    // public static $cacheRoleKey = 'larakey.cache.role_key';
-
-    // public static $cacheModelKey = 'larakey.cache.model_key';
-
-    // public static $cacheStore = 'larakey.cache.store';
-
-    // public static $strictPermissionAssignment = 'larakey.strict.permission.assignment';
-
-    // public static $checkifClassExists = 'larakey.check_if_class_exists';
-
-    // public static $authGuards = 'auth.guards';
     
     /** @var string */
     protected $roleClass;
@@ -67,6 +36,18 @@ class Larakey
         $this->roleClass = config(Config::$roleClass);
         $this->permissionClass = config(Config::$permissionClass);
         $this->modelHasPermissionClass = config(Config::$modelHasPermissionClass);
+    }
+
+    /**
+     * Get the permission key.
+     *
+     * @param string|object|\Illuminate\Database\Eloquent\Model $to
+     *
+     * @return \Ghustavh97\Larakey\Padlock\Key
+     */
+    public function getKey($to, $permission = null): Key
+    {
+        return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
     }
 
     /**

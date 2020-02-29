@@ -14,9 +14,13 @@ use Ghustavh97\Larakey\Padlock\Access as LarakeyAccess;
 use Ghustavh97\Larakey\Padlock\Cache as LarakeyCache;
 use Ghustavh97\Larakey\Padlock\Gate as LarakeyGate;
 
+use Ghustavh97\Larakey\Padlock\Key;
+use Ghustavh97\Larakey\Padlock\Cache;
+use Ghustavh97\Larakey\Padlock\Gate;
+
 class LarakeyServiceProvider extends ServiceProvider
 {
-    public function boot(LarakeyGate $larakeyGate, LarakeyCache $larakeyCache, Filesystem $filesystem)
+    public function boot(Gate $gate, Cache $cache, Filesystem $filesystem)
     {
         if (function_exists('config_path')) {
             $this->publishes([
@@ -43,31 +47,21 @@ class LarakeyServiceProvider extends ServiceProvider
             return new Larakey;
         });
 
-        $this->app->singleton(LarakeyCache::class, function ($app) use ($larakeyCache) {
-            return $larakeyCache;
+        $this->app->singleton(Cache::class, function ($app) use ($cache) {
+            return $cache;
         });
 
-        $this->app->singleton(LarakeyAccess::class, function ($app, $parameters) {
-            return new LarakeyAccess($parameters['to']);
+        $this->app->singleton(Key::class, function ($app, $parameters) {
+            return new Key($parameters['to'], $parameters['permission']);
         });
 
-        $this->app->singleton(LarakeyGate::class, function ($app) use ($larakeyGate) {
-            return $larakeyGate;
+        $this->app->singleton(Gate::class, function ($app) use ($gate) {
+            return $gate;
         });
 
         $this->registerModelBindings();
 
-        $larakeyGate->registerPermissions();
-
-        // $permissionLoader->registerPermissions();
-
-        // $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
-        //     return $permissionLoader;
-        // });
-
-        // $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
-        //     return $permissionLoader;
-        // });
+        $gate->registerPermissions();
     }
 
     public function register()

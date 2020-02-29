@@ -21,11 +21,11 @@ use Ghustavh97\Larakey\Larakey;
 
 use Ghustavh97\Larakey\Padlock\Cache;
 use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Padlock\Access;
+use Ghustavh97\Larakey\Padlock\Key;
 
 trait HasLarakeyPermissions
 {
-    use LarakeyHelpers;
+    use LarakeyTraitHelpers;
 
     private $permissionClass;
 
@@ -71,9 +71,9 @@ trait HasLarakeyPermissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopePermission(Builder $query, $permissions, $model = null): Builder
+    public function scopePermission(Builder $query, $permissions, $to = null): Builder
     {
-        $permissionScope = $this->getPermissionAccess($model);
+        $permissionScope = $this->locksmith()->getKey($to);
 
         $permissions = $this->convertToPermissionModels($permissions);
 
@@ -284,16 +284,14 @@ trait HasLarakeyPermissions
     public function hasDirectPermission(...$arguments): bool
     {
         extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-                ->only(['permissions', 'model', 'recursive', 'guard'])
+                ->only(['permissions', 'to', 'recursive', 'guard'])
                 ->all());
 
         $permission = $this->getPermission($permissions, $guard);
 
-        $permissionScope = $this->getPermissionAccess($model);
+        $key = $this->locksmith()->getKey($to);
 
-        return $this->permissions->contains(function ($value) use ($permission, $permissionScope) {
-            return $value->matches($permission, $permissionScope);
-        });
+        return $key->unlocks($this, $permission);
     }
 
     /**
@@ -342,12 +340,12 @@ trait HasLarakeyPermissions
     public function givePermissionTo(...$arguments)
     {
         extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-        ->only(['permissions', 'model'])
+        ->only(['permissions', 'to'])
         ->all());
 
         $permissions = collect($permissions)
             ->flatten()
-            ->map(function ($permission) use ($model) {
+            ->map(function ($permission) use ($to) {
                 if (empty($permission)) {
                     return false;
                 }
@@ -362,12 +360,12 @@ trait HasLarakeyPermissions
             ->map->id
             ->all();
 
-        if (! $model && config(Config::$strictPermissionAssignment)) {
+        if (! $to && config(Config::$strictPermissionAssignment)) {
             throw StrictPermission::assignment();
         }
 
-        $permissions = collect($permissions)->map(function ($permission, $key) use ($model) {
-            $permissionScope = $this->getPermissionAccess($model);
+        $permissions = collect($permissions)->map(function ($permission, $key) use ($to) {
+            $permissionScope = $this->locksmith()->getKey($to);
 
             if ($this->permissions()
                     ->where('id', $permission)
@@ -450,10 +448,10 @@ trait HasLarakeyPermissions
     public function revokePermissionTo(...$arguments)
     {
         extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-                ->only(['permissions', 'model', 'recursive'])
+                ->only(['permissions', 'to', 'recursive'])
                 ->all());
 
-        $permissionScope = $this->getPermissionAccess($model);
+        $permissionScope = $this->locksmith()->getKey($to);
 
         collect($permissions)->each(function ($permission) use ($recursive, $permissionScope) {
 
@@ -463,14 +461,14 @@ trait HasLarakeyPermissions
 
             $detach = $permission->id;
 
-            if ($permissionScope->hasFullRange()) {
+            if ($permissionScope->hasAllAccess()) {
                 $permission = $this->permissions()->where('id', $permission->id);
 
                 if (! $recursive) {
                     $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN)
                                              ->wherePivot('to_type', Larakey::WILDCARD_TOKEN);
                 }
-            } elseif ($permissionScope->hasClassRange()) {
+            } elseif ($permissionScope->hasClassAccess()) {
                 $permission = $this->permissions()
                                 ->where('id', $permission->id)
                                 ->wherePivot('to_type', $permissionScope->to_type);

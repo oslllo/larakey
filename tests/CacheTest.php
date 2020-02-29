@@ -40,14 +40,14 @@ class CacheTest extends TestCase
 
         $cacheStore = $this->cache->getCacheStore();
 
+        $this->cache_run_count = $this->cache_permissions_run_count + $this->cache_roles_run_count;
+
         switch (true) {
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
                 $this->cache_init_count = 1;
                 $this->cache_load_count = 1;
             default:
         }
-
-        $this->cache_run_count = $this->cache_permissions_run_count + $this->cache_roles_run_count;
     }
 
     /** @test */

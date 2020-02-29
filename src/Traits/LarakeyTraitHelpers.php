@@ -6,12 +6,12 @@ use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Access;
+use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
-trait LarakeyHelpers
+trait LarakeyTraitHelpers
 {
     protected function convertPipeToArray(string $pipeString)
     {
@@ -45,17 +45,22 @@ trait LarakeyHelpers
         return Guard::getDefaultName($this);
     }
 
-    /**
-     * Get the permission scope.
-     *
-     * @param string|object|\Illuminate\Database\Eloquent\Model $model
-     *
-     * @return \Ghustavh97\Larakey\Padlock\Access
-     */
-    protected function getPermissionAccess($to): Access
+    protected function locksmith(): Larakey
     {
-        return app()->makeWith(Access::class, ['to' => $to]);
+        return app(Larakey::class);
     }
+
+    // /**
+    //  * Get the permission scope.
+    //  *
+    //  * @param string|object|\Illuminate\Database\Eloquent\Model $to
+    //  *
+    //  * @return \Ghustavh97\Larakey\Padlock\Key
+    //  */
+    // protected function getKey($to, $permission = null): Key
+    // {
+    //     return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
+    // }
 
     protected function getPermissionArguments(string $functionName, array $arguments): Collection
     {
@@ -75,7 +80,7 @@ trait LarakeyHelpers
             throw InvalidArguments::tooMany();
         }
 
-        $data = collect(['permissions', 'model', 'guard', 'recursive', 'id'])->mapWithKeys(function ($value) {
+        $data = collect(['permissions', 'to', 'guard', 'recursive', 'id'])->mapWithKeys(function ($value) {
             return [$value => null];
         });
 
@@ -96,24 +101,24 @@ trait LarakeyHelpers
                 return true;
             }
 
-            if ($data['model'] === null
+            if ($data['to'] === null
                 &&  (\is_string($argument) && \strpos($argument, '\\') !== false)
                 || $argument instanceof Model) {
-                $model = null;
+                $to = null;
                 
                 if (is_string($argument)) {
                     if (! class_exists($argument)) {
                         throw ClassDoesNotExist::check($argument);
                     }
 
-                    $model = new $argument;
+                    $to = new $argument;
                 }
         
                 if ($argument instanceof Model) {
-                    $model = $argument;
+                    $to = $argument;
                 }
         
-                $data['model'] = $model;
+                $data['to'] = $to;
             }
 
             if ($data['id'] === null
@@ -137,11 +142,11 @@ trait LarakeyHelpers
             }
         });
 
-        if ($data['model'] !== null
-            && $data['model'] instanceof Model
-            && ! $data['model']->exists
+        if ($data['to'] !== null
+            && $data['to'] instanceof Model
+            && ! $data['to']->exists
             && $data['id'] !== null) {
-                $data['model'] = get_class($data['model'])::find($data['id']);
+                $data['to'] = get_class($data['to'])::find($data['id']);
         }
 
         return $data;
