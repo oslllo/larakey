@@ -3,7 +3,7 @@
 namespace Ghustavh97\Larakey\Commands;
 
 use Illuminate\Console\Command;
-use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Padlock\Cache;
 
 class CacheReset extends Command
 {
@@ -13,7 +13,7 @@ class CacheReset extends Command
 
     public function handle()
     {
-        if (app(LarakeyRegistrar::class)->flushCache()) {
+        if (app(Cache::class)->flushCache()) {
             $this->info('Permission cache flushed.');
         } else {
             $this->error('Unable to flush cache.');

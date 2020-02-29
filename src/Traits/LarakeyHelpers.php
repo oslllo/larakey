@@ -6,7 +6,8 @@ use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\LarakeyPermissionScope;
+use Ghustavh97\Larakey\Padlock\Access;
+use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
@@ -49,11 +50,11 @@ trait LarakeyHelpers
      *
      * @param string|object|\Illuminate\Database\Eloquent\Model $model
      *
-     * @return \Ghustavh97\Larakey\LarakeyPermissionScope
+     * @return \Ghustavh97\Larakey\Padlock\Access
      */
-    protected function getPermissionScope($model): LarakeyPermissionScope
+    protected function getPermissionAccess($to): Access
     {
-        return app()->makeWith(LarakeyPermissionScope::class, ['model' => $model]);
+        return app()->makeWith(Access::class, ['to' => $to]);
     }
 
     protected function getPermissionArguments(string $functionName, array $arguments): Collection
@@ -119,7 +120,7 @@ trait LarakeyHelpers
                 && (is_string($argument) || is_int($argument))
                 && ! is_bool($argument)
                 && ! \strpos($argument, '\\') !== false
-                && ! in_array($argument, array_keys(config(Larakey::$authGuards)))) {
+                && ! in_array($argument, array_keys(config(Config::$authGuards)))) {
                     $data['id'] = $argument;
             }
 
@@ -127,7 +128,7 @@ trait LarakeyHelpers
                 && $argument != Larakey::WILDCARD_TOKEN
                 && ! is_bool($argument)
                 && ! \strpos($argument, '\\') !== false
-                && in_array($argument, array_keys(config(Larakey::$authGuards)))) {
+                && in_array($argument, array_keys(config(Config::$authGuards)))) {
                     $data['guard'] = $this->getGuard($argument);
             }
 

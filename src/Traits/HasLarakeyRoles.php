@@ -3,10 +3,12 @@
 namespace Ghustavh97\Larakey\Traits;
 
 use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Padlock\Cache;
+use Ghustavh97\Larakey\Padlock\Config;
+
 use Illuminate\Support\Collection;
 use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Larakey\LarakeyRegistrar;
 use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -30,7 +32,7 @@ trait HasLarakeyRoles
     public function getRoleClass()
     {
         if (! isset($this->roleClass)) {
-            $this->roleClass = app(LarakeyRegistrar::class)->getRoleClass();
+            $this->roleClass = app(Larakey::class)->getRoleClass();
         }
 
         return $this->roleClass;
@@ -81,7 +83,7 @@ trait HasLarakeyRoles
         }, $roles);
 
         return $query->whereHas('roles', function ($query) use ($roles) {
-            $query->whereIn(config(Larakey::$rolesTableName).'.id', \array_column($roles, 'id'));
+            $query->whereIn(config(Config::$rolesTableName).'.id', \array_column($roles, 'id'));
         });
     }
 
@@ -331,6 +333,6 @@ trait HasLarakeyRoles
      */
     public function forgetCachedRoles($reload = false)
     {
-        app(LarakeyRegistrar::class)->forgetCachedRoles($reload);
+        app(Cache::class)->forgetCachedRoles($reload);
     }
 }

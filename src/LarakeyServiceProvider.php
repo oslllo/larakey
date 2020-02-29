@@ -10,13 +10,13 @@ use Illuminate\View\Compilers\BladeCompiler;
 use Ghustavh97\Larakey\Contracts\Role as RoleContract;
 use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
-use Ghustavh97\Larakey\Models\ModelHasPermission;
-
+use Ghustavh97\Larakey\Padlock\Access as LarakeyAccess;
 use Ghustavh97\Larakey\Padlock\Cache as LarakeyCache;
+use Ghustavh97\Larakey\Padlock\Gate as LarakeyGate;
 
 class LarakeyServiceProvider extends ServiceProvider
 {
-    public function boot(LarakeyRegistrar $permissionLoader, Filesystem $filesystem, Larakey $larakey)
+    public function boot(LarakeyGate $larakeyGate, LarakeyCache $larakeyCache, Filesystem $filesystem)
     {
         if (function_exists('config_path')) {
             $this->publishes([
@@ -39,25 +39,35 @@ class LarakeyServiceProvider extends ServiceProvider
             Commands\Show::class,
         ]);
 
-        $this->app->singleton(Larakey::class, function ($app) use ($larakey) {
-            return $larakey;
+        $this->app->singleton(Larakey::class, function ($app) {
+            return new Larakey;
         });
 
-        $this->app->singleton(LarakeyPermissionScope::class, function ($app, $parameters) {
-            return new LarakeyPermissionScope($parameters['model']);
+        $this->app->singleton(LarakeyCache::class, function ($app) use ($larakeyCache) {
+            return $larakeyCache;
+        });
+
+        $this->app->singleton(LarakeyAccess::class, function ($app, $parameters) {
+            return new LarakeyAccess($parameters['to']);
+        });
+
+        $this->app->singleton(LarakeyGate::class, function ($app) use ($larakeyGate) {
+            return $larakeyGate;
         });
 
         $this->registerModelBindings();
 
-        $permissionLoader->registerPermissions();
+        $larakeyGate->registerPermissions();
 
-        $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
-            return $permissionLoader;
-        });
+        // $permissionLoader->registerPermissions();
 
-        $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
-            return $permissionLoader;
-        });
+        // $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
+        //     return $permissionLoader;
+        // });
+
+        // $this->app->singleton(LarakeyRegistrar::class, function ($app) use ($permissionLoader) {
+        //     return $permissionLoader;
+        // });
     }
 
     public function register()

@@ -12,6 +12,7 @@ use Ghustavh97\Larakey\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Ghustavh97\Larakey\Contracts\ModelHasPermission;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\Padlock\Config;
 
 class Cache
 {
@@ -21,14 +22,14 @@ class Cache
     /** @var \Illuminate\Cache\CacheManager */
     protected $cacheManager;
 
-    /** @var string */
-    protected $permissionClass;
+    // /** @var string */
+    // protected $permissionClass;
 
-    /** @var string */
-    protected $modelHasPermissionClass;
+    // /** @var string */
+    // protected $modelHasPermissionClass;
 
-    /** @var string */
-    protected $roleClass;
+    // /** @var string */
+    // protected $roleClass;
 
     /** @var \Illuminate\Support\Collection */
     protected $permissions;
@@ -55,9 +56,9 @@ class Cache
      */
     public function __construct(CacheManager $cacheManager)
     {
-        $this->permissionClass = config(Larakey::$permissionClass);
-        $this->modelHasPermissionClass = config(Larakey::$modelHasPermissionClass);
-        $this->roleClass = config(Larakey::$roleClass);
+        // $this->permissionClass = config(Config::$permissionClass);
+        // $this->modelHasPermissionClass = config(Config::$modelHasPermissionClass);
+        // $this->roleClass = config(Config::$roleClass);
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();
@@ -65,13 +66,13 @@ class Cache
 
     protected function initializeCache()
     {
-        self::$cacheExpirationTime = config(Larakey::$cacheExpirationTime);
+        self::$cacheExpirationTime = config(Config::$cacheExpirationTime);
 
-        self::$cachePermissionKey = config(Larakey::$cachePermissionKey);
+        self::$cachePermissionKey = config(Config::$cachePermissionKey);
 
-        self::$cacheRoleKey = config(Larakey::$cacheRoleKey);
+        self::$cacheRoleKey = config(Config::$cacheRoleKey);
         
-        self::$cacheModelKey = config(Larakey::$cacheModelKey);
+        self::$cacheModelKey = config(Config::$cacheModelKey);
 
         $this->cache = $this->getCacheStoreFromConfig();
     }
@@ -82,7 +83,7 @@ class Cache
          * The'default' fallback here is from the permission.php config file,
          * where 'default' means to use config(cache.default)
          */
-        $cacheDriver = config(Larakey::$cacheStore, 'default');
+        $cacheDriver = config(Config::$cacheStore, 'default');
 
         // when 'default' is specified, no action is required since we already have the default instance
         if ($cacheDriver === 'default') {
@@ -147,7 +148,7 @@ class Cache
                 self::$cachePermissionKey,
                 self::$cacheExpirationTime,
                 function () {
-                    return $this->getPermissionClass()
+                    return app(Larakey::class)->getPermissionClass()
                     ->with('roles')
                     ->get();
                 }
@@ -183,7 +184,7 @@ class Cache
     {
         if ($this->roles === null) {
             $this->roles = $this->cache->remember(self::$cacheRoleKey, self::$cacheExpirationTime, function () {
-                return $this->getRoleClass()
+                return app(Larakey::class)->getRoleClass()
                     ->with('permissions')
                     ->get();
             });
@@ -209,35 +210,35 @@ class Cache
         return $this->forgetCachedPermissions() && $this->forgetCachedRoles();
     }
 
-    /**
-     * Get an instance of the permission class.
-     *
-     * @return \Ghustavh97\Larakey\Contracts\Permission
-     */
-    public function getPermissionClass(): Permission
-    {
-        return app($this->permissionClass);
-    }
+    // /**
+    //  * Get an instance of the permission class.
+    //  *
+    //  * @return \Ghustavh97\Larakey\Contracts\Permission
+    //  */
+    // public function getPermissionClass(): Permission
+    // {
+    //     return app($this->permissionClass);
+    // }
 
-    /**
-     * Get an instance of the role class.
-     *
-     * @return \Ghustavh97\Larakey\Contracts\Role
-     */
-    public function getRoleClass(): Role
-    {
-        return app($this->roleClass);
-    }
+    // /**
+    //  * Get an instance of the role class.
+    //  *
+    //  * @return \Ghustavh97\Larakey\Contracts\Role
+    //  */
+    // public function getRoleClass(): Role
+    // {
+    //     return app($this->roleClass);
+    // }
 
-    /**
-     * Get an instance of the ModelHasPermission class.
-     *
-     * @return \Ghustavh97\Larakey\Contracts\ModelHasPermission
-     */
-    public function getmodelHasPermissionClass(): ModelHasPermission
-    {
-        return app($this->modelHasPermissionClass);
-    }
+    // /**
+    //  * Get an instance of the ModelHasPermission class.
+    //  *
+    //  * @return \Ghustavh97\Larakey\Contracts\ModelHasPermission
+    //  */
+    // public function getmodelHasPermissionClass(): ModelHasPermission
+    // {
+    //     return app($this->modelHasPermissionClass);
+    // }
 
     public function getModelFromAttributes($attributes = [])
     {
@@ -259,19 +260,19 @@ class Cache
         return null;
     }
 
-    public function setPermissionClass($permissionClass)
-    {
-        $this->permissionClass = $permissionClass;
+    // public function setPermissionClass($permissionClass)
+    // {
+    //     $this->permissionClass = $permissionClass;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function setRoleClass($roleClass)
-    {
-        $this->roleClass = $roleClass;
+    // public function setRoleClass($roleClass)
+    // {
+    //     $this->roleClass = $roleClass;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * Get the instance of the Cache Store.

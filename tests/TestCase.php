@@ -9,7 +9,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Ghustavh97\Larakey\Test\Models\Post;
 use Ghustavh97\Larakey\Test\Models\User;
 use Ghustavh97\Larakey\Test\Models\Admin;
-use Ghustavh97\Larakey\LarakeyRegistrar;
+
+use Ghustavh97\Larakey\Padlock\Cache as LaraCache;
+
 use Ghustavh97\Larakey\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Ghustavh97\Larakey\LarakeyServiceProvider;
@@ -156,7 +158,7 @@ abstract class TestCase extends Orchestra
         });
 
         if (Cache::getStore() instanceof \Illuminate\Cache\DatabaseStore ||
-            $app[LarakeyRegistrar::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
+            $app[LaraCache::class]->getCacheStore() instanceof \Illuminate\Cache\DatabaseStore) {
             $this->createCacheTable();
         }
 
@@ -187,7 +189,7 @@ abstract class TestCase extends Orchestra
      */
     protected function reloadPermissions()
     {
-        app(LarakeyRegistrar::class)->forgetCachedPermissions();
+        app(LaraCache::class)->forgetCachedPermissions();
     }
 
     public function createCacheTable()

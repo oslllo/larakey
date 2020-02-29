@@ -3,6 +3,7 @@
 namespace Ghustavh97\Larakey\Models;
 
 use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Contracts\ModelHasPermission as ModelHasPermissionContract;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Ghustavh97\Larakey\Exceptions\StrictPermission;
@@ -28,7 +29,7 @@ class ModelHasPermission extends MorphPivot implements ModelHasPermissionContrac
         
         static::creating(function ($permission) {
             if (! $permission->to_id || ! $permission->to_type) {
-                if (config(Larakey::$strictPermissionAssignment)) {
+                if (config(Config::$strictPermissionAssignment)) {
                     throw StrictPermission::assignment();
                 }
 

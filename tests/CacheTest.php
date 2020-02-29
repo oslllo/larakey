@@ -10,6 +10,9 @@ use Ghustavh97\Larakey\LarakeyRegistrar;
 use Ghustavh97\Larakey\Contracts\Permission;
 use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 
+use Ghustavh97\Larakey\Padlock\Cache;
+use Ghustavh97\Larakey\Larakey;
+
 class CacheTest extends TestCase
 {
     protected $cache_init_count = 0;
@@ -25,13 +28,17 @@ class CacheTest extends TestCase
     {
         parent::setUp();
 
-        $this->registrar = app(LarakeyRegistrar::class);
+        $this->cache = app(Cache::class);
 
-        $this->registrar->forgetCachedPermissions();
+        $this->larakey = app(Larakey::class);
+
+        $this->cache->forgetCachedPermissions();
+
+        $this->cache->forgetCachedRoles();
 
         DB::connection()->enableQueryLog();
 
-        $cacheStore = $this->registrar->getCacheStore();
+        $cacheStore = $this->cache->getCacheStore();
 
         switch (true) {
             case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
@@ -48,7 +55,7 @@ class CacheTest extends TestCase
     {
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_permissions_run_count);
     }
@@ -58,7 +65,7 @@ class CacheTest extends TestCase
     {
         $this->resetQueryCount();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_roles_run_count);
     }
@@ -70,9 +77,9 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -87,9 +94,9 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -101,9 +108,9 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -118,9 +125,9 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -130,15 +137,15 @@ class CacheTest extends TestCase
     {
         $this->testUser->assignRole('testUserRole');
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
         $this->testUser->removeRole('testUserRole');
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -146,17 +153,17 @@ class CacheTest extends TestCase
     /** @test */
     public function user_creation_should_not_flush_the_cache()
     {
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         User::create(['email' => 'new']);
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         // should all be in memory, so no init/load required
         $this->assertQueryCount(0);
@@ -169,9 +176,9 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
 
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
 
-        $this->registrar->getRoles();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }
@@ -228,7 +235,7 @@ class CacheTest extends TestCase
         $this->testUser->assignRole('testUserRole');
 
         $this->resetQueryCount();
-        $this->registrar->getPermissions();
+        $this->cache->getPermissions();
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_permissions_run_count);
 
         $this->resetQueryCount();
@@ -246,8 +253,8 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded
-        $this->registrar->getPermissions();
-        $this->registrar->getRoles();
+        $this->cache->getPermissions();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
@@ -256,8 +263,8 @@ class CacheTest extends TestCase
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded
-        $this->registrar->getPermissions();
-        $this->registrar->getRoles();
+        $this->cache->getPermissions();
+        $this->cache->getRoles();
 
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
@@ -265,8 +272,8 @@ class CacheTest extends TestCase
         Artisan::call('permission:cache-reset');
 
         $this->resetQueryCount();
-        $this->registrar->getPermissions();
-        $this->registrar->getRoles();
+        $this->cache->getPermissions();
+        $this->cache->getRoles();
         // assert that the cache had to be reloaded
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
     }

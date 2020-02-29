@@ -5,7 +5,8 @@ namespace Ghustavh97\Larakey\Models;
 use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\LarakeyRegistrar;
+use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Padlock\Cache;
 use Ghustavh97\Larakey\Traits\HasLarakeyPermissions;
 use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
@@ -141,9 +142,9 @@ class Role extends Model implements RoleContract
      */
     protected static function getRoles(array $params = []): Collection
     {
-        return app(LarakeyRegistrar::class)
-            ->setRoleClass(static::class)
-            ->getRoles($params);
+        app(Larakey::class)->setRoleClass(static::class);
+        
+        return app(Cache::class)->getRoles($params);
     }
 
     /**

@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\LarakeyPermissionScope;
 use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Ghustavh97\Larakey\Padlock\Config;
+
+use Ghustavh97\Larakey\Contracts\Role;
+use Ghustavh97\Larakey\Contracts\Permission;
 
 class Larakey
 {
@@ -17,39 +21,97 @@ class Larakey
 
     const GIVE_PERMISSION_TO_FUNCTION = ['NAME' => 'givePermissionTo', 'ARGUMENT_LIMIT' => 3];
 
-    public static $permissionClass = 'larakey.models.permission';
+    // public static $permissionClass = 'larakey.models.permission';
 
-    public static $modelHasPermissionClass = 'larakey.models.permission_pivot';
+    // public static $modelHasPermissionClass = 'larakey.models.permission_pivot';
 
-    public static $roleClass = 'larakey.models.role';
+    // public static $roleClass = 'larakey.models.role';
 
-    public static $rolesTableName = 'larakey.table_names.roles';
+    // public static $rolesTableName = 'larakey.table_names.roles';
 
-    public static $permissionsTableName = 'larakey.table_names.permissions';
+    // public static $permissionsTableName = 'larakey.table_names.permissions';
 
-    public static $modelHasPermissionTableName = 'larakey.table_names.model_has_permissions';
+    // public static $modelHasPermissionTableName = 'larakey.table_names.model_has_permissions';
 
-    public static $modelMorphKeyColumnName = 'larakey.column_names.model_morph_key';
+    // public static $modelMorphKeyColumnName = 'larakey.column_names.model_morph_key';
 
-    public static $displayPermissionInException = 'larakey.display_permission_in_exception';
+    // public static $displayPermissionInException = 'larakey.display_permission_in_exception';
 
-    public static $cacheExpirationTime = 'larakey.cache.expiration_time';
+    // public static $cacheExpirationTime = 'larakey.cache.expiration_time';
 
-    public static $cachePermissionKey = 'larakey.cache.permission_key';
+    // public static $cachePermissionKey = 'larakey.cache.permission_key';
 
-    public static $cacheRoleKey = 'larakey.cache.role_key';
+    // public static $cacheRoleKey = 'larakey.cache.role_key';
 
-    public static $cacheModelKey = 'larakey.cache.model_key';
+    // public static $cacheModelKey = 'larakey.cache.model_key';
 
-    public static $cacheStore = 'larakey.cache.store';
+    // public static $cacheStore = 'larakey.cache.store';
 
-    public static $strictPermissionAssignment = 'larakey.strict.permission.assignment';
+    // public static $strictPermissionAssignment = 'larakey.strict.permission.assignment';
 
-    public static $checkifClassExists = 'larakey.check_if_class_exists';
+    // public static $checkifClassExists = 'larakey.check_if_class_exists';
 
-    public static $authGuards = 'auth.guards';
-
+    // public static $authGuards = 'auth.guards';
     
+    /** @var string */
+    protected $roleClass;
+
+    /** @var string */
+    protected $permissionClass;
+
+    /** @var string */
+    protected $modelHasPermissionClass;
+
+    public function __construct()
+    {
+        $this->roleClass = config(Config::$roleClass);
+        $this->permissionClass = config(Config::$permissionClass);
+        $this->modelHasPermissionClass = config(Config::$modelHasPermissionClass);
+    }
+
+    /**
+     * Get an instance of the permission class.
+     *
+     * @return \Ghustavh97\Larakey\Contracts\Permission
+     */
+    public function getPermissionClass(): Permission
+    {
+        return app($this->permissionClass);
+    }
+
+    /**
+     * Get an instance of the role class.
+     *
+     * @return \Ghustavh97\Larakey\Contracts\Role
+     */
+    public function getRoleClass(): Role
+    {
+        return app($this->roleClass);
+    }
+
+    public function setPermissionClass($permissionClass)
+    {
+        $this->permissionClass = $permissionClass;
+
+        return $this;
+    }
+
+    public function setRoleClass($roleClass)
+    {
+        $this->roleClass = $roleClass;
+
+        return $this;
+    }
+
+    /**
+     * Get an instance of the ModelHasPermission class.
+     *
+     * @return \Ghustavh97\Larakey\Contracts\ModelHasPermission
+     */
+    public function getmodelHasPermissionClass(): ModelHasPermission
+    {
+        return app($this->modelHasPermissionClass);
+    }
 
     public static function getArguments(string $functionName, array $arguments): Collection
     {
@@ -114,7 +176,7 @@ class Larakey
                 && (is_string($argument) || is_int($argument))
                 && ! is_bool($argument)
                 && ! \strpos($argument, '\\') !== false
-                && ! in_array($argument, array_keys(config(Larakey::$authGuards)))) {
+                && ! in_array($argument, array_keys(config(Config::$authGuards)))) {
                     $data['id'] = $argument;
             }
 
@@ -122,7 +184,7 @@ class Larakey
                 && $argument != Larakey::WILDCARD_TOKEN
                 && ! is_bool($argument)
                 && ! \strpos($argument, '\\') !== false
-                && in_array($argument, array_keys(config(Larakey::$authGuards)))) {
+                && in_array($argument, array_keys(config(Config::$authGuards)))) {
                     $data['guard'] = $this->getGuard($argument);
             }
 
@@ -162,4 +224,6 @@ class Larakey
 
         return explode('|', trim($pipeString, $quoteCharacter));
     }
+
+
 }

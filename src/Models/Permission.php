@@ -6,14 +6,19 @@ use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Ghustavh97\Larakey\Traits\HasLarakeyRoles;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\LarakeyRegistrar;
 use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
-use Ghustavh97\Larakey\LarakeyPermissionScope;
+
 use Ghustavh97\Larakey\Larakey;
+use Ghustavh97\Larakey\Padlock\Config;
+use Ghustavh97\Larakey\Padlock\Key;
+use Ghustavh97\Larakey\Padlock\Access;
+use Ghustavh97\Larakey\Padlock\Cache;
+
+
 use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
@@ -31,7 +36,7 @@ class Permission extends Model implements PermissionContract
 
         parent::__construct($attributes);
 
-        $this->setTable(config(Larakey::$permissionsTableName));
+        $this->setTable(config(Config::$permissionsTableName));
 
         $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
     }
@@ -70,12 +75,12 @@ class Permission extends Model implements PermissionContract
         )->using(config('larakey.models.permission_pivot'))->withPivot(['to_type', 'to_id']);
     }
 
-    public function matches(self $permission, LarakeyPermissionScope $permissionScope)
+    public function matches(self $permission, Access $key)
     {
         return (string) $this->id === (string) $permission->id
-            && ((string) $this->to_id === (string) $permissionScope->to_id
+            && ((string) $this->to_id === (string) $key->to_id
             || (string) $this->to_id === Larakey::WILDCARD_TOKEN)
-            && ((string) $this->to_type === (string) $permissionScope->to_type
+            && ((string) $this->to_type === (string) $key->to_type
             || (string) $this->to_type === Larakey::WILDCARD_TOKEN);
     }
 
@@ -169,9 +174,9 @@ class Permission extends Model implements PermissionContract
      */
     protected static function getPermissions(array $params = []): Collection
     {
-        return app(LarakeyRegistrar::class)
-            ->setPermissionClass(static::class)
-            ->getPermissions($params);
+        app(Larakey::class)->setPermissionClass(static::class);
+        
+        return app(Cache::class)->getPermissions($params);
     }
 
     public function getToIdAttribute()
