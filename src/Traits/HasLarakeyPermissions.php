@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Models\ModelHasPermission;
+use Ghustavh97\Larakey\Models\HasPermission;
 use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Larakey\Exceptions\StrictPermission;
@@ -283,9 +283,15 @@ trait HasLarakeyPermissions
      */
     public function hasDirectPermission(...$arguments): bool
     {
-        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-                ->only(['permissions', 'to', 'recursive', 'guard'])
-                ->all());
+        $combination = $this->locksmith()->combination($arguments);
+
+        // dd($combination->get());
+
+        extract($combination->get(['permissions', 'to', 'recursive', 'guard']));
+
+        // extract($this->getPermissionArguments(__FUNCTION__, $arguments)
+        //         ->only(['permissions', 'to', 'recursive', 'guard'])
+        //         ->all());
 
         $permission = $this->getPermission($permissions, $guard);
 

@@ -4,11 +4,11 @@ namespace Ghustavh97\Larakey\Models;
 
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Contracts\ModelHasPermission as ModelHasPermissionContract;
+use Ghustavh97\Larakey\Contracts\HasPermission as HasPermissionContract;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Ghustavh97\Larakey\Exceptions\StrictPermission;
 
-class ModelHasPermission extends MorphPivot implements ModelHasPermissionContract
+class HasPermission extends MorphPivot implements HasPermissionContract
 {
     public $incrementing = false;
 

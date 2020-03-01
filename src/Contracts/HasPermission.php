@@ -2,7 +2,7 @@
 
 namespace Ghustavh97\Larakey\Contracts;
 
-interface ModelHasPermission
+interface HasPermission
 {
     //
 }

@@ -143,8 +143,8 @@ class Role extends Model implements RoleContract
     protected static function getRoles(array $params = []): Collection
     {
         app(Larakey::class)->setRoleClass(static::class);
-        
-        return app(Cache::class)->getRoles($params);
+
+        return app(Cache::class)->getCachedRoles($params);
     }
 
     /**

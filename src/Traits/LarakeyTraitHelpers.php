@@ -13,28 +13,6 @@ use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
 trait LarakeyTraitHelpers
 {
-    protected function convertPipeToArray(string $pipeString)
-    {
-        $pipeString = trim($pipeString);
-
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
-
-        $quoteCharacter = substr($pipeString, 0, 1);
-        $endCharacter = substr($quoteCharacter, -1, 1);
-
-        if ($quoteCharacter !== $endCharacter) {
-            return explode('|', $pipeString);
-        }
-
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return explode('|', $pipeString);
-        }
-
-        return explode('|', trim($pipeString, $quoteCharacter));
-    }
-
     protected function getGuardNames(): Collection
     {
         return Guard::getNames($this);
@@ -49,18 +27,6 @@ trait LarakeyTraitHelpers
     {
         return app(Larakey::class);
     }
-
-    // /**
-    //  * Get the permission scope.
-    //  *
-    //  * @param string|object|\Illuminate\Database\Eloquent\Model $to
-    //  *
-    //  * @return \Ghustavh97\Larakey\Padlock\Key
-    //  */
-    // protected function getKey($to, $permission = null): Key
-    // {
-    //     return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
-    // }
 
     protected function getPermissionArguments(string $functionName, array $arguments): Collection
     {
@@ -89,7 +55,7 @@ trait LarakeyTraitHelpers
                 $permissions = $argument;
 
                 if (is_string($permissions) && false !== strpos($permissions, '|')) {
-                    $permissions = $this->convertPipeToArray($permissions);
+                    $permissions = $this->locksmith()->convertPipeToArray($permissions);
                 }
         
                 if (is_string($permissions) || is_object($permissions)) {

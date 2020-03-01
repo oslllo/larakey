@@ -5,7 +5,6 @@ namespace Ghustavh97\Larakey\Traits;
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Cache;
 use Ghustavh97\Larakey\Padlock\Config;
-
 use Illuminate\Support\Collection;
 use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
@@ -216,7 +215,7 @@ trait HasLarakeyRoles
         $guard = $guard ? $guard : $this->getDefaultGuardName();
 
         if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->convertPipeToArray($roles);
+            $roles = $this->locksmith()->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
@@ -276,7 +275,7 @@ trait HasLarakeyRoles
     public function hasAllRoles($roles, string $guard = null): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->convertPipeToArray($roles);
+            $roles = $this->locksmith()->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {

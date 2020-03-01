@@ -26,7 +26,7 @@ return [
 
         'permission' => Ghustavh97\Larakey\Models\Permission::class,
 
-        'permission_pivot' => Ghustavh97\Larakey\Models\ModelHasPermission::class,
+        'permission_pivot' => Ghustavh97\Larakey\Models\HasPermission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which

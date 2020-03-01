@@ -9,14 +9,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Ghustavh97\Larakey\Contracts\Role as RoleContract;
 use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
-
-use Ghustavh97\Larakey\Padlock\Access as LarakeyAccess;
-use Ghustavh97\Larakey\Padlock\Cache as LarakeyCache;
-use Ghustavh97\Larakey\Padlock\Gate as LarakeyGate;
-
 use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Cache;
 use Ghustavh97\Larakey\Padlock\Gate;
+use Ghustavh97\Larakey\Padlock\Combination;
 
 class LarakeyServiceProvider extends ServiceProvider
 {
@@ -51,8 +47,12 @@ class LarakeyServiceProvider extends ServiceProvider
             return $cache;
         });
 
-        $this->app->singleton(Key::class, function ($app, $parameters) {
+        $this->app->bind(Key::class, function ($app, $parameters) {
             return new Key($parameters['to'], $parameters['permission']);
+        });
+
+        $this->app->bind(Combination::class, function ($app, $parameters) {
+            return new Combination($parameters['arguments']);
         });
 
         $this->app->singleton(Gate::class, function ($app) use ($gate) {
