@@ -16,10 +16,6 @@ use Ghustavh97\Larakey\Contracts\Permission;
 class Larakey
 {
     const WILDCARD_TOKEN = '*';
-
-    const HAS_DIRECT_PERMISSION_FUNCTION = ['NAME' => 'hasDirectPermission', 'ARGUMENT_LIMIT' => 4];
-
-    const GIVE_PERMISSION_TO_FUNCTION = ['NAME' => 'givePermissionTo', 'ARGUMENT_LIMIT' => 3];
     
     /** @var string */
     protected $roleClass;
@@ -141,6 +137,4 @@ class Larakey
 
         return explode('|', trim($pipeString, $quoteCharacter));
     }
-
-
 }

@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-
 use Ghustavh97\Larakey\Contracts\Permission;
+use Ghustavh97\Larakey\Contracts\Locksmith;
 use Ghustavh97\Larakey\Models\HasPermission;
 use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -16,20 +16,16 @@ use Ghustavh97\Larakey\Exceptions\StrictPermission;
 use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 use Ghustavh97\Larakey\Exceptions\PermissionNotAssigned;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
-
 use Ghustavh97\Larakey\Larakey;
-
 use Ghustavh97\Larakey\Padlock\Cache;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Padlock\Key;
 
-trait HasLarakeyPermissions
+trait HasPermissions
 {
-    use LarakeyTraitHelpers;
-
     private $permissionClass;
 
-    public static function bootHasLarakeyPermissions()
+    public static function bootHasPermissions()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -47,6 +43,13 @@ trait HasLarakeyPermissions
         }
 
         return $this->permissionClass;
+    }
+
+    protected function locksmith(): Larakey
+    {
+        app(Larakey::class)->setUser($this);
+        
+        return app(Larakey::class);
     }
 
     /**
@@ -73,7 +76,7 @@ trait HasLarakeyPermissions
      */
     public function scopePermission(Builder $query, $permissions, $to = null): Builder
     {
-        $permissionScope = $this->locksmith()->getKey($to);
+        $permissionKey = $this->locksmith()->getKey($to);
 
         $permissions = $this->convertToPermissionModels($permissions);
 
@@ -81,20 +84,20 @@ trait HasLarakeyPermissions
             return array_merge($result, $permission->roles->all());
         }, []));
 
-        $query = $query->where(function ($query) use ($permissions, $rolesWithPermissions, $permissionScope) {
-            $query->whereHas('permissions', function ($query) use ($permissions, $permissionScope) {
-                $query->where(config(Config::$modelHasPermissionTableName).'.to_id', $permissionScope->to_id)
-                    ->where(config(Config::$modelHasPermissionTableName).'.to_type', $permissionScope->to_type)
+        $query = $query->where(function ($query) use ($permissions, $rolesWithPermissions, $permissionKey) {
+            $query->whereHas('permissions', function ($query) use ($permissions, $permissionKey) {
+                $query->where(config(Config::$modelHasPermissionTableName).'.to_id', $permissionKey->to_id)
+                    ->where(config(Config::$modelHasPermissionTableName).'.to_type', $permissionKey->to_type)
                     ->whereIn(config(Config::$permissionsTableName).'.id', \array_column($permissions, 'id'));
             });
             
             if (count($rolesWithPermissions) > 0) {
-                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions, $permissions, $permissionScope) {
-                    $query->where(function ($query) use ($rolesWithPermissions, $permissions, $permissionScope) {
+                $query->orWhereHas('roles', function ($query) use ($rolesWithPermissions, $permissions, $permissionKey) {
+                    $query->where(function ($query) use ($rolesWithPermissions, $permissions, $permissionKey) {
                         $query->whereIn(config(Config::$rolesTableName).'.id', \array_column($rolesWithPermissions, 'id'))
-                        ->whereHas('permissions', function ($query) use ($permissions, $permissionScope) {
-                            $query->where(config(Config::$modelHasPermissionTableName).'.to_id', $permissionScope->to_id)
-                                ->where(config(Config::$modelHasPermissionTableName).'.to_type', $permissionScope->to_type);
+                        ->whereHas('permissions', function ($query) use ($permissions, $permissionKey) {
+                            $query->where(config(Config::$modelHasPermissionTableName).'.to_id', $permissionKey->to_id)
+                                ->where(config(Config::$modelHasPermissionTableName).'.to_type', $permissionKey->to_type);
                         });
                     });
                 });
@@ -122,7 +125,7 @@ trait HasLarakeyPermissions
                 return $permission;
             }
 
-            return $this->getPermissionClass()->findByName($permission, $this->getDefaultGuardName());
+            return $this->getPermissionClass()->findByName($permission, $this->locksmith()->getDefaultGuardName());
         }, $permissions);
     }
 
@@ -130,7 +133,7 @@ trait HasLarakeyPermissions
     private function getPermission($permission, $guard = null): Permission
     {
         $permissionClass = $this->getPermissionClass();
-        $guard = $this->getGuard($guard);
+        $guard = $this->locksmith()->getGuard($guard);
 
         if (is_array($permission)) {
             $permission = $permission[0];
@@ -251,9 +254,9 @@ trait HasLarakeyPermissions
      */
     protected function hasPermissionViaRole(...$arguments): bool
     {
-        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-                ->only(['permissions', 'guard'])
-                ->all());
+        $combination = $this->locksmith()->combination($arguments);
+
+        extract($combination->get(['permissions', 'guard']));
 
         $permission = $this->getPermission($permissions, $guard);
 
@@ -285,13 +288,7 @@ trait HasLarakeyPermissions
     {
         $combination = $this->locksmith()->combination($arguments);
 
-        // dd($combination->get());
-
         extract($combination->get(['permissions', 'to', 'recursive', 'guard']));
-
-        // extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-        //         ->only(['permissions', 'to', 'recursive', 'guard'])
-        //         ->all());
 
         $permission = $this->getPermission($permissions, $guard);
 
@@ -345,9 +342,9 @@ trait HasLarakeyPermissions
      */
     public function givePermissionTo(...$arguments)
     {
-        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-        ->only(['permissions', 'to'])
-        ->all());
+        $combination = $this->locksmith()->combination($arguments);
+
+        extract($combination->get(['permissions', 'to']));
 
         $permissions = collect($permissions)
             ->flatten()
@@ -371,17 +368,17 @@ trait HasLarakeyPermissions
         }
 
         $permissions = collect($permissions)->map(function ($permission, $key) use ($to) {
-            $permissionScope = $this->locksmith()->getKey($to);
+            $permissionKey = $this->locksmith()->getKey($to);
 
             if ($this->permissions()
                     ->where('id', $permission)
-                    ->wherePivot('to_id', $permissionScope->to_id)
-                    ->wherePivot('to_type', $permissionScope->to_type)
+                    ->wherePivot('to_id', $permissionKey->to_id)
+                    ->wherePivot('to_type', $permissionKey->to_type)
                     ->first()) {
                 return false;
             }
 
-            return array($permission => $permissionScope->getPivot());
+            return array($permission => $permissionKey->getPivot());
         })
         ->reject(function ($value) {
             return $value === false;
@@ -453,13 +450,13 @@ trait HasLarakeyPermissions
      */
     public function revokePermissionTo(...$arguments)
     {
-        extract($this->getPermissionArguments(__FUNCTION__, $arguments)
-                ->only(['permissions', 'to', 'recursive'])
-                ->all());
+        $combination = $this->locksmith()->combination($arguments);
 
-        $permissionScope = $this->locksmith()->getKey($to);
+        extract($combination->get(['permissions', 'to', 'recursive']));
 
-        collect($permissions)->each(function ($permission) use ($recursive, $permissionScope) {
+        $permissionKey = $this->locksmith()->getKey($to);
+
+        collect($permissions)->each(function ($permission) use ($recursive, $permissionKey) {
 
             if (! $permission instanceof Permission) {
                 $permission = $this->getPermission($permission);
@@ -467,17 +464,17 @@ trait HasLarakeyPermissions
 
             $detach = $permission->id;
 
-            if ($permissionScope->hasAllAccess()) {
+            if ($permissionKey->hasAllAccess()) {
                 $permission = $this->permissions()->where('id', $permission->id);
 
                 if (! $recursive) {
                     $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN)
                                              ->wherePivot('to_type', Larakey::WILDCARD_TOKEN);
                 }
-            } elseif ($permissionScope->hasClassAccess()) {
+            } elseif ($permissionKey->hasClassAccess()) {
                 $permission = $this->permissions()
                                 ->where('id', $permission->id)
-                                ->wherePivot('to_type', $permissionScope->to_type);
+                                ->wherePivot('to_type', $permissionKey->to_type);
 
                 if (! $recursive) {
                     $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN);
@@ -485,8 +482,8 @@ trait HasLarakeyPermissions
             } else {
                 $permission = $this->permissions()
                                 ->where('id', $permission->id)
-                                ->wherePivot('to_id', $permissionScope->to_id)
-                                ->wherePivot('to_type', $permissionScope->to_type);
+                                ->wherePivot('to_id', $permissionKey->to_id)
+                                ->wherePivot('to_type', $permissionKey->to_type);
             }
 
             if (! $permission->first()) {
@@ -528,21 +525,21 @@ trait HasLarakeyPermissions
         if (is_numeric($permission)) {
             return $permissionClass->findById(
                 $permission,
-                $this->getDefaultGuardName()
+                $this->locksmith()->getDefaultGuardName()
             );
         }
 
         if (is_string($permission)) {
             return $permissionClass->findByName(
                 $permission,
-                $this->getDefaultGuardName()
+                $this->locksmith()->getDefaultGuardName()
             );
         }
 
         if (is_array($permission)) {
             return $permissionClass
             ->whereIn('name', $permission)
-            ->whereIn('guard_name', $this->getGuardNames())
+            ->whereIn('guard_name', $this->locksmith()->getGuardNames())
             ->get();
         }
     }
@@ -554,8 +551,8 @@ trait HasLarakeyPermissions
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {
-        if (! $this->getGuardNames()->contains($roleOrPermission->guard_name)) {
-            throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->getGuardNames());
+        if (! $this->locksmith()->getGuardNames()->contains($roleOrPermission->guard_name)) {
+            throw GuardDoesNotMatch::create($roleOrPermission->guard_name, $this->locksmith()->getGuardNames());
         }
     }
 

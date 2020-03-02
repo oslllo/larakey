@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Ghustavh97\Larakey\Padlock\Config;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\Exceptions\InvalidArguments;
+use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
 class Combination
 {
@@ -55,8 +56,8 @@ class Combination
             }
 
             if ($this->to === null
-                && ((\is_string($argument) && \strpos($argument, '\\') !== false) || $argument instanceof Model)) {
-                
+                && ((\is_string($argument) && \strpos($argument, '\\') !== false)
+                || $argument instanceof Model)) {
                 if (is_string($argument)) {
                     if (! class_exists($argument)) { //!Config
                         throw ClassDoesNotExist::check($argument);

@@ -10,10 +10,5 @@ use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
 trait HasLarakey
 {
-    use HasLarakeyRoles;
-
-    public function initializeHasLaraKey()
-    {
-        app(Larakey::class)->setUser($this);
-    }
+    use HasRoles;
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Traits\HasLarakeyPermissions;
+use Ghustavh97\Larakey\Traits\HasPermissions;
 use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
 use Ghustavh97\Larakey\Exceptions\RoleAlreadyExists;
@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model implements RoleContract
 {
-    use HasLarakeyPermissions;
+    use HasPermissions;
     use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];
@@ -161,15 +161,15 @@ class Role extends Model implements RoleContract
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->locksmith()->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->locksmith()->getDefaultGuardName());
         }
 
-        if (! $this->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
+        if (! $this->locksmith()->getGuardNames()->contains($permission->guard_name)) {
+            throw GuardDoesNotMatch::create($permission->guard_name, $this->locksmith()->getGuardNames());
         }
         
         return $this->hasDirectPermission($permission);

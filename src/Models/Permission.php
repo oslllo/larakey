@@ -4,14 +4,13 @@ namespace Ghustavh97\Larakey\Models;
 
 use Ghustavh97\Larakey\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Traits\HasLarakeyRoles;
+use Ghustavh97\Larakey\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
 use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
-
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Padlock\Key;
@@ -22,7 +21,7 @@ use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
-    use HasLarakeyRoles;
+    use HasRoles;
     use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];

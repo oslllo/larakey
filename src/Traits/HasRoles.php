@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-trait HasLarakeyRoles
+trait HasRoles
 {
-    use HasLarakeyPermissions;
+    use HasPermissions;
 
     private $roleClass;
 
-    public static function bootHasLarakeyRoles()
+    public static function bootHasRoles()
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -76,7 +76,7 @@ trait HasLarakeyRoles
             }
 
             $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->getDefaultGuardName();
+            $guard = $guard ?: $this->locksmith()->getDefaultGuardName();
 
             return $this->getRoleClass()->{$method}($role, $guard);
         }, $roles);
@@ -180,7 +180,7 @@ trait HasLarakeyRoles
     public function getRole($role, $guard = null): Role
     {
         $roleClass = $this->getRoleClass();
-        $guard = $guard ? $guard : $this->getDefaultGuardName();
+        $guard = $guard ? $guard : $this->locksmith()->getDefaultGuardName();
 
         if (is_array($role)) {
             $role = $role[0];
@@ -212,7 +212,7 @@ trait HasLarakeyRoles
     public function hasRole($roles, string $guard = null, bool $returnRole = false)
     {
         $roleClass = $this->getRoleClass();
-        $guard = $guard ? $guard : $this->getDefaultGuardName();
+        $guard = $guard ? $guard : $this->locksmith()->getDefaultGuardName();
 
         if (is_string($roles) && false !== strpos($roles, '|')) {
             $roles = $this->locksmith()->convertPipeToArray($roles);
@@ -317,11 +317,11 @@ trait HasLarakeyRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return $roleClass->findById($role, $this->getDefaultGuardName());
+            return $roleClass->findById($role, $this->locksmith()->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->getDefaultGuardName());
+            return $roleClass->findByName($role, $this->locksmith()->getDefaultGuardName());
         }
 
         return $role;
