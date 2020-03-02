@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test\Models;
+namespace Ghustavh97\Larakey\Test\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Guardian\Test\Models\User;
+use Ghustavh97\Larakey\Test\Models\User;
 
 class Post extends Model
 {

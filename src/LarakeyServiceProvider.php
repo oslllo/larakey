@@ -1,31 +1,32 @@
 <?php
 
-namespace Ghustavh97\Guardian;
+namespace Ghustavh97\Larakey;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Ghustavh97\Guardian\Contracts\Role as RoleContract;
-use Ghustavh97\Guardian\Exceptions\StrictModeRestriction;
-use Ghustavh97\Guardian\Contracts\Permission as PermissionContract;
+use Ghustavh97\Larakey\Contracts\Role as RoleContract;
+use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
+use Ghustavh97\Larakey\Padlock\Key;
+use Ghustavh97\Larakey\Padlock\Cache;
+use Ghustavh97\Larakey\Padlock\Gate;
+use Ghustavh97\Larakey\Padlock\Combination;
 
-use Ghustavh97\Guardian\Models\ModelHasPermission;
-
-class GuardianServiceProvider extends ServiceProvider
+class LarakeyServiceProvider extends ServiceProvider
 {
-    public function boot(GuardianRegistrar $permissionLoader, Filesystem $filesystem)
+    public function boot(Gate $gate, Cache $cache, Filesystem $filesystem)
     {
-        if (isNotLumen()) {
+        if (function_exists('config_path')) {
             $this->publishes([
-                __DIR__.'/../config/guardian.php' => config_path('guardian.php'),
+                __DIR__.'/../config/larakey.php' => config_path('larakey.php'),
             ], 'config');
 
-            $guardianPermissionsTable = __DIR__.'/../database/migrations/create_guardian_permission_tables.php.stub';
+            $larakeyPermissionsTable = __DIR__.'/../database/migrations/create_larakey_permission_tables.php.stub';
 
             $this->publishes([
-                $guardianPermissionsTable => $this->getMigrationFileName($filesystem),
+                $larakeyPermissionsTable => $this->getMigrationFileName($filesystem),
             ], 'migrations');
 
             $this->registerMacroHelpers();
@@ -38,48 +39,44 @@ class GuardianServiceProvider extends ServiceProvider
             Commands\Show::class,
         ]);
 
+        $this->app->singleton(Larakey::class, function ($app) {
+            return new Larakey;
+        });
+
+        $this->app->singleton(Cache::class, function ($app) use ($cache) {
+            return $cache;
+        });
+
+        $this->app->bind(Key::class, function ($app, $parameters) {
+            return new Key($parameters['to'], $parameters['permission']);
+        });
+
+        $this->app->bind(Combination::class, function ($app, $parameters) {
+            return new Combination($parameters['arguments']);
+        });
+
+        $this->app->singleton(Gate::class, function ($app) use ($gate) {
+            return $gate;
+        });
+
         $this->registerModelBindings();
 
-        $permissionLoader->registerPermissions();
-
-        $this->app->singleton(GuardianRegistrar::class, function ($app) use ($permissionLoader) {
-            return $permissionLoader;
-        });
-
-        $ModelHasPermission = app(GuardianRegistrar::class)->getModelHasPermissionClass();
-
-        $ModelHasPermission::creating(function ($permission) {
-            if (! $permission->to_id || ! $permission->to_type) {
-                if (config('guardian.strict.permission.assignment')) {
-                    throw StrictModeRestriction::assignment();
-                }
-
-                if (! $permission->to_id) {
-                    $permission->to_id = '*';
-                }
-
-                if (! $permission->to_type) {
-                    $permission->to_type = '*';
-                }
-            }
-        });
+        $gate->registerPermissions();
     }
 
     public function register()
     {
-        if (isNotLumen()) {
-            $this->mergeConfigFrom(
-                __DIR__.'/../config/guardian.php',
-                'guardian'
-            );
-        }
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/larakey.php',
+            'larakey'
+        );
 
         $this->registerBladeExtensions();
     }
 
     protected function registerModelBindings()
     {
-        $config = $this->app->config['guardian.models'];
+        $config = $this->app->config['larakey.models'];
 
         $this->app->bind(PermissionContract::class, $config['permission']);
         $this->app->bind(RoleContract::class, $config['role']);
@@ -179,8 +176,8 @@ class GuardianServiceProvider extends ServiceProvider
 
         return Collection::make($this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
-                return $filesystem->glob($path.'*_create_guardian_permission_tables.php');
-            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_guardian_permission_tables.php")
+                return $filesystem->glob($path.'*_create_larakey_permission_tables.php');
+            })->push($this->app->databasePath()."/migrations/{$timestamp}_create_larakey_permission_tables.php")
             ->first();
     }
 }

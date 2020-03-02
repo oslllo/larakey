@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian;
+namespace Ghustavh97\Larakey;
 
 use Illuminate\Support\Collection;
 

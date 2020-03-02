@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

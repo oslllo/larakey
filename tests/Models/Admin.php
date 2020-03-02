@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test\Models;
+namespace Ghustavh97\Larakey\Test\Models;
 
 use Illuminate\Auth\Authenticatable;
-use Ghustavh97\Guardian\Traits\Guardian;
+use Ghustavh97\Larakey\Traits\HasLarakey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Admin extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use Guardian, Authorizable, Authenticatable;
+    use HasLarakey, Authorizable, Authenticatable;
 
     protected $fillable = ['email'];
 

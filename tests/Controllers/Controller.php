@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test\Controllers;
+namespace Ghustavh97\Larakey\Test\Controllers;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;

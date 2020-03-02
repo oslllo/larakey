@@ -4,11 +4,14 @@ return [
 
     'strict' => [
         'permission' => [
-            'assignment' => false
+            'assignment' => false,
+            'revoke' => false
         ]
     ],
 
     'revoke_recursion' => false,
+
+    'check_if_class_exists' => true, //! Needs test
 
     'models' => [
 
@@ -18,12 +21,12 @@ return [
          * is often just the "Permission" model but you may use whatever you like.
          *
          * The model you want to use as a Permission model needs to implement the
-         * `Ghustavh97\Guardian\Contracts\Permission` contract.
+         * `Ghustavh97\Larakey\Contracts\Permission` contract.
          */
 
-        'permission' => Ghustavh97\Guardian\Models\Permission::class,
+        'permission' => Ghustavh97\Larakey\Models\Permission::class,
 
-        'permission_pivot' => Ghustavh97\Guardian\Models\ModelHasPermission::class,
+        'permission_pivot' => Ghustavh97\Larakey\Models\HasPermission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -31,10 +34,10 @@ return [
          * is often just the "Role" model but you may use whatever you like.
          *
          * The model you want to use as a Role model needs to implement the
-         * `Ghustavh97\Guardian\Contracts\Role` contract.
+         * `Ghustavh97\Larakey\Contracts\Role` contract.
          */
 
-        'role' => Ghustavh97\Guardian\Models\Role::class,
+        'role' => Ghustavh97\Larakey\Models\Role::class,
 
     ],
 
@@ -46,7 +49,7 @@ return [
          * default value but you may easily change it to any table you like.
          */
 
-        'roles' => 'guardian_roles',
+        'roles' => 'larakey_roles',
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
@@ -54,7 +57,7 @@ return [
          * default value but you may easily change it to any table you like.
          */
 
-        'permissions' => 'guardian_permissions',
+        'permissions' => 'larakey_permissions',
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
@@ -62,7 +65,7 @@ return [
          * basic default value but you may easily change it to any table you like.
          */
 
-        'model_has_permissions' => 'guardian_model_has_permissions',
+        'model_has_permissions' => 'larakey_model_has_permissions',
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -70,15 +73,15 @@ return [
          * basic default value but you may easily change it to any table you like.
          */
 
-        'model_has_roles' => 'guardian_model_has_roles',
+        'model_has_roles' => 'larakey_model_has_roles',
 
-        /*
-         * When using the "HasRoles" trait from this package, we need to know which
-         * table should be used to retrieve your roles permissions. We have chosen a
-         * basic default value but you may easily change it to any table you like.
-         */
+        // /*
+        //  * When using the "HasRoles" trait from this package, we need to know which
+        //  * table should be used to retrieve your roles permissions. We have chosen a
+        //  * basic default value but you may easily change it to any table you like.
+        //  */
 
-        'role_has_permissions' => 'guardian_role_has_permissions',
+        // 'role_has_permissions' => 'larakey_role_has_permissions',
     ],
 
     'column_names' => [
@@ -115,9 +118,9 @@ return [
          * The cache key used to store all permissions.
          */
 
-        'permission_key' => 'guardian.permission.cache',
+        'permission_key' => 'larakey.permission.cache',
 
-        'role_key' => 'guardian.role.cache',
+        'role_key' => 'larakey.role.cache',
 
         /*
          * When checking for a permission against a model by passing a Permission

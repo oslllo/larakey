@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test\Models;
+namespace Ghustavh97\Larakey\Test\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

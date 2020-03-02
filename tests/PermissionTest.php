@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Guardian\Test;
+namespace Ghustavh97\Larakey\Test;
 
-use Ghustavh97\Guardian\Test\Models\User;
-use Ghustavh97\Guardian\Contracts\Permission;
-use Ghustavh97\Guardian\Exceptions\PermissionAlreadyExists;
+use Ghustavh97\Larakey\Test\Models\User;
+use Ghustavh97\Larakey\Contracts\Permission;
+use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
 
 class PermissionTest extends TestCase
 {

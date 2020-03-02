@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Guardian\Commands;
+namespace Ghustavh97\Larakey\Commands;
 
 use Illuminate\Console\Command;
-use Ghustavh97\Guardian\GuardianRegistrar;
+use Ghustavh97\Larakey\Padlock\Cache;
 
 class CacheReset extends Command
 {
@@ -13,7 +13,7 @@ class CacheReset extends Command
 
     public function handle()
     {
-        if (app(GuardianRegistrar::class)->flushCache()) {
+        if (app(Cache::class)->flushCache()) {
             $this->info('Permission cache flushed.');
         } else {
             $this->error('Unable to flush cache.');
