@@ -5,13 +5,19 @@ namespace Ghustavh97\Larakey\Padlock;
 use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
 use Illuminate\Database\Eloquent\Model;
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 
 class Key
 {
+    use LarakeyHelpers;
+
     public $to;
+
     public $to_id;
+
     public $to_type;
+    
     public $permission;
 
     public function __construct($to, $permission = null)
@@ -31,7 +37,7 @@ class Key
             $this->to_type = \get_class($this->to);
         } elseif ($this->to instanceof Model && ! $this->to->exists) {
             $this->to_type = \get_class($this->to);
-        } elseif (is_string($this->to)) {
+        } elseif (is_string($this->to) && ! $this->isWildcardToken($this->to)) {
             if (! class_exists($this->to) && config(Config::$checkifClassExists)) {
                 throw ClassDoesNotExist::check($this->to);
             }

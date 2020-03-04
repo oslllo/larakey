@@ -47,16 +47,16 @@ class LarakeyServiceProvider extends ServiceProvider
             return $cache;
         });
 
+        $this->app->singleton(Gate::class, function ($app) use ($gate) {
+            return $gate;
+        });
+
         $this->app->bind(Key::class, function ($app, $parameters) {
             return new Key($parameters['to'], $parameters['permission']);
         });
 
         $this->app->bind(Combination::class, function ($app, $parameters) {
             return new Combination($parameters['arguments']);
-        });
-
-        $this->app->singleton(Gate::class, function ($app) use ($gate) {
-            return $gate;
         });
 
         $this->registerModelBindings();

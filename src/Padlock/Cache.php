@@ -176,27 +176,7 @@ class Cache
     {
         return $this->forgetCachedPermissions() && $this->forgetCachedRoles();
     }
-
-    public function getModelFromAttributes($attributes = [])
-    {
-        if (count($attributes)) {
-            $model = $attributes[0];
-
-            if (is_string($model)) {
-                if (! class_exists($model)) {
-                    throw ClassDoesNotExist::check($model);
-                }
-                return new $model;
-            }
-
-            if ($model instanceof Model) {
-                return $model;
-            }
-        }
-
-        return null;
-    }
-
+    
     /**
      * Get the instance of the Cache Store.
      *

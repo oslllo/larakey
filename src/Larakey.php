@@ -35,22 +35,22 @@ class Larakey
         $this->modelHasPermissionClass = config(Config::$modelHasPermissionClass);
     }
 
-    /**
-     * Get the permission key.
-     *
-     * @param string|object|\Illuminate\Database\Eloquent\Model $to
-     *
-     * @return \Ghustavh97\Larakey\Padlock\Key
-     */
-    public function getKey($to, $permission = null): Key
-    {
-        return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
-    }
+    // /**
+    //  * Get the permission key.
+    //  *
+    //  * @param string|object|\Illuminate\Database\Eloquent\Model $to
+    //  *
+    //  * @return \Ghustavh97\Larakey\Padlock\Key
+    //  */
+    // public function getPermissionKey($to, $permission = null): Key
+    // {
+    //     return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
+    // }
 
-    public function combination(array $arguments): Combination
-    {
-        return app()->makeWith(Combination::class, ['arguments' => $arguments]);
-    }
+    // public function combination(array $arguments): Combination
+    // {
+    //     return app()->makeWith(Combination::class, ['arguments' => $arguments]);
+    // }
 
     /**
      * Get an instance of the permission class.
@@ -62,25 +62,25 @@ class Larakey
         return app($this->permissionClass);
     }
 
-    public function setUser(Model $user)
-    {
-        $this->user = $user;
-    }
+    // public function setUser(Model $user)
+    // {
+    //     $this->user = $user;
+    // }
 
-    public function getGuardNames(): Collection
-    {
-        return Guard::getNames($this->user);
-    }
+    // public function getGuardNames(): Collection
+    // {
+    //     return Guard::getNames($this->user);
+    // }
 
-    public function getDefaultGuardName(): string
-    {
-        return Guard::getDefaultName($this->user);
-    }
+    // public function getDefaultGuardName(): string
+    // {
+    //     return Guard::getDefaultName($this->user);
+    // }
 
-    public function getGuard($guard): String
-    {
-        return $guard ? $guard : $this->getDefaultGuardName();
-    }
+    // public function getGuard($guard): String
+    // {
+    //     return $guard ? $guard : $this->getDefaultGuardName();
+    // }
 
     /**
      * Get an instance of the role class.
@@ -116,25 +116,25 @@ class Larakey
         return app($this->modelHasPermissionClass);
     }
 
-    public static function convertPipeToArray(string $pipeString)
-    {
-        $pipeString = trim($pipeString);
+    // public static function convertPipeToArray(string $pipeString)
+    // {
+    //     $pipeString = trim($pipeString);
 
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
+    //     if (strlen($pipeString) <= 2) {
+    //         return $pipeString;
+    //     }
 
-        $quoteCharacter = substr($pipeString, 0, 1);
-        $endCharacter = substr($quoteCharacter, -1, 1);
+    //     $quoteCharacter = substr($pipeString, 0, 1);
+    //     $endCharacter = substr($quoteCharacter, -1, 1);
 
-        if ($quoteCharacter !== $endCharacter) {
-            return explode('|', $pipeString);
-        }
+    //     if ($quoteCharacter !== $endCharacter) {
+    //         return explode('|', $pipeString);
+    //     }
 
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return explode('|', $pipeString);
-        }
+    //     if (! in_array($quoteCharacter, ["'", '"'])) {
+    //         return explode('|', $pipeString);
+    //     }
 
-        return explode('|', trim($pipeString, $quoteCharacter));
-    }
+    //     return explode('|', trim($pipeString, $quoteCharacter));
+    // }
 }

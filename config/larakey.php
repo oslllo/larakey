@@ -9,7 +9,7 @@ return [
         ]
     ],
 
-    'revoke_recursion' => false,
+    'recursion_on_permission_revoke' => false,
 
     'check_if_class_exists' => true, //! Needs test
 

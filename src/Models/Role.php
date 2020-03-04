@@ -15,10 +15,12 @@ use Ghustavh97\Larakey\Contracts\Role as RoleContract;
 use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 
 class Role extends Model implements RoleContract
 {
     use HasPermissions;
+    use LarakeyHelpers;
     use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];
@@ -161,15 +163,15 @@ class Role extends Model implements RoleContract
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->locksmith()->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->locksmith()->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
         }
 
-        if (! $this->locksmith()->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->locksmith()->getGuardNames());
+        if (! $this->getGuardNames()->contains($permission->guard_name)) {
+            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
         
         return $this->hasDirectPermission($permission);

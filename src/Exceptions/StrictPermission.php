@@ -8,6 +8,11 @@ class StrictPermission extends InvalidArgumentException
 {
     public static function assignment()
     {
-        return new static("Permission scope 'e.g to a class or model instance' should be set in strict mode.");
+        return new static("Permission scope should be set when strict permission assignment is enabled.");
+    }
+
+    public static function revoke()
+    {
+        return new static("Permission scope should be set when strict permission assignment is enabled.");
     }
 }

@@ -15,13 +15,13 @@ use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Cache;
-
-
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
     use HasRoles;
+    use LarakeyHelpers;
     use RefreshesLarakeyCache;
 
     protected $guarded = ['id'];

@@ -10,10 +10,12 @@ use Ghustavh97\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 
 trait HasRoles
 {
     use HasPermissions;
+    use LarakeyHelpers;
 
     private $roleClass;
 
@@ -76,7 +78,7 @@ trait HasRoles
             }
 
             $method = is_numeric($role) ? 'findById' : 'findByName';
-            $guard = $guard ?: $this->locksmith()->getDefaultGuardName();
+            $guard = $guard ?: $this->getDefaultGuardName();
 
             return $this->getRoleClass()->{$method}($role, $guard);
         }, $roles);
@@ -180,7 +182,7 @@ trait HasRoles
     public function getRole($role, $guard = null): Role
     {
         $roleClass = $this->getRoleClass();
-        $guard = $guard ? $guard : $this->locksmith()->getDefaultGuardName();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
 
         if (is_array($role)) {
             $role = $role[0];
@@ -212,10 +214,10 @@ trait HasRoles
     public function hasRole($roles, string $guard = null, bool $returnRole = false)
     {
         $roleClass = $this->getRoleClass();
-        $guard = $guard ? $guard : $this->locksmith()->getDefaultGuardName();
+        $guard = $guard ? $guard : $this->getDefaultGuardName();
 
         if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->locksmith()->convertPipeToArray($roles);
+            $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
@@ -275,7 +277,7 @@ trait HasRoles
     public function hasAllRoles($roles, string $guard = null): bool
     {
         if (is_string($roles) && false !== strpos($roles, '|')) {
-            $roles = $this->locksmith()->convertPipeToArray($roles);
+            $roles = $this->convertPipeToArray($roles);
         }
 
         if (is_string($roles)) {
@@ -317,11 +319,11 @@ trait HasRoles
         $roleClass = $this->getRoleClass();
 
         if (is_numeric($role)) {
-            return $roleClass->findById($role, $this->locksmith()->getDefaultGuardName());
+            return $roleClass->findById($role, $this->getDefaultGuardName());
         }
 
         if (is_string($role)) {
-            return $roleClass->findByName($role, $this->locksmith()->getDefaultGuardName());
+            return $roleClass->findByName($role, $this->getDefaultGuardName());
         }
 
         return $role;
