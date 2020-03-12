@@ -6,13 +6,23 @@ use InvalidArgumentException;
 
 class StrictPermission extends InvalidArgumentException
 {
-    public static function assignment()
+    /**
+     * Exception function for when permission scope on assignment is not set.
+     *
+     * @return self
+     */
+    public static function assignment(): self
     {
-        return new static("Permission scope should be set when strict permission assignment is enabled.");
+        return new static("Permission scope on assignment is not set.");
     }
 
-    public static function revoke()
+    /**
+     * Exception function for when permission scope on revoke is not set
+     *
+     * @return self
+     */
+    public static function revoke(): self
     {
-        return new static("Permission scope should be set when strict permission assignment is enabled.");
+        return new static("Permission scope on revoke is not set.");
     }
 }

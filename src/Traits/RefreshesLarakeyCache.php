@@ -6,7 +6,12 @@ use Ghustavh97\Larakey\Padlock\Cache;
 
 trait RefreshesLarakeyCache
 {
-    public static function bootRefreshesLarakeyCache()
+    /**
+     * Boots RefreshesLarakeyCache trait.
+     *
+     * @return void
+     */
+    public static function bootRefreshesLarakeyCache(): void
     {
         static::saved(function () {
             app(Cache::class)->forgetCachedPermissions();

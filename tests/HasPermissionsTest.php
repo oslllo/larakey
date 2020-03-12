@@ -169,7 +169,7 @@ class HasPermissionsTest extends TestCase
     {
         $this->expectException(InvalidArguments::class);
 
-        $this->testUser->hasPermissionTo('manage', Post::class, 'api', true, true);
+        $this->testUser->hasPermissionTo('manage', Post::class, $this->testUserPost->id, 'api', true, true);
 
         $this->assertFalse($this->testUser->hasPermissionTo('manage'));
     }

@@ -7,12 +7,27 @@ use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class CreatePermission extends Command
 {
+    /**
+     * Command signature.
+     *
+     * @var string
+     */
     protected $signature = 'permission:create-permission 
                 {name : The name of the permission} 
                 {guard? : The name of the guard}';
 
+    /**
+     * Command description.
+     *
+     * @var string
+     */
     protected $description = 'Create a permission';
 
+    /**
+     * Command handle function
+     *
+     * @return void
+     */
     public function handle()
     {
         $permissionClass = app(PermissionContract::class);

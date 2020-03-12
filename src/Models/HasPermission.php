@@ -10,12 +10,48 @@ use Ghustavh97\Larakey\Exceptions\StrictPermission;
 
 class HasPermission extends MorphPivot implements HasPermissionContract
 {
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var boolean
+     */
     public $incrementing = false;
 
-    protected $primaryKey = null;
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType;
 
-    protected $guarded = [];
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string|null
+     */
+    protected $primaryKey;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [];
+
+    /**
+     * HasPermission constructor.
+     *
+     * @param array $attributes
+     *
+     * @return void
+     */
     public function __construct(array $attributes = [])
     {
         $this->setTable(config('larakey.table_names.model_has_permissions'));
@@ -23,6 +59,13 @@ class HasPermission extends MorphPivot implements HasPermissionContract
         parent::__construct($attributes);
     }
 
+    /**
+     * Boot function.
+     *
+     * @return void
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\StrictPermission
+     */
     protected static function boot()
     {
         parent::boot();

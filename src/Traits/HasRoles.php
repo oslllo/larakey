@@ -17,9 +17,19 @@ trait HasRoles
     use HasPermissions;
     use LarakeyHelpers;
 
+    /**
+     * Role class instance.
+     *
+     * @var \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     */
     private $roleClass;
 
-    public static function bootHasRoles()
+    /**
+     * Boots HasRoles trait.
+     *
+     * @return void
+     */
+    public static function bootHasRoles(): void
     {
         static::deleting(function ($model) {
             if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
@@ -30,7 +40,12 @@ trait HasRoles
         });
     }
 
-    public function getRoleClass()
+    /**
+     * Returns role class instance.
+     *
+     * @return \Ghustavh97\Larakey\Contracts\Role|Ghustavh97\Larakey\Models\Role
+     */
+    public function getRoleClass(): Role
     {
         if (! isset($this->roleClass)) {
             $this->roleClass = app(Larakey::class)->getRoleClass();
@@ -54,7 +69,7 @@ trait HasRoles
     }
 
     /**
-     * Scope the model query to certain roles only.
+     * Scopes the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
@@ -89,7 +104,7 @@ trait HasRoles
     }
 
     /**
-     * Assign the given role to the model.
+     * Assigns the given role to the model.
      *
      * @param array|string|\Ghustavh97\Larakey\Contracts\Role ...$roles
      *
@@ -136,19 +151,15 @@ trait HasRoles
             );
         }
 
-        //! I don't see the use of this
-
         $this->forgetCachedPermissions();
 
-        // $this->forgetCachedRoles(true);
         $this->forgetCachedRoles();
-
 
         return $this;
     }
 
     /**
-     * Revoke the given role from the model.
+     * Revokes the given role from the model.
      *
      * @param string|\Ghustavh97\Larakey\Contracts\Role $role
      */
@@ -166,7 +177,7 @@ trait HasRoles
     }
 
     /**
-     * Remove all current roles and set the given ones.
+     * Removes all current roles and set the given ones.
      *
      * @param  array|\Ghustavh97\Larakey\Contracts\Role|string  ...$roles
      *
@@ -179,6 +190,13 @@ trait HasRoles
         return $this->assignRole($roles);
     }
 
+    /**
+     * Returns role.
+     *
+     * @param \Ghustavh97\Larakey\Contracts\Role $role
+     * @param null|string $guard
+     * @return Role
+     */
     public function getRole($role, $guard = null): Role
     {
         $roleClass = $this->getRoleClass();
@@ -204,11 +222,12 @@ trait HasRoles
     }
 
     /**
-     * Determine if the model has (one of) the given role(s).
+     * Determines if the model has (one of) the given role(s).
      *
      * @param string|int|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
-     * @return bool
+     * @param bool $returnRole
+     * @return bool|\Ghustavh97\Larakey\Contracts\Role
      */
 
     public function hasRole($roles, string $guard = null, bool $returnRole = false)
@@ -254,7 +273,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the model has any of the given role(s).
+     * Determines if the model has any of the given role(s).
      *
      * Alias to hasRole() but without Guard controls
      *
@@ -268,7 +287,7 @@ trait HasRoles
     }
 
     /**
-     * Determine if the model has all of the given role(s).
+     * Determines if the model has all of the given role(s).
      *
      * @param  string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @param  string|null  $guard
@@ -302,18 +321,31 @@ trait HasRoles
     }
 
     /**
-     * Return all permissions directly coupled to the model.
+     * Returns all permissions directly coupled to the model.
+     *
+     * @return \Illuminate\Support\Collection
      */
     public function getDirectPermissions(): Collection
     {
         return $this->permissions;
     }
 
+    /**
+     * Returns role name collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function getRoleNames(): Collection
     {
         return $this->roles->pluck('name');
     }
 
+    /**
+     * Returns stored role.
+     *
+     * @param int|string $role
+     * @return \Ghustavh97\Larakey\Contracts\Role
+     */
     protected function getStoredRole($role): Role
     {
         $roleClass = $this->getRoleClass();
@@ -331,8 +363,11 @@ trait HasRoles
 
     /**
      * Forget the cached roles.
+     *
+     * @param boolean $reload
+     * @return void
      */
-    public function forgetCachedRoles($reload = false)
+    public function forgetCachedRoles(bool $reload = false)
     {
         app(Cache::class)->forgetCachedRoles($reload);
     }

@@ -10,22 +10,46 @@ use Ghustavh97\Larakey\Padlock\Combination;
 
 trait LarakeyHelpers
 {
+    /**
+     * Checks if argument is class string.
+     *
+     * @param mixed $argument
+     * @return boolean
+     */
     private function isClassString($argument): bool
     {
         return \strpos($argument, '\\') !== false;
     }
 
+    /**
+     * Checks if argument is string pipe.
+     *
+     * @param string $argument
+     * @return boolean
+     */
     private function isStringPipe(string $argument): bool
     {
         return false !== \strpos($argument, '|');
     }
 
-    private function isWildcardToken(string $argument): bool
+    /**
+     * Checks if argument is wildcard token.
+     *
+     * @param mixed $argument
+     * @return boolean
+     */
+    private function isWildcardToken($argument): bool
     {
         return $argument === Larakey::WILDCARD_TOKEN;
     }
 
-    private static function convertPipeToArray(string $pipeString)
+    /**
+     * Converts string pipe to array.
+     *
+     * @param string $pipeString
+     * @return array
+     */
+    private static function convertPipeToArray(string $pipeString): array
     {
         $pipeString = \trim($pipeString);
 
@@ -47,33 +71,55 @@ trait LarakeyHelpers
         return \explode('|', \trim($pipeString, $quoteCharacter));
     }
 
+    /**
+     * Returns guard names a collection.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     private function getGuardNames(): Collection
     {
         return Guard::getNames($this);
     }
 
+    /**
+     * Returns default guard name.
+     *
+     * @return string
+     */
     private function getDefaultGuardName(): string
     {
         return Guard::getDefaultName($this);
     }
 
-    private function getGuard($guard): String
+    /**
+     * Returns guard with name (default guard is returned if null is given).
+     *
+     * @param string|null $guard
+     * @return string
+     */
+    private function getGuard($guard): string
     {
         return $guard ? $guard : $this->getDefaultGuardName();
     }
 
     /**
-     * Get the permission key.
+     * Returns the permission key.
      *
-     * @param string|object|\Illuminate\Database\Eloquent\Model $to
+     * @param string|object|\Illuminate\Database\Eloquent\Model $model
      *
      * @return \Ghustavh97\Larakey\Padlock\Key
      */
-    private function getPermissionKey($to, $permission = null): Key
+    private function getPermissionKey($model, $permission = null): Key
     {
-        return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
+        return app()->makeWith(Key::class, ['model' => $model, 'permission' => $permission]);
     }
 
+    /**
+     * Returns combination class instance.
+     *
+     * @param array $arguments
+     * @return \Ghustavh97\Larakey\Padlock\Combination
+     */
     private function combination(array $arguments): Combination
     {
         return app()->makeWith(Combination::class, ['arguments' => $arguments]);
