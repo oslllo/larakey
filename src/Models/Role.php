@@ -15,14 +15,26 @@ use Ghustavh97\Larakey\Contracts\Role as RoleContract;
 use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 
 class Role extends Model implements RoleContract
 {
     use HasPermissions;
+    use LarakeyHelpers;
     use RefreshesLarakeyCache;
 
+    /**
+     * The attributes that are not mass assignable
+     *
+     * @var array
+     */
     protected $guarded = ['id'];
 
+    /**
+     * Role constructor.
+     *
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
@@ -32,7 +44,16 @@ class Role extends Model implements RoleContract
         $this->setTable(config('larakey.table_names.roles'));
     }
 
-    public static function create(array $attributes = [])
+    /**
+     * Create role
+     *
+     * @param array $attributes
+     *
+     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\RoleAlreadyExists
+     */
+    public static function create(array $attributes = []): RoleContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
@@ -47,6 +68,8 @@ class Role extends Model implements RoleContract
 
     /**
      * A role may be given various permissions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function permissions(): BelongsToMany
     {
@@ -61,6 +84,8 @@ class Role extends Model implements RoleContract
 
     /**
      * A role belongs to some users of the model associated with its guard.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function users(): MorphToMany
     {
@@ -74,7 +99,7 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * Find a role by its name and guard name.
+     * Find a role by its name (and optionally guardName).
      *
      * @param string $name
      * @param string|null $guardName
@@ -96,6 +121,16 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
+    /**
+     * Find a role by its id (and optionally guardName).
+     *
+     * @param integer $id
+     * @param string|null $guardName
+     *
+     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
+     */
     public static function findById(int $id, $guardName = null): RoleContract
     {
         $guardName = $guardName ?? Guard::getDefaultName(static::class);
@@ -109,6 +144,13 @@ class Role extends Model implements RoleContract
         return $role;
     }
 
+    /**
+     * Find a role by query.
+     *
+     * @param array $query
+     *
+     * @return null|\Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     */
     private static function findRoleByQuery(array $query)
     {
         $role = static::getRoles($query);
@@ -122,7 +164,7 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
@@ -138,7 +180,11 @@ class Role extends Model implements RoleContract
     }
 
     /**
-     * Get the current cached roles.
+     * Get a collection of roles.
+     *
+     * @param array $params
+     *
+     * @return \Illuminate\Support\Collection
      */
     protected static function getRoles(array $params = []): Collection
     {
@@ -161,15 +207,15 @@ class Role extends Model implements RoleContract
         $permissionClass = $this->getPermissionClass();
 
         if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->locksmith()->getDefaultGuardName());
+            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
         }
 
         if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->locksmith()->getDefaultGuardName());
+            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
         }
 
-        if (! $this->locksmith()->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->locksmith()->getGuardNames());
+        if (! $this->getGuardNames()->contains($permission->guard_name)) {
+            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
         }
         
         return $this->hasDirectPermission($permission);

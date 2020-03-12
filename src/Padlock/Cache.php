@@ -13,35 +13,69 @@ use Illuminate\Contracts\Auth\Access\Authorizable;
 use Ghustavh97\Larakey\Contracts\HasPermission;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 use Ghustavh97\Larakey\Padlock\Config;
+use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\Cache\Repository;
 
 class Cache
 {
-    /** @var \Illuminate\Contracts\Cache\Repository */
+    /**
+     * Cache repository.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
     protected $cache;
 
-    /** @var \Illuminate\Cache\CacheManager */
+    /**
+     * Cache manager
+     *
+     * @var \Illuminate\Cache\CacheManager
+     */
     protected $cacheManager;
 
-    /** @var \Illuminate\Support\Collection */
+    /**
+     * Stores cached permissions.
+     *
+     * @var \Illuminate\Support\Collection
+     */
     protected $permissions;
 
-    /** @var \Illuminate\Support\Collection */
+    /**
+     * Stores cached roles.
+     *
+     * @var \Illuminate\Support\Collection
+     */
     protected $roles;
 
-    /** @var DateInterval|int */
+    /**
+     * Stores cache expiration time.
+     *
+     * @var DateInterval|int
+     */
     public static $cacheExpirationTime;
 
-    /** @var string */
+    /**
+     * Stores cache permission key.
+     *
+     * @var string
+     */
     public static $cachePermissionKey;
 
-    /** @var string */
+    /**
+     * Stores cache role key.
+     *
+     * @var string
+     */
     public static $cacheRoleKey;
 
-    /** @var string */
+    /**
+     * stores cache model key.
+     *
+     * @var string
+     */
     public static $cacheModelKey;
 
     /**
-     * LarakeyRegistrar constructor.
+     * Cache constructor.
      *
      * @param \Illuminate\Cache\CacheManager $cacheManager
      */
@@ -51,6 +85,11 @@ class Cache
         $this->initializeCache();
     }
 
+    /**
+     * Initialize cache.
+     *
+     * @return void
+     */
     protected function initializeCache()
     {
         self::$cacheExpirationTime = config(Config::$cacheExpirationTime);
@@ -64,7 +103,12 @@ class Cache
         $this->cache = $this->getCacheStoreFromConfig();
     }
 
-    protected function getCacheStoreFromConfig(): \Illuminate\Contracts\Cache\Repository
+    /**
+     * Get cache store from config.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    protected function getCacheStoreFromConfig(): Repository
     {
         /**
          * The'default' fallback here is from the permission.php config file,
@@ -86,9 +130,13 @@ class Cache
     }
 
     /**
-     * Flush the cache permissions.
+     * Flush cached permissions.
+     *
+     * @param boolean $reload
+     *
+     * @return boolean
      */
-    public function forgetCachedPermissions($reload = false)
+    public function forgetCachedPermissions(bool $reload = false): bool
     {
         $this->permissions = null;
 
@@ -108,7 +156,7 @@ class Cache
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getCachedPermissions(array $params = []): Collection //!GetcachedPermissions
+    public function getCachedPermissions(array $params = []): Collection
     {
         if ($this->permissions === null) {
             $this->permissions = $this->cache->remember(
@@ -132,9 +180,13 @@ class Cache
     }
 
     /**
-     * Flush the cache roles.
+     * Flush the cached roles.
+     *
+     * @param boolean $reload
+     *
+     * @return boolean
      */
-    public function forgetCachedRoles($reload = false)
+    public function forgetCachedRoles(bool $reload = false): bool
     {
         $this->roles = null;
 
@@ -147,6 +199,12 @@ class Cache
         return $forgotten;
     }
 
+    /**
+     * Get cached roles.
+     *
+     * @param array $params
+     * @return \Illuminate\Support\Collection
+     */
     public function getCachedRoles(array $params = []): Collection
     {
         if ($this->roles === null) {
@@ -166,43 +224,33 @@ class Cache
         return $roles;
     }
 
+    /**
+     * Reload cache.
+     *
+     * @return void
+     */
     public function loadCache()
     {
         $this->getCachedPermissions();
         $this->getCachedRoles();
     }
 
+    /**
+     * Flush cached roles and permissions.
+     *
+     * @return void
+     */
     public function flushCache()
     {
         return $this->forgetCachedPermissions() && $this->forgetCachedRoles();
     }
-
-    public function getModelFromAttributes($attributes = [])
-    {
-        if (count($attributes)) {
-            $model = $attributes[0];
-
-            if (is_string($model)) {
-                if (! class_exists($model)) {
-                    throw ClassDoesNotExist::check($model);
-                }
-                return new $model;
-            }
-
-            if ($model instanceof Model) {
-                return $model;
-            }
-        }
-
-        return null;
-    }
-
+    
     /**
      * Get the instance of the Cache Store.
      *
      * @return \Illuminate\Contracts\Cache\Store
      */
-    public function getCacheStore(): \Illuminate\Contracts\Cache\Store
+    public function getCacheStore(): Store
     {
         return $this->cache->getStore();
     }

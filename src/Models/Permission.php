@@ -15,19 +15,34 @@ use Ghustavh97\Larakey\Larakey;
 use Ghustavh97\Larakey\Padlock\Config;
 use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Cache;
-
-
+use Ghustavh97\Larakey\Traits\LarakeyHelpers;
 use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
     use HasRoles;
+    use LarakeyHelpers;
     use RefreshesLarakeyCache;
 
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
     protected $guarded = ['id'];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
     protected $appends = [];
 
+    /**
+     * Permission constructor
+     *
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? config('auth.defaults.guard');
@@ -39,7 +54,16 @@ class Permission extends Model implements PermissionContract
         $this->appends = array_merge($this->appends, ['to_type', 'to_id']);
     }
 
-    public static function create(array $attributes = [])
+    /**
+     * Create permission.
+     *
+     * @param array $attributes
+     *
+     * @return \Ghustavh97\Larakey\Models\Permission|\Ghustavh97\Larakey\Contracts\Permission
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists
+     */
+    public static function create(array $attributes = []): PermissionContract
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 
@@ -54,13 +78,10 @@ class Permission extends Model implements PermissionContract
         return static::query()->create($attributes);
     }
 
-    public function setIdAttribute($value)
-    {
-        $this->attributes['id'] = (int) $value;
-    }
-
     /**
      * A permission can be applied to roles.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function roles(): BelongsToMany
     {
@@ -75,6 +96,8 @@ class Permission extends Model implements PermissionContract
 
     /**
      * A permission belongs to some users of the model associated with its guard.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function users(): MorphToMany
     {
@@ -93,9 +116,9 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
-     *
      * @return \Ghustavh97\Larakey\Contracts\Permission
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
@@ -115,9 +138,9 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
-     *
      * @return \Ghustavh97\Larakey\Contracts\Permission
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
@@ -131,6 +154,13 @@ class Permission extends Model implements PermissionContract
         return $permission;
     }
 
+    /**
+     * Find permission by query.
+     *
+     * @param array $query
+     *
+     * @return null|\Ghustavh97\Larakey\Models\Permission|\Ghustavh97\Larakey\Contracts\Permission
+     */
     private static function findPermissionByQuery(array $query)
     {
         $permission = static::getPermissions($query);
@@ -160,6 +190,10 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Get the current cached permissions.
+     *
+     * @param array $params
+     *
+     * @return \Illuminate\Support\Collection
      */
     protected static function getPermissions(array $params = []): Collection
     {
@@ -168,6 +202,11 @@ class Permission extends Model implements PermissionContract
         return app(Cache::class)->getCachedPermissions($params);
     }
 
+    /**
+     * Get permission to_id attribute.
+     *
+     * @return void|string
+     */
     public function getToIdAttribute()
     {
         if ($this->pivot) {
@@ -175,6 +214,11 @@ class Permission extends Model implements PermissionContract
         }
     }
 
+    /**
+     * Get permission to_type attribute.
+     *
+     * @return void|string
+     */
     public function getToTypeAttribute()
     {
         if ($this->pivot) {

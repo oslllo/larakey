@@ -32,7 +32,9 @@ class Config
 
     public static $strictPermissionAssignment = 'larakey.strict.permission.assignment';
 
-    public static $checkifClassExists = 'larakey.check_if_class_exists';
+    public static $strictPermissionRevoke = 'larakey.strict.permission.revoke';
 
     public static $authGuards = 'auth.guards';
+
+    public static $recursionOnPermissionRevoke = 'larakey.recursion_on_permission_revoke';
 }

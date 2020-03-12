@@ -3,15 +3,58 @@
 return [
 
     'strict' => [
+
         'permission' => [
+
+            /*
+            * When set to true, assigning a permission will require that you specify the
+            * permission's scope or it throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            *
+            * For example
+            *
+            * If set to true:
+            *
+            * $user->givePermissionTo('view', '*') passes.
+            * $user->givePermissionTo('view') throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            *
+            * If set to false:
+            *
+            * $user->givePermissionTo('view', '*') passes.
+            * $user->givePermissionTo('view') passes.
+            */
+
             'assignment' => false,
+
+            /*
+            * When set to true, revoking a permission will require that you specify the
+            * permission's scope or it throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            *
+            * For example
+            *
+            * If set to true:
+            *
+            * $user->revokePermission('view', '*') passes.
+            * $user->revokePermission('view') throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            *
+            * If set to false:
+            *
+            * $user->revokePermission('view', '*') passes.
+            * $user->revokePermission('view') passes.
+            */
+
             'revoke' => false
+
         ]
+
     ],
 
-    'revoke_recursion' => false,
+    /*
+    * Revoke permission and others of lower scope recursively.
+    *
+    * `*` > Class > Instance
+    */
 
-    'check_if_class_exists' => true, //! Needs test
+    'recursion_on_permission_revoke' => false,
 
     'models' => [
 
@@ -25,6 +68,15 @@ return [
          */
 
         'permission' => Ghustavh97\Larakey\Models\Permission::class,
+
+        /*
+         * When using the "HasPermissions" trait from this package, we need to know which
+         * Eloquent model should be used to retrieve your permissions. Of course, it
+         * is often just the "Permission" model but you may use whatever you like.
+         *
+         * The model you want to use as a Permission model needs to implement the
+         * `Ghustavh97\Larakey\Contracts\HasPermission` contract.
+         */
 
         'permission_pivot' => Ghustavh97\Larakey\Models\HasPermission::class,
 
@@ -61,8 +113,8 @@ return [
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
-         * table should be used to retrieve your models permissions. We have chosen a
-         * basic default value but you may easily change it to any table you like.
+         * table should be used to retrieve your permissions. We have chosen a basic
+         * default value but you may easily change it to any table you like.
          */
 
         'model_has_permissions' => 'larakey_model_has_permissions',
@@ -74,14 +126,6 @@ return [
          */
 
         'model_has_roles' => 'larakey_model_has_roles',
-
-        // /*
-        //  * When using the "HasRoles" trait from this package, we need to know which
-        //  * table should be used to retrieve your roles permissions. We have chosen a
-        //  * basic default value but you may easily change it to any table you like.
-        //  */
-
-        // 'role_has_permissions' => 'larakey_role_has_permissions',
     ],
 
     'column_names' => [
@@ -119,6 +163,10 @@ return [
          */
 
         'permission_key' => 'larakey.permission.cache',
+
+        /*
+         * The cache key used to store all roles.
+         */
 
         'role_key' => 'larakey.role.cache',
 

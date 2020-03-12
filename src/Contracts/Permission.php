@@ -19,9 +19,9 @@ interface Permission
      * @param string $name
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
-     *
      * @return Permission
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findByName(string $name, $guardName): self;
 
@@ -31,9 +31,9 @@ interface Permission
      * @param int $id
      * @param string|null $guardName
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
-     *
      * @return Permission
+     *
+     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findById(int $id, $guardName): self;
 

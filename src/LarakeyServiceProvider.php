@@ -16,6 +16,14 @@ use Ghustavh97\Larakey\Padlock\Combination;
 
 class LarakeyServiceProvider extends ServiceProvider
 {
+    /**
+     * LarakeyServiceProvider boot function
+     *
+     * @param \Ghustavh97\Larakey\Padlock\Gate $gate
+     * @param \Ghustavh97\Larakey\Padlock\Cache $cache
+     * @param \Illuminate\Filesystem\Filesystem $filesystem
+     * @return void
+     */
     public function boot(Gate $gate, Cache $cache, Filesystem $filesystem)
     {
         if (function_exists('config_path')) {
@@ -47,16 +55,16 @@ class LarakeyServiceProvider extends ServiceProvider
             return $cache;
         });
 
+        $this->app->singleton(Gate::class, function ($app) use ($gate) {
+            return $gate;
+        });
+
         $this->app->bind(Key::class, function ($app, $parameters) {
-            return new Key($parameters['to'], $parameters['permission']);
+            return new Key($parameters['model'], $parameters['permission']);
         });
 
         $this->app->bind(Combination::class, function ($app, $parameters) {
             return new Combination($parameters['arguments']);
-        });
-
-        $this->app->singleton(Gate::class, function ($app) use ($gate) {
-            return $gate;
         });
 
         $this->registerModelBindings();
@@ -64,6 +72,11 @@ class LarakeyServiceProvider extends ServiceProvider
         $gate->registerPermissions();
     }
 
+    /**
+     * LarakeyServiceProvider boot function
+     *
+     * @return void
+     */
     public function register()
     {
         $this->mergeConfigFrom(
@@ -74,6 +87,11 @@ class LarakeyServiceProvider extends ServiceProvider
         $this->registerBladeExtensions();
     }
 
+    /**
+     * Registers model bindings.
+     *
+     * @return void
+     */
     protected function registerModelBindings()
     {
         $config = $this->app->config['larakey.models'];
@@ -82,6 +100,11 @@ class LarakeyServiceProvider extends ServiceProvider
         $this->app->bind(RoleContract::class, $config['role']);
     }
 
+    /**
+     * Registers blade extensions.
+     *
+     * @return void
+     */
     protected function registerBladeExtensions()
     {
         $this->app->afterResolving('blade.compiler', function (BladeCompiler $bladeCompiler) {
@@ -137,6 +160,11 @@ class LarakeyServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Registers micro helpers.
+     *
+     * @return void
+     */
     protected function registerMacroHelpers()
     {
         Route::macro('role', function ($roles = []) {

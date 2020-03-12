@@ -1,6 +1,6 @@
 {
     "name": "ghustavh97/larakey",
-    "description": "Permission handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
+    "description": "Permission and role handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
     "keywords": [
         "spatie",
         "laravel",
@@ -18,9 +18,9 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Freek Van der Herten",
-            "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
+            "name": "Ghustavh Ehm",
+            "email": "ghustavh97@gmail.com",
+            "homepage": "https://github.com/Ghustavh97",
             "role": "Developer"
         }
     ],

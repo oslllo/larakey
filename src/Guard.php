@@ -42,6 +42,12 @@ class Guard
             ->keys();
     }
 
+    /**
+     * Returns class guard names.
+     *
+     * @param object|string $class
+     * @return string
+     */
     public static function getDefaultName($class): string
     {
         $default = config('auth.defaults.guard');

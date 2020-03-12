@@ -9,12 +9,12 @@ use Ghustavh97\Larakey\Exceptions\InvalidArguments;
 use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
 use Ghustavh97\Larakey\Padlock\Key;
 use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Padlock\Combination;
 use Ghustavh97\Larakey\Contracts\Role;
 use Ghustavh97\Larakey\Contracts\Permission;
 
 class Larakey
 {
+    /** @var string */
     const WILDCARD_TOKEN = '*';
     
     /** @var string */
@@ -26,8 +26,11 @@ class Larakey
     /** @var string */
     protected $modelHasPermissionClass;
 
-    protected $user;
-
+    /**
+     * Larakey constructor.
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->roleClass = config(Config::$roleClass);
@@ -36,24 +39,7 @@ class Larakey
     }
 
     /**
-     * Get the permission key.
-     *
-     * @param string|object|\Illuminate\Database\Eloquent\Model $to
-     *
-     * @return \Ghustavh97\Larakey\Padlock\Key
-     */
-    public function getKey($to, $permission = null): Key
-    {
-        return app()->makeWith(Key::class, ['to' => $to, 'permission' => $permission]);
-    }
-
-    public function combination(array $arguments): Combination
-    {
-        return app()->makeWith(Combination::class, ['arguments' => $arguments]);
-    }
-
-    /**
-     * Get an instance of the permission class.
+     * Returns an instance of the permission class.
      *
      * @return \Ghustavh97\Larakey\Contracts\Permission
      */
@@ -62,28 +48,8 @@ class Larakey
         return app($this->permissionClass);
     }
 
-    public function setUser(Model $user)
-    {
-        $this->user = $user;
-    }
-
-    public function getGuardNames(): Collection
-    {
-        return Guard::getNames($this->user);
-    }
-
-    public function getDefaultGuardName(): string
-    {
-        return Guard::getDefaultName($this->user);
-    }
-
-    public function getGuard($guard): String
-    {
-        return $guard ? $guard : $this->getDefaultGuardName();
-    }
-
     /**
-     * Get an instance of the role class.
+     * Returns an instance of the role class.
      *
      * @return \Ghustavh97\Larakey\Contracts\Role
      */
@@ -92,14 +58,26 @@ class Larakey
         return app($this->roleClass);
     }
 
-    public function setPermissionClass($permissionClass)
+    /**
+     * Sets Larakey permission class.
+     *
+     * @param string $permissionClass
+     * @return $this
+     */
+    public function setPermissionClass(string $permissionClass): self
     {
         $this->permissionClass = $permissionClass;
 
         return $this;
     }
 
-    public function setRoleClass($roleClass)
+    /**
+     * Sets Larakey role class.
+     *
+     * @param string $roleClass
+     * @return $this
+     */
+    public function setRoleClass(string $roleClass): self
     {
         $this->roleClass = $roleClass;
 
@@ -107,34 +85,12 @@ class Larakey
     }
 
     /**
-     * Get an instance of the HasPermission class.
+     * Returns an instance of the HasPermission class.
      *
      * @return \Ghustavh97\Larakey\Contracts\HasPermission
      */
     public function getmodelHasPermissionClass(): HasPermission
     {
         return app($this->modelHasPermissionClass);
-    }
-
-    public static function convertPipeToArray(string $pipeString)
-    {
-        $pipeString = trim($pipeString);
-
-        if (strlen($pipeString) <= 2) {
-            return $pipeString;
-        }
-
-        $quoteCharacter = substr($pipeString, 0, 1);
-        $endCharacter = substr($quoteCharacter, -1, 1);
-
-        if ($quoteCharacter !== $endCharacter) {
-            return explode('|', $pipeString);
-        }
-
-        if (! in_array($quoteCharacter, ["'", '"'])) {
-            return explode('|', $pipeString);
-        }
-
-        return explode('|', trim($pipeString, $quoteCharacter));
     }
 }

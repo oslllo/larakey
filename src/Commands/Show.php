@@ -9,12 +9,27 @@ use Ghustavh97\Larakey\Models\Permission;
 
 class Show extends Command
 {
+    /**
+     * Command signature.
+     *
+     * @var string
+     */
     protected $signature = 'permission:show
             {guard? : The name of the guard}
             {style? : The display style (default|borderless|compact|box)}';
 
+    /**
+     * Command description.
+     *
+     * @var string
+     */
     protected $description = 'Show a table of roles and permissions per guard';
 
+    /**
+     * Command handle function.
+     *
+     * @return void
+     */
     public function handle()
     {
         $style = $this->argument('style') ?? 'default';
