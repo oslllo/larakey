@@ -1,14 +1,14 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Contracts\Role;
-use Ghustavh97\Larakey\Test\Models\User;
-use Ghustavh97\Larakey\Models\Permission;
-use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
-use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
-use Ghustavh97\Larakey\Exceptions\RoleAlreadyExists;
-use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
+use Oslllo\Larakey\Contracts\Role;
+use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Models\Permission;
+use Oslllo\Larakey\Exceptions\RoleDoesNotExist;
+use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
+use Oslllo\Larakey\Exceptions\RoleAlreadyExists;
+use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
 
 class RoleTest extends TestCase
 {

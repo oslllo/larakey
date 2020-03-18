@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Exceptions;
+namespace Oslllo\Larakey\Exceptions;
 
 use InvalidArgumentException;
 

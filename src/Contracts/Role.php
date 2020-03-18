@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Contracts;
+namespace Oslllo\Larakey\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -19,9 +19,9 @@ interface Role
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Oslllo\Larakey\Contracts\Role
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName): self;
 
@@ -31,9 +31,9 @@ interface Role
      * @param int $id
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Oslllo\Larakey\Contracts\Role
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\RoleDoesNotExist
      */
     public static function findById(int $id, $guardName): self;
 
@@ -43,14 +43,14 @@ interface Role
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Oslllo\Larakey\Contracts\Role
      */
     public static function findOrCreate(string $name, $guardName): self;
 
     /**
      * Determine if the user may perform the given permission.
      *
-     * @param string|\Ghustavh97\Larakey\Contracts\Permission $permission
+     * @param string|\Oslllo\Larakey\Contracts\Permission $permission
      *
      * @return bool
      */

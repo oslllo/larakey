@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Padlock;
+namespace Oslllo\Larakey\Padlock;
 
 class Config
 {

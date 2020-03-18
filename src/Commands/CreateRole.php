@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Larakey\Commands;
+namespace Oslllo\Larakey\Commands;
 
 use Illuminate\Console\Command;
-use Ghustavh97\Larakey\Contracts\Role as RoleContract;
-use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
+use Oslllo\Larakey\Contracts\Role as RoleContract;
+use Oslllo\Larakey\Contracts\Permission as PermissionContract;
 
 class CreateRole extends Command
 {

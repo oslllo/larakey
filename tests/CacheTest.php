@@ -1,17 +1,17 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
 use Illuminate\Support\Facades\DB;
-use Ghustavh97\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Ghustavh97\Larakey\Test\Models\User;
-use Ghustavh97\Larakey\LarakeyRegistrar;
-use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
+use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\LarakeyRegistrar;
+use Oslllo\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
 
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Larakey;
 
 class CacheTest extends TestCase
 {
@@ -249,7 +249,7 @@ class CacheTest extends TestCase
     public function it_can_reset_the_cache_with_artisan_command()
     {
         Artisan::call('permission:create-permission', ['name' => 'new-permission']);
-        $this->assertCount(1, \Ghustavh97\Larakey\Models\Permission::where('name', 'new-permission')->get());
+        $this->assertCount(1, \Oslllo\Larakey\Models\Permission::where('name', 'new-permission')->get());
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded
@@ -259,7 +259,7 @@ class CacheTest extends TestCase
         $this->assertQueryCount($this->cache_init_count + $this->cache_load_count + $this->cache_run_count);
 
         Artisan::call('permission:create-role', ['name' => 'new-role']);
-        $this->assertCount(1, \Ghustavh97\Larakey\Models\Role::where('name', 'new-role')->get());
+        $this->assertCount(1, \Oslllo\Larakey\Models\Role::where('name', 'new-role')->get());
 
         $this->resetQueryCount();
         // retrieve permissions and roles, and assert that the cache had to be loaded

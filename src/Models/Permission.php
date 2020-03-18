@@ -1,22 +1,22 @@
 <?php
 
-namespace Ghustavh97\Larakey\Models;
+namespace Oslllo\Larakey\Models;
 
-use Ghustavh97\Larakey\Guard;
+use Oslllo\Larakey\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Traits\HasRoles;
+use Oslllo\Larakey\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
+use Oslllo\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
+use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
-use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
+use Oslllo\Larakey\Exceptions\PermissionAlreadyExists;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Config;
+use Oslllo\Larakey\Padlock\Key;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Contracts\Permission as PermissionContract;
 
 class Permission extends Model implements PermissionContract
 {
@@ -59,9 +59,9 @@ class Permission extends Model implements PermissionContract
      *
      * @param array $attributes
      *
-     * @return \Ghustavh97\Larakey\Models\Permission|\Ghustavh97\Larakey\Contracts\Permission
+     * @return \Oslllo\Larakey\Models\Permission|\Oslllo\Larakey\Contracts\Permission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists
+     * @throws \Oslllo\Larakey\Exceptions\PermissionAlreadyExists
      */
     public static function create(array $attributes = []): PermissionContract
     {
@@ -116,9 +116,9 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission
+     * @return \Oslllo\Larakey\Contracts\Permission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): PermissionContract
     {
@@ -138,9 +138,9 @@ class Permission extends Model implements PermissionContract
      * @param int $id
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission
+     * @return \Oslllo\Larakey\Contracts\Permission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findById(int $id, $guardName = null): PermissionContract
     {
@@ -159,7 +159,7 @@ class Permission extends Model implements PermissionContract
      *
      * @param array $query
      *
-     * @return null|\Ghustavh97\Larakey\Models\Permission|\Ghustavh97\Larakey\Contracts\Permission
+     * @return null|\Oslllo\Larakey\Models\Permission|\Oslllo\Larakey\Contracts\Permission
      */
     private static function findPermissionByQuery(array $query)
     {
@@ -174,7 +174,7 @@ class Permission extends Model implements PermissionContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission
+     * @return \Oslllo\Larakey\Contracts\Permission
      */
     public static function findOrCreate(string $name, $guardName = null): PermissionContract
     {

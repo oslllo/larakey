@@ -1,20 +1,17 @@
----
-title: Exceptions
-weight: 3
----
+# Exceptions
 
 If you need to override exceptions thrown by this package, you can simply use normal [Laravel practices for handling exceptions](https://laravel.com/docs/errors#render-method).
 
 An example is shown below for your convenience, but nothing here is specific to this package other than the name of the exception.
 
-You can find all the exceptions added by this package in the code here: https://github.com/spatie/laravel-permission/tree/master/src/Exceptions
+You can find all the exceptions added by this package in the code here: https://github.com/oslllo/larakey/tree/master/src/Exceptions
 
 
 **app/Exceptions/Handler.php**
 ```php
-public function render($request, Exception $exception)
+public function render($request, Throwable $exception)
 {
-    if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
+    if ($exception instanceof \Oslllo\Larakey\Exceptions\UnauthorizedException) {
         return response()->json([
             'responseMessage' => 'You do not have the required authorization.',
             'responseStatus'  => 403,
@@ -24,3 +21,5 @@ public function render($request, Exception $exception)
     return parent::render($request, $exception);
 }
 ```
+
+---

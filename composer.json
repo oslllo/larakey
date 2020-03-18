@@ -1,5 +1,5 @@
 {
-    "name": "ghustavh97/larakey",
+    "name": "oslllo/larakey",
     "description": "Permission and role handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
     "keywords": [
         "spatie",
@@ -10,17 +10,17 @@
         "acl",
         "rbac",
         "security",
-        "ghustavh97",
+        "oslllo",
         "authority",
         "larakey"
     ],
-    "homepage": "https://github.com/Ghustavh97/larakey/",
+    "homepage": "https://github.com/Oslllo/larakey/",
     "license": "MIT",
     "authors": [
         {
             "name": "Ghustavh Ehm",
             "email": "ghustavh97@gmail.com",
-            "homepage": "https://github.com/Ghustavh97",
+            "homepage": "https://github.com/Oslllo",
             "role": "Developer"
         }
     ],
@@ -38,7 +38,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ghustavh97\\Larakey\\": "src"
+            "Oslllo\\Larakey\\": "src"
         },
         "files": [
             "src/Helpers.php"
@@ -46,13 +46,13 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ghustavh97\\Larakey\\Test\\": "tests"
+            "Oslllo\\Larakey\\Test\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ghustavh97\\Larakey\\LarakeyServiceProvider"
+                "Oslllo\\Larakey\\LarakeyServiceProvider"
             ]
         }
     },

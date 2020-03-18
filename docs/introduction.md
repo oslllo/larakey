@@ -1,34 +1,73 @@
----
-title: Introduction
-weight: 1
----
+# Introduction
 
-This package allows you to manage user permissions and roles in a database.
+❓ What will you be able to do with the package once [installed](#installation)?:
 
-Once installed you can do stuff like this:
+### **Once installed you can do stuff like:**
 
+```
+✅ Give permissions to users.
+```
 ```php
-// Adding permissions to a user
+// Give general permission that you can manage and filter in your app.
 $user->givePermissionTo('edit articles');
 
-// Adding permissions via a role
-$user->assignRole('writer');
+// Give a user a permission that is tied to a class.
+$user->givePermissionTo('edit', Article::class);
 
-$role->givePermissionTo('edit articles');
+// Give a user a permission to a model instance.
+$article = Article::find(1);
+$user->givePermissionTo('edit', $article); // OR
+$user->givePermissionTo('edit', Article::class, 1); // OR
+$user->givePermissionTo('edit', Article::class, $article->id);
+
+
+// Give user permission to edit anything.
+$user->givePermissionTo('edit'); //OR
+$user->givePermissionTo('edit', '*');
+
+// etc...
 ```
 
-If you're using multiple guards we've got you covered as well. Every guard will have its own set of permissions and roles that can be assigned to the guard's users. Read about it in the [using multiple guards](https://docs.spatie.be/laravel-permission/v3/basic-usage/multiple-guards/) section of the readme.
+```
+✅ Assign roles to users.
+```
+
+```php
+// Assign user a role.
+$user->assignRole('writer');
+
+// Give permission to role
+$role->givePermissionTo('edit articles');
+
+$role->givePermissionTo('view', Article::class);
+
+// etc...
+```
 
 Because all permissions will be registered on [Laravel's gate](https://laravel.com/docs/authorization), you can check if a user has a permission with Laravel's default `can` function:
 
 ```php
-$user->can('edit articles');
+$user->can('view', Article::class); //OR
+
+$article = Article::find(1);
+$user->can('view', $article); //OR
+$user->can('view', Article::class, $article->id);
 ```
 
 and Blade directives:
 
-```blade
-@can('edit articles')
+```php
+@can('view', Article::class)
 ...
 @endcan
+
+// OR
+
+@can('view', $article)
+...
+@endcan
+
+// etc...
 ```
+
+---

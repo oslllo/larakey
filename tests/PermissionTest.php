@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Test\Models\User;
-use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Exceptions\PermissionAlreadyExists;
+use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Exceptions\PermissionAlreadyExists;
 
 class PermissionTest extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Larakey\Commands;
+namespace Oslllo\Larakey\Commands;
 
 use Illuminate\Console\Command;
-use Ghustavh97\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Padlock\Cache;
 
 class CacheReset extends Command
 {

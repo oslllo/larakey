@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test\Controllers;
+namespace Oslllo\Larakey\Test\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use Ghustavh97\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Test\Models\Post;
 
 class AuthorizeController extends Controller
 {

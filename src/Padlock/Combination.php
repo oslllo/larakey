@@ -1,14 +1,14 @@
 <?php
 
-namespace Ghustavh97\Larakey\Padlock;
+namespace Oslllo\Larakey\Padlock;
 
-use Ghustavh97\Larakey\Larakey;
+use Oslllo\Larakey\Larakey;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Padlock\Config;
+use Oslllo\Larakey\Padlock\Config;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
-use Ghustavh97\Larakey\Exceptions\InvalidArguments;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Exceptions\InvalidArguments;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
 
 class Combination
 {
@@ -52,7 +52,7 @@ class Combination
     /**
      * Permissions.
      *
-     * @var string|array|\Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Models\Permission
+     * @var string|array|\Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Models\Permission
      */
     protected $permissions;
     
@@ -202,7 +202,7 @@ class Combination
     /**
      * Set class $permisions variable.
      *
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Models\Permission $permissions
+     * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Models\Permission $permissions
      * @return void
      */
     private function setPermissions($permissions): void
@@ -211,7 +211,11 @@ class Combination
             $permissions = $this->convertPipeToArray($permissions);
         }
 
-        if (is_string($permissions) || is_object($permissions)) {
+        if ($permissions instanceof Collection) {
+            $permissions = $permissions->all();
+        }
+
+        if ((is_string($permissions) || is_object($permissions)) && (! $permissions instanceof Collection)) {
             $permissions = [$permissions];
         }
         

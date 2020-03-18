@@ -1,13 +1,13 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test\Models;
+namespace Oslllo\Larakey\Test\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Traits\HasLarakey;
-use Ghustavh97\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Traits\HasLarakey;
+use Oslllo\Larakey\Test\Models\Post;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Larakey\Test\Models\Comment;
+use Oslllo\Larakey\Test\Models\Comment;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;

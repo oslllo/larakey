@@ -1,11 +1,11 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
 use Artisan;
-use Ghustavh97\Larakey\Contracts\Role;
-use Ghustavh97\Larakey\Test\Models\Post;
-use Ghustavh97\Larakey\Test\Models\User;
+use Oslllo\Larakey\Contracts\Role;
+use Oslllo\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Test\Models\User;
 
 class BladeTest extends TestCase
 {

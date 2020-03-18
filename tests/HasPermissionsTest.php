@@ -1,18 +1,18 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Contracts\Role;
-use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Test\Models\User;
-use Ghustavh97\Larakey\Test\Models\Post;
-use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
-use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
-use Ghustavh97\Larakey\Exceptions\PermissionNotAssigned;
-use Ghustavh97\Larakey\Exceptions\StrictPermission;
-use Ghustavh97\Larakey\Exceptions\InvalidArguments;
+use Oslllo\Larakey\Contracts\Role;
+use Oslllo\Larakey\Padlock\Config;
+use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
+use Oslllo\Larakey\Exceptions\PermissionNotAssigned;
+use Oslllo\Larakey\Exceptions\StrictPermission;
+use Oslllo\Larakey\Exceptions\InvalidArguments;
 
 class HasPermissionsTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test\Providers;
+namespace Oslllo\Larakey\Test\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -14,7 +14,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'Ghustavh97\Larakey\Test\Controllers';
+    protected $namespace = 'Oslllo\Larakey\Test\Controllers';
     protected $routesPath;
 
     /**
