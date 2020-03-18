@@ -1,4 +1,4 @@
-<img src="images/cover.svg" alt="Larakey Cover" width="auto" height="300"/>
+<img src="images/cover.png" alt="Larakey Cover" width="500" height="auto"/>
 
 # Larakey <small>0.1</small>
 
