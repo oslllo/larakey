@@ -1,12 +1,12 @@
 <?php
 
-namespace Ghustavh97\Larakey\Traits;
+namespace Oslllo\Larakey\Traits;
 
-use Ghustavh97\Larakey\Guard;
-use Ghustavh97\Larakey\Larakey;
+use Oslllo\Larakey\Guard;
+use Oslllo\Larakey\Larakey;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Padlock\Combination;
+use Oslllo\Larakey\Padlock\Key;
+use Oslllo\Larakey\Padlock\Combination;
 
 trait LarakeyHelpers
 {
@@ -107,7 +107,7 @@ trait LarakeyHelpers
      *
      * @param string|object|\Illuminate\Database\Eloquent\Model $model
      *
-     * @return \Ghustavh97\Larakey\Padlock\Key
+     * @return \Oslllo\Larakey\Padlock\Key
      */
     private function getPermissionKey($model, $permission = null): Key
     {
@@ -118,7 +118,7 @@ trait LarakeyHelpers
      * Returns combination class instance.
      *
      * @param array $arguments
-     * @return \Ghustavh97\Larakey\Padlock\Combination
+     * @return \Oslllo\Larakey\Padlock\Combination
      */
     private function combination(array $arguments): Combination
     {

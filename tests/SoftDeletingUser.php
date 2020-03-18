@@ -1,8 +1,8 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SoftDeletingUser extends User

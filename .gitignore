@@ -4,3 +4,4 @@ vendor
 tests/temp
 .idea
 .phpunit.result.cache
+docs/index.html

@@ -1,16 +1,16 @@
 <?php
 
-namespace Ghustavh97\Larakey;
+namespace Oslllo\Larakey;
 
-use Ghustavh97\Larakey\Guard;
+use Oslllo\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Exceptions\InvalidArguments;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
-use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Contracts\Role;
-use Ghustavh97\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Exceptions\InvalidArguments;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Padlock\Key;
+use Oslllo\Larakey\Padlock\Config;
+use Oslllo\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Permission;
 
 class Larakey
 {
@@ -41,7 +41,7 @@ class Larakey
     /**
      * Returns an instance of the permission class.
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission
+     * @return \Oslllo\Larakey\Contracts\Permission
      */
     public function getPermissionClass(): Permission
     {
@@ -51,7 +51,7 @@ class Larakey
     /**
      * Returns an instance of the role class.
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Oslllo\Larakey\Contracts\Role
      */
     public function getRoleClass(): Role
     {
@@ -87,7 +87,7 @@ class Larakey
     /**
      * Returns an instance of the HasPermission class.
      *
-     * @return \Ghustavh97\Larakey\Contracts\HasPermission
+     * @return \Oslllo\Larakey\Contracts\HasPermission
      */
     public function getmodelHasPermissionClass(): HasPermission
     {

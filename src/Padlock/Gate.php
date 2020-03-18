@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Padlock;
+namespace Oslllo\Larakey\Padlock;
 
 use Illuminate\Contracts\Auth\Access\Gate as IlluminateGate;
 use Illuminate\Contracts\Auth\Access\Authorizable;

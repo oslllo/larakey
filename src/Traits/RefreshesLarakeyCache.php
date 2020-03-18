@@ -1,8 +1,8 @@
 <?php
 
-namespace Ghustavh97\Larakey\Traits;
+namespace Oslllo\Larakey\Traits;
 
-use Ghustavh97\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Padlock\Cache;
 
 trait RefreshesLarakeyCache
 {

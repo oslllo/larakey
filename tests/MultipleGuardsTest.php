@@ -1,8 +1,8 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Models\Permission;
+use Oslllo\Larakey\Models\Permission;
 
 class MultipleGuardsTest extends TestCase
 {

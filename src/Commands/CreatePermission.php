@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Larakey\Commands;
+namespace Oslllo\Larakey\Commands;
 
 use Illuminate\Console\Command;
-use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
+use Oslllo\Larakey\Contracts\Permission as PermissionContract;
 
 class CreatePermission extends Command
 {

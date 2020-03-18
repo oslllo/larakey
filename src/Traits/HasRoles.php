@@ -1,16 +1,16 @@
 <?php
 
-namespace Ghustavh97\Larakey\Traits;
+namespace Oslllo\Larakey\Traits;
 
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Padlock\Config;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Padlock\Config;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
+use Oslllo\Larakey\Exceptions\RoleDoesNotExist;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
 
 trait HasRoles
 {
@@ -20,7 +20,7 @@ trait HasRoles
     /**
      * Role class instance.
      *
-     * @var \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @var \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      */
     private $roleClass;
 
@@ -43,7 +43,7 @@ trait HasRoles
     /**
      * Returns role class instance.
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role|Ghustavh97\Larakey\Models\Role
+     * @return \Oslllo\Larakey\Contracts\Role|Oslllo\Larakey\Models\Role
      */
     public function getRoleClass(): Role
     {
@@ -72,7 +72,7 @@ trait HasRoles
      * Scopes the model query to certain roles only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|array|\Oslllo\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string $guard
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -106,7 +106,7 @@ trait HasRoles
     /**
      * Assigns the given role to the model.
      *
-     * @param array|string|\Ghustavh97\Larakey\Contracts\Role ...$roles
+     * @param array|string|\Oslllo\Larakey\Contracts\Role ...$roles
      *
      * @return $this
      */
@@ -161,7 +161,7 @@ trait HasRoles
     /**
      * Revokes the given role from the model.
      *
-     * @param string|\Ghustavh97\Larakey\Contracts\Role $role
+     * @param string|\Oslllo\Larakey\Contracts\Role $role
      */
     public function removeRole($role)
     {
@@ -179,7 +179,7 @@ trait HasRoles
     /**
      * Removes all current roles and set the given ones.
      *
-     * @param  array|\Ghustavh97\Larakey\Contracts\Role|string  ...$roles
+     * @param  array|\Oslllo\Larakey\Contracts\Role|string  ...$roles
      *
      * @return $this
      */
@@ -193,7 +193,7 @@ trait HasRoles
     /**
      * Returns role.
      *
-     * @param \Ghustavh97\Larakey\Contracts\Role $role
+     * @param \Oslllo\Larakey\Contracts\Role $role
      * @param null|string $guard
      * @return Role
      */
@@ -224,10 +224,10 @@ trait HasRoles
     /**
      * Determines if the model has (one of) the given role(s).
      *
-     * @param string|int|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Oslllo\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      * @param string|null $guard
      * @param bool $returnRole
-     * @return bool|\Ghustavh97\Larakey\Contracts\Role
+     * @return bool|\Oslllo\Larakey\Contracts\Role
      */
 
     public function hasRole($roles, string $guard = null, bool $returnRole = false)
@@ -277,7 +277,7 @@ trait HasRoles
      *
      * Alias to hasRole() but without Guard controls
      *
-     * @param string|int|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
+     * @param string|int|array|\Oslllo\Larakey\Contracts\Role|\Illuminate\Support\Collection $roles
      *
      * @return bool
      */
@@ -289,7 +289,7 @@ trait HasRoles
     /**
      * Determines if the model has all of the given role(s).
      *
-     * @param  string|array|\Ghustavh97\Larakey\Contracts\Role|\Illuminate\Support\Collection  $roles
+     * @param  string|array|\Oslllo\Larakey\Contracts\Role|\Illuminate\Support\Collection  $roles
      * @param  string|null  $guard
      * @return bool
      */
@@ -344,7 +344,7 @@ trait HasRoles
      * Returns stored role.
      *
      * @param int|string $role
-     * @return \Ghustavh97\Larakey\Contracts\Role
+     * @return \Oslllo\Larakey\Contracts\Role
      */
     protected function getStoredRole($role): Role
     {

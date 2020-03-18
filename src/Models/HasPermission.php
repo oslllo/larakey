@@ -1,12 +1,12 @@
 <?php
 
-namespace Ghustavh97\Larakey\Models;
+namespace Oslllo\Larakey\Models;
 
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Contracts\HasPermission as HasPermissionContract;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Config;
+use Oslllo\Larakey\Contracts\HasPermission as HasPermissionContract;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Ghustavh97\Larakey\Exceptions\StrictPermission;
+use Oslllo\Larakey\Exceptions\StrictPermission;
 
 class HasPermission extends MorphPivot implements HasPermissionContract
 {
@@ -64,7 +64,7 @@ class HasPermission extends MorphPivot implements HasPermissionContract
      *
      * @return void
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\StrictPermission
+     * @throws \Oslllo\Larakey\Exceptions\StrictPermission
      */
     protected static function boot()
     {

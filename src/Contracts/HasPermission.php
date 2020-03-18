@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Contracts;
+namespace Oslllo\Larakey\Contracts;
 
 interface HasPermission
 {

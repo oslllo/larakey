@@ -8,14 +8,14 @@ return [
 
             /*
             * When set to true, assigning a permission will require that you specify the
-            * permission's scope or it throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            * permission's scope or it throws `Oslllo\Larakey\Exceptions\StrictPermission`
             *
             * For example
             *
             * If set to true:
             *
             * $user->givePermissionTo('view', '*') passes.
-            * $user->givePermissionTo('view') throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            * $user->givePermissionTo('view') throws `Oslllo\Larakey\Exceptions\StrictPermission`
             *
             * If set to false:
             *
@@ -27,14 +27,14 @@ return [
 
             /*
             * When set to true, revoking a permission will require that you specify the
-            * permission's scope or it throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            * permission's scope or it throws `Oslllo\Larakey\Exceptions\StrictPermission`
             *
             * For example
             *
             * If set to true:
             *
             * $user->revokePermission('view', '*') passes.
-            * $user->revokePermission('view') throws `Ghustavh97\Larakey\Exceptions\StrictPermission`
+            * $user->revokePermission('view') throws `Oslllo\Larakey\Exceptions\StrictPermission`
             *
             * If set to false:
             *
@@ -64,10 +64,10 @@ return [
          * is often just the "Permission" model but you may use whatever you like.
          *
          * The model you want to use as a Permission model needs to implement the
-         * `Ghustavh97\Larakey\Contracts\Permission` contract.
+         * `Oslllo\Larakey\Contracts\Permission` contract.
          */
 
-        'permission' => Ghustavh97\Larakey\Models\Permission::class,
+        'permission' => Oslllo\Larakey\Models\Permission::class,
 
         /*
          * When using the "HasPermissions" trait from this package, we need to know which
@@ -75,10 +75,10 @@ return [
          * is often just the "Permission" model but you may use whatever you like.
          *
          * The model you want to use as a Permission model needs to implement the
-         * `Ghustavh97\Larakey\Contracts\HasPermission` contract.
+         * `Oslllo\Larakey\Contracts\HasPermission` contract.
          */
 
-        'permission_pivot' => Ghustavh97\Larakey\Models\HasPermission::class,
+        'permission_pivot' => Oslllo\Larakey\Models\HasPermission::class,
 
         /*
          * When using the "HasRoles" trait from this package, we need to know which
@@ -86,10 +86,10 @@ return [
          * is often just the "Role" model but you may use whatever you like.
          *
          * The model you want to use as a Role model needs to implement the
-         * `Ghustavh97\Larakey\Contracts\Role` contract.
+         * `Oslllo\Larakey\Contracts\Role` contract.
          */
 
-        'role' => Ghustavh97\Larakey\Models\Role::class,
+        'role' => Oslllo\Larakey\Models\Role::class,
 
     ],
 

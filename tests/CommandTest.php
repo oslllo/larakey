@@ -1,10 +1,10 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
-use Ghustavh97\Larakey\Models\Role;
+use Oslllo\Larakey\Models\Role;
 use Illuminate\Support\Facades\Artisan;
-use Ghustavh97\Larakey\Models\Permission;
+use Oslllo\Larakey\Models\Permission;
 
 class CommandTest extends TestCase
 {

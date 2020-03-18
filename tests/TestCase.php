@@ -1,43 +1,43 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
-use Ghustavh97\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
-use Ghustavh97\Larakey\Test\Models\Post;
-use Ghustavh97\Larakey\Test\Models\User;
-use Ghustavh97\Larakey\Test\Models\Admin;
+use Oslllo\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\Models\Admin;
 
-use Ghustavh97\Larakey\Padlock\Cache as LaraCache;
+use Oslllo\Larakey\Padlock\Cache as LaraCache;
 
-use Ghustavh97\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Ghustavh97\Larakey\LarakeyServiceProvider;
-use Ghustavh97\Larakey\Test\Providers\RouteServiceProvider;
+use Oslllo\Larakey\LarakeyServiceProvider;
+use Oslllo\Larakey\Test\Providers\RouteServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Ghustavh97\Larakey\Test\Models\User */
+    /** @var \Oslllo\Larakey\Test\Models\User */
     protected $testUser;
 
-    /** @var \Ghustavh97\Larakey\Test\Models\Post */
+    /** @var \Oslllo\Larakey\Test\Models\Post */
     protected $testUserPost;
 
-    /** @var \Ghustavh97\Larakey\Test\Models\Admin */
+    /** @var \Oslllo\Larakey\Test\Models\Admin */
     protected $testAdmin;
 
-    /** @var \Ghustavh97\Larakey\Models\Role */
+    /** @var \Oslllo\Larakey\Models\Role */
     protected $testUserRole;
 
-    /** @var \Ghustavh97\Larakey\Models\Role */
+    /** @var \Oslllo\Larakey\Models\Role */
     protected $testAdminRole;
 
-    /** @var \Ghustavh97\Larakey\Models\Permission */
+    /** @var \Oslllo\Larakey\Models\Permission */
     protected $testUserPermission;
 
-    /** @var \Ghustavh97\Larakey\Models\Permission */
+    /** @var \Oslllo\Larakey\Models\Permission */
     protected $testAdminPermission;
 
     public function setUp(): void

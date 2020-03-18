@@ -1,26 +1,26 @@
 <?php
 
-namespace Ghustavh97\Larakey\Traits;
+namespace Oslllo\Larakey\Traits;
 
-use Ghustavh97\Larakey\Guard;
+use Oslllo\Larakey\Guard;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Contracts\Locksmith;
-use Ghustavh97\Larakey\Models\HasPermission;
-use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
+use Oslllo\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Contracts\Locksmith;
+use Oslllo\Larakey\Models\HasPermission;
+use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Ghustavh97\Larakey\Exceptions\StrictPermission;
-use Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist;
-use Ghustavh97\Larakey\Exceptions\PermissionNotAssigned;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Padlock\Config;
-use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Exceptions\StrictPermission;
+use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
+use Oslllo\Larakey\Exceptions\PermissionNotAssigned;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Padlock\Config;
+use Oslllo\Larakey\Padlock\Key;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
 
 trait HasPermissions
 {
@@ -29,7 +29,7 @@ trait HasPermissions
     /**
      * Permission class instance.
      *
-     * @var \Ghustavh97\Larakey\Contracts\Permission|Ghustavh97\Larakey\Models\Permission
+     * @var \Oslllo\Larakey\Contracts\Permission|Oslllo\Larakey\Models\Permission
      */
     private $permissionClass;
 
@@ -52,7 +52,7 @@ trait HasPermissions
     /**
      * Get permission class instance.
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission|Ghustavh97\Larakey\Models\Permission
+     * @return \Oslllo\Larakey\Contracts\Permission|Oslllo\Larakey\Models\Permission
      */
     public function getPermissionClass(): Permission
     {
@@ -81,15 +81,23 @@ trait HasPermissions
      * Scope the model query to certain permissions only.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopePermission(Builder $query, $permissions, $model = null): Builder
+    public function scopePermission(Builder $query, ...$arguments): Builder
     {
-        $permissionKey = $this->getPermissionKey($model);
+        // dd($arguments);
+        // $permissions, $model = null
+        $combination = $this->combination($arguments);
+        // dd($combination);
+        extract($combination->get(['permissions', 'model']));
 
+        $permissionKey = $this->getPermissionKey($model);
+        // dd($permissions);
         $permissions = $this->convertToPermissionModels($permissions);
+
+        // dd($permissions);
 
         $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
             return array_merge($result, $permission->roles->all());
@@ -119,7 +127,7 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return array
      */
@@ -244,8 +252,8 @@ trait HasPermissions
     /**
      * Get permission role instance.
      *
-     * @param \Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Models\Permission $permission
-     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @param \Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Models\Permission $permission
+     * @return \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      */
     public function getPermissionRole(Permission $permission): Role
     {
@@ -450,7 +458,7 @@ trait HasPermissions
     /**
      * Remove all current permissions and set the given ones.
      *
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
      * @return $this
      */
@@ -534,9 +542,9 @@ trait HasPermissions
     }
 
     /**
-     * @param string|array|\Ghustavh97\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
      *
-     * @return \Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Contracts\Permission[]|\Illuminate\Support\Collection
+     * @return \Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Contracts\Permission[]|\Illuminate\Support\Collection
      */
     protected function getStoredPermission($permission)
     {
@@ -569,9 +577,9 @@ trait HasPermissions
     }
 
     /**
-     * @param \Ghustavh97\Larakey\Contracts\Permission|\Ghustavh97\Larakey\Contracts\Role $roleOrPermission
+     * @param \Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Contracts\Role $roleOrPermission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch
+     * @throws \Oslllo\Larakey\Exceptions\GuardDoesNotMatch
      */
     protected function ensureModelSharesGuard($roleOrPermission)
     {

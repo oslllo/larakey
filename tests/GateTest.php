@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test;
+namespace Oslllo\Larakey\Test;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 

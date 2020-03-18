@@ -1,6 +1,6 @@
 <?php
 
-namespace Ghustavh97\Larakey\Contracts;
+namespace Oslllo\Larakey\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -21,7 +21,7 @@ interface Permission
      *
      * @return Permission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findByName(string $name, $guardName): self;
 
@@ -33,7 +33,7 @@ interface Permission
      *
      * @return Permission
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\PermissionDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\PermissionDoesNotExist
      */
     public static function findById(int $id, $guardName): self;
 

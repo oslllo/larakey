@@ -1,21 +1,21 @@
 <?php
 
-namespace Ghustavh97\Larakey\Models;
+namespace Oslllo\Larakey\Models;
 
-use Ghustavh97\Larakey\Guard;
+use Oslllo\Larakey\Guard;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Traits\HasPermissions;
-use Ghustavh97\Larakey\Exceptions\RoleDoesNotExist;
-use Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch;
-use Ghustavh97\Larakey\Exceptions\RoleAlreadyExists;
-use Ghustavh97\Larakey\Contracts\Role as RoleContract;
-use Ghustavh97\Larakey\Traits\RefreshesLarakeyCache;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Traits\HasPermissions;
+use Oslllo\Larakey\Exceptions\RoleDoesNotExist;
+use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
+use Oslllo\Larakey\Exceptions\RoleAlreadyExists;
+use Oslllo\Larakey\Contracts\Role as RoleContract;
+use Oslllo\Larakey\Traits\RefreshesLarakeyCache;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
 
 class Role extends Model implements RoleContract
 {
@@ -49,9 +49,9 @@ class Role extends Model implements RoleContract
      *
      * @param array $attributes
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @return \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\RoleAlreadyExists
+     * @throws \Oslllo\Larakey\Exceptions\RoleAlreadyExists
      */
     public static function create(array $attributes = []): RoleContract
     {
@@ -104,9 +104,9 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @return \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\RoleDoesNotExist
      */
     public static function findByName(string $name, $guardName = null): RoleContract
     {
@@ -127,9 +127,9 @@ class Role extends Model implements RoleContract
      * @param integer $id
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @return \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\RoleDoesNotExist
+     * @throws \Oslllo\Larakey\Exceptions\RoleDoesNotExist
      */
     public static function findById(int $id, $guardName = null): RoleContract
     {
@@ -149,7 +149,7 @@ class Role extends Model implements RoleContract
      *
      * @param array $query
      *
-     * @return null|\Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @return null|\Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      */
     private static function findRoleByQuery(array $query)
     {
@@ -164,7 +164,7 @@ class Role extends Model implements RoleContract
      * @param string $name
      * @param string|null $guardName
      *
-     * @return \Ghustavh97\Larakey\Contracts\Role|\Ghustavh97\Larakey\Models\Role
+     * @return \Oslllo\Larakey\Contracts\Role|\Oslllo\Larakey\Models\Role
      */
     public static function findOrCreate(string $name, $guardName = null): RoleContract
     {
@@ -200,7 +200,7 @@ class Role extends Model implements RoleContract
      *
      * @return bool
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\GuardDoesNotMatch
+     * @throws \Oslllo\Larakey\Exceptions\GuardDoesNotMatch
      */
     public function hasPermissionTo($permission): bool
     {

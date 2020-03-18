@@ -1,13 +1,13 @@
 <?php
 
-namespace Ghustavh97\Larakey\Padlock;
+namespace Oslllo\Larakey\Padlock;
 
-use Ghustavh97\Larakey\Larakey;
-use Ghustavh97\Larakey\Padlock\Config;
+use Oslllo\Larakey\Larakey;
+use Oslllo\Larakey\Padlock\Config;
 use Illuminate\Database\Eloquent\Model;
-use Ghustavh97\Larakey\Contracts\Permission;
-use Ghustavh97\Larakey\Traits\LarakeyHelpers;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Traits\LarakeyHelpers;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
 
 class Key
 {
@@ -21,14 +21,14 @@ class Key
     public $to;
 
     /**
-     * \Ghustavh97\Larakey\Models\HasPermission to model with id.
+     * \Oslllo\Larakey\Models\HasPermission to model with id.
      *
      * @var string|int
      */
     public $to_id;
 
     /**
-     * \Ghustavh97\Larakey\Models\HasPermission to model with type.
+     * \Oslllo\Larakey\Models\HasPermission to model with type.
      *
      * @var string
      */
@@ -37,7 +37,7 @@ class Key
     /**
      * The permission to check.
      *
-     * @var null|\Ghustavh97\Larakey\Contracts\Permission
+     * @var null|\Oslllo\Larakey\Contracts\Permission
      */
     public $permission;
 
@@ -45,7 +45,7 @@ class Key
      * Key class constructor.
      *
      * @param string|\Illuminate\Database\Eloquent\Model $to
-     * @param null|\Ghustavh97\Larakey\Contracts\Permission $permission
+     * @param null|\Oslllo\Larakey\Contracts\Permission $permission
      */
     public function __construct($to, $permission = null)
     {
@@ -80,7 +80,7 @@ class Key
     }
 
     /**
-     * Get \Ghustavh97\Larakey\Models\HasPermission to pivot.
+     * Get \Oslllo\Larakey\Models\HasPermission to pivot.
      *
      * @return array
      */
@@ -126,7 +126,7 @@ class Key
      * Determine if key unlock padlock/permission.
      *
      * @param \Illuminate\Database\Eloquent\Model $instance
-     * @param \Ghustavh97\Larakey\Contracts\Permission|Ghustavh97\Larakey\Models\Permission $permission
+     * @param \Oslllo\Larakey\Contracts\Permission|Oslllo\Larakey\Models\Permission $permission
      * @return boolean
      */
     public function unlocks(Model $instance, Permission $permission): bool

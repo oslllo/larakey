@@ -1,18 +1,18 @@
 <?php
 
-namespace Ghustavh97\Larakey\Padlock;
+namespace Oslllo\Larakey\Padlock;
 
-use Ghustavh97\Larakey\Larakey;
+use Oslllo\Larakey\Larakey;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Ghustavh97\Larakey\Contracts\Role;
+use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Ghustavh97\Larakey\Contracts\Permission;
+use Oslllo\Larakey\Contracts\Permission;
 use Illuminate\Contracts\Auth\Access\Authorizable;
-use Ghustavh97\Larakey\Contracts\HasPermission;
-use Ghustavh97\Larakey\Exceptions\ClassDoesNotExist;
-use Ghustavh97\Larakey\Padlock\Config;
+use Oslllo\Larakey\Contracts\HasPermission;
+use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
+use Oslllo\Larakey\Padlock\Config;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Repository;
 

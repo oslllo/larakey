@@ -1,11 +1,11 @@
 <?php
 
-namespace Ghustavh97\Larakey\Middlewares;
+namespace Oslllo\Larakey\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Ghustavh97\Larakey\Exceptions\UnauthorizedException;
+use Oslllo\Larakey\Exceptions\UnauthorizedException;
 
 class RoleMiddleware
 {
@@ -18,7 +18,7 @@ class RoleMiddleware
      *
      * @return mixed
      *
-     * @throws \Ghustavh97\Larakey\Exceptions\UnauthorizedException
+     * @throws \Oslllo\Larakey\Exceptions\UnauthorizedException
      */
     public function handle(Request $request, Closure $next, $role)
     {

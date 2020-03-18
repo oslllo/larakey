@@ -1,26 +1,26 @@
 <?php
 
-namespace Ghustavh97\Larakey;
+namespace Oslllo\Larakey;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
-use Ghustavh97\Larakey\Contracts\Role as RoleContract;
-use Ghustavh97\Larakey\Contracts\Permission as PermissionContract;
-use Ghustavh97\Larakey\Padlock\Key;
-use Ghustavh97\Larakey\Padlock\Cache;
-use Ghustavh97\Larakey\Padlock\Gate;
-use Ghustavh97\Larakey\Padlock\Combination;
+use Oslllo\Larakey\Contracts\Role as RoleContract;
+use Oslllo\Larakey\Contracts\Permission as PermissionContract;
+use Oslllo\Larakey\Padlock\Key;
+use Oslllo\Larakey\Padlock\Cache;
+use Oslllo\Larakey\Padlock\Gate;
+use Oslllo\Larakey\Padlock\Combination;
 
 class LarakeyServiceProvider extends ServiceProvider
 {
     /**
      * LarakeyServiceProvider boot function
      *
-     * @param \Ghustavh97\Larakey\Padlock\Gate $gate
-     * @param \Ghustavh97\Larakey\Padlock\Cache $cache
+     * @param \Oslllo\Larakey\Padlock\Gate $gate
+     * @param \Oslllo\Larakey\Padlock\Cache $cache
      * @param \Illuminate\Filesystem\Filesystem $filesystem
      * @return void
      */

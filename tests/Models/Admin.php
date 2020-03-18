@@ -1,9 +1,9 @@
 <?php
 
-namespace Ghustavh97\Larakey\Test\Models;
+namespace Oslllo\Larakey\Test\Models;
 
 use Illuminate\Auth\Authenticatable;
-use Ghustavh97\Larakey\Traits\HasLarakey;
+use Oslllo\Larakey\Traits\HasLarakey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\Authorizable;
