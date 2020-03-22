@@ -1,4 +1,5 @@
-# Blade Permissions
+# <u>Blade Permissions</u>
+
 This package doesn't add any **permission**-specific Blade directives. 
 Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 

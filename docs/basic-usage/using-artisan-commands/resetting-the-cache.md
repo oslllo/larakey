@@ -1,8 +1,8 @@
-# Resetting the Cache
+# <u>Resetting the Cache</u>
 
 When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record.
 
-See the Advanced-Usage/Cache section of these docs for detailed specifics.
+See the [Advanced-Usage/Cache](advanced-usage/cache/cache.md) section of these docs for detailed specifics.
 
 If you need to manually reset the cache for this package, you may use the following artisan command:
 

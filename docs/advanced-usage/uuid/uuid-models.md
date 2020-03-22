@@ -1,4 +1,4 @@
-# Models <a id="uuid-models"></a>
+# <u>Models</u>
 
 You will probably want to Extend the default Role and Permission models into your own namespace, to set some specific properties (see the Extending section of the docs):
 

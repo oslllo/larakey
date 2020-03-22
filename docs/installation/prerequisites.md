@@ -1,4 +1,4 @@
-# Prerequisites
+# <u>Prerequisites</u>
 
 This package can be used in Laravel 5.8 or higher.
 
@@ -20,9 +20,9 @@ class User extends Authenticatable
 }
 ```
 
-Additionally, your ```User``` model/object ***MUST NOT*** have a role or roles property (or field in the database), nor a ```roles()``` method on it. Those will interfere with the properties and methods added by the ```HasLarakey``` trait provided by this package, thus causing unexpected outcomes when this package’s methods are used to inspect roles and permissions.
+Additionally, your ```User``` model/object 🚫**MUST NOT** have a role or roles property (or field in the database), nor a ```roles()``` method on it. Those will interfere with the properties and methods added by the ```HasLarakey``` trait provided by this package, thus causing unexpected outcomes when this package’s methods are used to inspect roles and permissions.
 
-Similarly, your ```User``` model/object ***MUST NOT*** have a permission or permissions property (or field in the database), nor a ```permissions()``` method on it. Those will interfere with the properties and methods added by the ```HasPermissions``` trait provided by this package (which is invoked via the ```HasLarakey``` trait).
+Similarly, your ```User``` model/object 🚫**MUST NOT** have a permission or permissions property (or field in the database), nor a ```permissions()``` method on it. Those will interfere with the properties and methods added by the ```HasPermissions``` trait provided by this package (which is invoked via the ```HasLarakey``` trait).
 
 This package publishes a ```config/larakey.php``` file. If you already have a file by that name, you must rename or remove it, as it will conflict with this package. You could optionally merge your own values with those required by this package, as long as the keys that this package expects are present. See the [source](https://github.com/Oslllo/larakey/blob/master/config/larakey.php) file for more details.
 

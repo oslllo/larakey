@@ -1,38 +1,38 @@
-* [Home](/)
-
-* [Introduction](introduction.md)
-
-* [Prerequisites](prerequisites.md)
+* Home
+    * [Home](/)
+    * [Introduction](introduction.md)
+        - [Features](introduction.md#features)
 
 * Installation
+    * [⚠️ Prerequisites](installation/prerequisites.md)
     * [Installation](installation/installation.md)
     * [Default config file contents](installation/default-config-file-contents.md)
 
 * Basic Usage
-    * [Basic Usage](basic-usage.md)
+    * [Basic Usage](basic-usage/basic-usage.md#basic-usage)
     * [Eloquent](basic-usage/eloquent.md)
 
     * Using Permissions
-        * [⚠️ Using Permissions](basic-usage/using-permissions.md)
+        * [⚠️ Using Permissions](basic-usage/using-permissions/using-permissions.md)
         * [Assigning Permissions](basic-usage/using-permissions/assigning-permissions.md)
         * [Revoking Permissions](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md)
-            * [❕ With Recursion](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
+            * [〽️ With Recursion](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
         * [Checking For Permissions](basic-usage/using-permissions/checking-for-permissions.md)
         * [Checking For Direct Permissions](basic-usage/using-permissions/checking-for-direct-permissions.md)
-        * [Checking For Any Direct Permission](basic-usage/using-permissions/checking-for-any-direct-permission.md)
-        * [Get Direct Permission](basic-usage/using-permissions/get-direct-permissions.md)
-        * [Get Permissions Via Roles](basic-usage/using-permissions/get-permissions-via-roles.md)
-        * [Get All Permissions](basic-usage/using-permissions/get-all-permissions.md)
+        * [⛔ Checking For Any Direct Permission](basic-usage/using-permissions/checking-for-any-direct-permission.md)
+        * [⛔ Get Direct Permission](basic-usage/using-permissions/get-direct-permissions.md)
+        * [Checking Permissions Via Roles](basic-usage/using-permissions/checking-permissions-via-roles.md)
+        * [⛔ Get All Permissions](basic-usage/using-permissions/get-all-permissions.md)
 
     * Using Roles
-        * [Using Roles](basic-usage/using-roles.md)
+        * [Using Roles](basic-usage/using-roles/using-roles.md)
         * [Assigning Roles](basic-usage/using-roles/assigning-roles.md)
         * [Revoking Roles](basic-usage/using-roles/revoking-roles.md)
         * [Syncing Roles](basic-usage/using-roles/syncing-roles.md)
         * [Checking For Roles](basic-usage/using-roles/checking-for-roles.md)
         * [Checking For Any Role](basic-usage/using-roles/checking-for-any-role.md)
         * [Checking For All Roles](basic-usage/using-roles/checking-for-all-roles.md)
-        * [Using permissions via roles](basic-usage/using-roles/using-permissions-via-roles.md)
+        * [Using permissions with roles](basic-usage/using-roles/using-permissions-with-roles.md)
 
     * Blade directives
         * [Blade Permissions](basic-usage/blade-directives/blade-permissions.md)
@@ -57,8 +57,8 @@
         * [Displaying roles and permissions in the console](basic-usage/using-artisan-commands/displaying-roles-and-permissions-in-the-console.md)
         * [Resetting the Cache](basic-usage/using-artisan-commands/resetting-the-cache.md)
 
-* Advanced usage
-    * [Unit testing](advanced-usage/unit-testing.md)
+* Advanced Usage
+    * [Unit Testing](advanced-usage/unit-testing.md)
     * [Database Seeding](advanced-usage/database-seeding.md)
     * [Exceptions](advanced-usage/exceptions.md)
 
@@ -72,7 +72,7 @@
 
     * Cache
         * [Cache](advanced-usage/cache/cache.md)
-        * [Manual cache reset](advanced-usage/cache/manual-cache-reset.md)
+        * [Manual Cache Reset](advanced-usage/cache/manual-cache-reset.md)
         * [Cache Identifier](advanced-usage/cache/cache-identifier.md)
 
     * UUID

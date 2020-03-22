@@ -10,7 +10,10 @@
 
 > Permissions and Roles For Laravel
 
-- Assign roles and permissions to a user
+- Assign permissions and roles to users.
+- Assign a permission to a class to a user.
+- Assign a permission to a model instances to a user.
+- Permission caching.
 
 [GitHub](https://github.com/oslllo/larakey/)
 [Get Started](/introduction)

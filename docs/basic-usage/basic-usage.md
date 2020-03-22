@@ -1,4 +1,4 @@
-# Basic Usage
+# <u>Basic Usage</u>
 
 First, add the ```Oslllo\Larakey\Traits\HasLarakey``` trait to your ```User``` model(s):
 
@@ -23,26 +23,28 @@ use Oslllo\Larakey\Models\Permission;
 $role = Role::create(['name' => 'writer']);
 $permission = Permission::create(['name' => 'edit articles']);
 ```
-A permission can be assigned to a role using 1 of these methods:
+>A permission can be assigned to a role using 1 of these methods:
 
 ```php
 $role->givePermissionTo($permission);
 $permission->assignRole($role);
 ```
-Multiple permissions can be synced to a role using 1 of these methods:
+
+>Multiple permissions can be synced to a role using 1 of these methods:
 
 ```php
 $role->syncPermissions($permissions);
 $permission->syncRoles($roles);
 ```
-A permission can be removed from a role using 1 of these methods:
+
+>A permission can be removed from a role using 1 of these methods:
 
 ```php
 $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
 
-If you’re using multiple guards the ```guard_name``` attribute needs to be set as well. Read about it in the [using multiple guards](#using-multiple-guards) section of the readme.
+> ⚠️ If you’re using multiple guards the ```guard_name``` attribute needs to be set as well. Read about it in the [using multiple guards](basic-usage/using-multiple-guards.md) section.
 
 The ```Larakey``` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
@@ -60,7 +62,7 @@ $permissions = $user->getAllPermissions();
 $roles = $user->getRoleNames(); // Returns a collection
 ```
 
-The ```Larakey``` trait also adds a ```role``` scope to your models to scope the query to certain roles or permissions:
+>The ```Larakey``` trait also adds a ```role``` scope to your models to scope the query to certain roles or permissions:
 
 ```php
 $users = User::role('writer')->get(); // Returns only users with the role 'writer'

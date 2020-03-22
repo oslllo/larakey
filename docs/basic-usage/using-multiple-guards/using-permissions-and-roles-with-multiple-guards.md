@@ -1,4 +1,4 @@
-# Using permissions and roles with multiple guards
+# <u>Using permissions and roles with multiple guards</u>
 
 When creating new permissions and roles, if no guard is specified, then the **first** defined guard in `auth.guards` config array will be used. 
 
@@ -13,7 +13,7 @@ $permission = Permission::create(['guard_name' => 'admin', 'name' => 'publish ar
 $permission = Permission::create(['guard_name' => 'web', 'name' => 'publish articles']);
 ```
 
-To check if a user has permission for a specific guard:
+>To check if a user has permission for a specific guard:
 
 ```php
 $user->hasPermissionTo('publish articles', 'admin');

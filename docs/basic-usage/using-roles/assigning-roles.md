@@ -1,16 +1,20 @@
-# Assigning Roles
+# <u>Assigning Roles</u>
  > The function `assignRole()` can be used to assign a role to a user.
-## Description
+#### Description
 ```php
 assignRole(mixed $roles): $this
 ```
-## Arguments
-- **$roles**
+#### Arguments
+- ***$roles***
     - Type : `string` | `array` | `\Oslllo\Larakey\Contracts\Role`
     - Description : The roles to be assigned to the user.
 
-## Returns
-    Returns $this.
+
+#### Returns
+Returns `$this`.
+
+---
+
 ## Examples
 ```php
 // Assign a role

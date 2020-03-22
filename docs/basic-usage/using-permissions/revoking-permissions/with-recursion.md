@@ -1,6 +1,9 @@
-# Revoking Permissions With Recursion
-***Revoke permission from user (with recursion)***
-Pass in a boolean of `true` in the `revokePermissionTo()` to revoke a permission with recursion. This will remove the permission with those with a lower scope that it.
+# <u>Revoking Permissions With Recursion</u>
+
+> To Revoke a permission from a user (using recursion), pass in a boolean of `true` in the `revokePermissionTo()` function. This will remove the permission with those with a lower scope that it.
+
+---
+
 ## Examples
 ```php
 // Give user permissions

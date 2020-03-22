@@ -1,6 +1,6 @@
-# Creating roles and permissions with Artisan Commands
+# <u>Creating roles and permissions with Artisan Commands</u>
 
-You can create a role or permission from the console with artisan commands.
+>You can create a role or permission from the console with artisan commands.
 
 ```bash
 php artisan permission:create-role writer
@@ -10,7 +10,7 @@ php artisan permission:create-role writer
 php artisan permission:create-permission "edit articles"
 ```
 
-When creating permissions/roles for specific guards you can specify the guard names as a second argument:
+>When creating permissions/roles for specific guards you can specify the guard names as a second argument:
 
 ```bash
 php artisan permission:create-role writer web
@@ -20,7 +20,7 @@ php artisan permission:create-role writer web
 php artisan permission:create-permission "edit articles" web
 ```
 
-When creating roles you can also create and link permissions at the same time:
+>When creating roles you can also create and link permissions at the same time:
 
 ```bash
 php artisan permission:create-role writer web "create articles|edit articles"

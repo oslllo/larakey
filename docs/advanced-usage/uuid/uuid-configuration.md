@@ -1,4 +1,4 @@
-# Configuration (morph key) <a id="uuid-configuration"></a>
+# <u>Configuration (Morph Key)</u>
 
 You will probably also want to update the configuration `column_names.model_morph_key`:
 

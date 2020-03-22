@@ -1,4 +1,4 @@
-# Roles vs Permissions
+# <u>Roles vs Permissions</u>
 
 It is generally best to code your app around `permissions` only. That way you can always use the native Laravel `@can` and `can()` directives everywhere in your app.
 

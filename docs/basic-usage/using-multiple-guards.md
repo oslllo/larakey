@@ -1,4 +1,4 @@
-## Using multiple guards
+## <u>Using multiple guards</u>
 
 When using the default Laravel auth configuration all of the core methods of this package will work out of the box, no extra configuration required.
 

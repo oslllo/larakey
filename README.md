@@ -1,4 +1,4 @@
-# 🔐Larakey (Permissions and Roles For Laravel)
+# Larakey - (Permissions and Roles For Laravel)
 
 ![Packagist Version (including pre-releases)](https://img.shields.io/packagist/v/oslllo/larakey?include_prereleases)
 ![Travis (.org) branch](https://img.shields.io/travis/oslllo/larakey/master?label=Travis%20CI)
@@ -6,12 +6,12 @@
 ![GitHub issues](https://img.shields.io/github/issues/Oslllo/larakey)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/Oslllo/larakey)
 
-A Permission and Role handling for, based on [laravel-permission](https://github.com/spatie/laravel-permission) by [Spatie](https://github.com/spatie)
+## Features
 
-
-ℹ This package will allow you to manage user permissions and roles in a database. It will also allow you to assign a class or model instance to a permission.
-
-
+- Assign permissions and roles to users.
+- Assign a permission to a class to a user.
+- Assign a permission to a model instances to a user.
+- Permission caching.
 
 # Documentation, Installation, and Usage Instructions
 
@@ -24,7 +24,7 @@ composer test
 
 # Questions and issues
 
-Find yourself stuck using the package? Found a bug? Do you have general questions or suggestions for improving the package? Feel free to [create an issue on GitHub](https://github.com/Oslllo/larakey/issues), we’ll try to address it as soon as possible.
+For any questions and issues feel free to [create an issue on GitHub](https://github.com/Oslllo/larakey/issues), we’ll try to address it as soon as possible.
 
 If you’ve found a bug regarding security please mail ghustavh97@gmail.com instead of using the issue tracker.
 
@@ -42,9 +42,7 @@ If you discover any security-related issues, please email [ghustavh97@gmail.com]
 
 # Credits
 
-This package is a fork of [laravel-permissions](https://github.com/spatie/laravel-permission)
-
-Massive thanks to [Freek Van der Herten](https://github.com/freekmurze) and [All Contributors](../../contributors) for making such an awesome package.
+This package is a fork of [laravel-permissions](https://github.com/spatie/laravel-permission) by [Freek Van der Herten](https://github.com/freekmurze) and [All Contributors](https://github.com/spatie/laravel-permission/contributors).
 
 # License
 

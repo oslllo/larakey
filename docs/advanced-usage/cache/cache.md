@@ -1,4 +1,4 @@
-# Cache
+# <u>Cache</u>
 
 Role and Permission data are cached to speed up performance.
 

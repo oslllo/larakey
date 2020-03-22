@@ -1,4 +1,4 @@
-# Extending Role and Permission Models
+# <u>Extending Role and Permission Models</u>
 If you are extending or replacing the role/permission models, you will need to specify your new models in this package's `config/larakey.php` file. 
 
 First be sure that you've published the configuration file (see the Installation instructions), and edit it to update the `models.role` and `models.permission` values to point to your new models.

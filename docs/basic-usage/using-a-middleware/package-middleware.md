@@ -11,7 +11,7 @@ protected $routeMiddleware = [
 ];
 ```
 
-Then you can protect your routes using middleware rules:
+>Then you can protect your routes using middleware rules:
 
 ```php
 Route::group(['middleware' => ['role:super-admin']], function () {
@@ -35,7 +35,7 @@ Route::group(['middleware' => ['role_or_permission:publish articles']], function
 });
 ```
 
-Alternatively, you can separate multiple roles or permission with a `|` (pipe) character:
+>Alternatively, you can separate multiple roles or permission with a `|` (pipe) character:
 
 ```php
 Route::group(['middleware' => ['role:super-admin|writer']], function () {
@@ -51,7 +51,7 @@ Route::group(['middleware' => ['role_or_permission:super-admin|edit articles']],
 });
 ```
 
-You can protect your controllers similarly, by setting desired middleware in the constructor:
+>You can protect your controllers similarly, by setting desired middleware in the constructor:
 
 ```php
 public function __construct()

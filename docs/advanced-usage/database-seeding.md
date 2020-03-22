@@ -1,4 +1,4 @@
-# Database Seeding
+# <u>Database Seeding</u>
 
 You may discover that it is best to flush this package's cache before seeding, to avoid cache conflict errors. This can be done directly in a seeder class. Here is a sample seeder, which first clears the cache, creates permissions and then assigns permissions to roles (the order of these steps is intentional):
 

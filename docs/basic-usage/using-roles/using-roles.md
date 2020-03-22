@@ -1,4 +1,4 @@
-# Using Roles
+# <u>Using Roles</u>
 ---
 
 > ❕ The `assignRole`, `hasRole`, `hasAnyRole`, `hasAllRoles`  and `removeRole` functions can accept a

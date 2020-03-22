@@ -1,4 +1,4 @@
-# Migrations <a id="uuid-migrations"></a>
+# <u>Migrations</u>
 
 You will probably want to update the `create_permission_tables.php` migration:
 

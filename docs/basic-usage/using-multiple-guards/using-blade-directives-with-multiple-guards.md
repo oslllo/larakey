@@ -1,4 +1,4 @@
-# Using blade directives with multiple guards
+# <u>Using blade directives with multiple guards</u>
 
 You can use all of the blade directives offered by this package by passing in the guard you wish to use as the second argument to the directive:
 
@@ -9,3 +9,4 @@ You can use all of the blade directives offered by this package by passing in th
     I am not a super-admin...
 @endrole
 ```
+---

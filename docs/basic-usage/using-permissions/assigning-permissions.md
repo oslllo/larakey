@@ -1,28 +1,35 @@
 
-# Assigning Permissions <a id="giving-permissionss-example"></a>
+# <u>Assigning Permissions</u>
+
 > The function `givePermissionTo()` is used to give permissions to a user.
-## Description
+#### Description
 ```php
 givePermissionTo(mixed $permission, [mixed $model = null, [mixed $modelId = null]]): bool
 ```
-## Arguments
-- **$permission**
+
+#### Arguments
+- ***$permission***
     - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
     - Description : The permission to give to the user.
-- **$model**
+- ***$model***
     - Type : `string` | `\Illuminate\Database\Eloquent\Model`
     - Description : The model class or instance to be used with the permission to limit scope.
-- **$modelId**
+- ***$modelId***
     - Type : `string` | `int`
     - Description : Used to indicate the id of a model when only a class name string is provided to `$model`. 
     - Note : ***`$model` must be present when this value is used.***
-## Returns
-    Returns boolean.
+
+#### Returns
+Returns `boolean`.
+
+---
+
 ## Examples
 
-### Give user permission
+>Give user permission (to any class or model instance).
+
 ```php
-// Give permission
+// Give permission to edit 'anything'.
 $user->givePermissionTo('edit'); // OR
 $user->givePermissionTo('edit', '*');
 ```
@@ -43,9 +50,11 @@ $user->hasPermissionTo('edit', $post); // TRUE
 $user->hasPermissionTo('edit', Comment::class, $comment->id); // TRUE
 ```
 
-### Give user permission to class
+---
+
+>Give user permission to a class.
 ```php
-// Give class permission
+// Give user permission to edit any post.
 $user->givePermissionTo('edit', Post::class);
 ```
 ```php
@@ -64,8 +73,12 @@ $comment = Comment::find(1);
 $user->hasPermissionTo('edit', $comment); // FALSE
 $user->hasPermissionTo('edit', Comment::class, $comment->id); // FALSE
 ```
-### Give user permission to model instance
+
+---
+
+> Give user permission to a model instance.
 ```php
+// Give user permission to edit this post
 $post = Post::find(1);
 $user->givePermissionTo('edit', $post); // OR;
 $user->givePermissionTo('edit', Post::class, $post->id);
@@ -86,12 +99,17 @@ $comment = Comment::find(1);
 $user->hasPermissionTo('edit', $comment); // FALSE
 $user->hasPermissionTo('edit', Comment::class, $comment->id); // FALSE
 ```
-### Give user multiple permissions at once
+
+---
+
+> Give user multiple permissions at once
 ```php
+// Give user multiple permissions to post class
 $user->givePermissionTo(['edit', 'delete', 'read']); // OR;
 $user->givePermissionTo(['edit', 'delete', 'read'], '*'); // OR;
 $user->givePermissionTo(['edit', 'delete', 'read'], Post::class); // OR;
 
+// Give user multiple permissions to a single post
 $post = Post::find(1);
 $user->givePermissionTo(['edit', 'delete', 'read'], $post); // OR;
 $user->givePermissionTo(['edit', 'delete', 'read'], Post::class, $post->id); // OR;

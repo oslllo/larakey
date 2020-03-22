@@ -1,4 +1,4 @@
-# Exceptions
+# <u>Exceptions</u>
 
 If you need to override exceptions thrown by this package, you can simply use normal [Laravel practices for handling exceptions](https://laravel.com/docs/errors#render-method).
 
