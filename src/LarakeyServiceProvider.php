@@ -73,7 +73,7 @@ class LarakeyServiceProvider extends ServiceProvider
     }
 
     /**
-     * LarakeyServiceProvider boot function
+     * LarakeyServiceProvider register function
      *
      * @return void
      */
@@ -189,6 +189,20 @@ class LarakeyServiceProvider extends ServiceProvider
             $this->middleware("permission:$permissions");
 
             return $this;
+        });
+
+        Collection::macro('larakeyPluckMultiple', function (array $values = []) {
+            $results = [];
+
+            $this->each(function ($item, $key) use ($values, &$results) {
+                array_push($results, array_values(collect($item)->only($values)->toArray()));
+            });
+
+            if (count($results) === 1) {
+                $results = $results[0];
+            }
+
+            return collect($results);
         });
     }
 

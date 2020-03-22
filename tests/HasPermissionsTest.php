@@ -725,19 +725,78 @@ class HasPermissionsTest extends TestCase
     /** @test */
     public function it_can_determine_that_user_has_direct_permission()
     {
-        $this->testUser->givePermissionTo('edit-articles');
-        $this->assertTrue($this->testUser->hasDirectPermission('edit-articles'));
+        $this->testUser->givePermissionTo('edit', '*');
+        $this->assertTrue($this->testUser->hasDirectPermission('edit'));
+        $this->assertTrue($this->testUser->hasDirectPermission('edit', Post::class));
+        $this->assertTrue($this->testUser->hasDirectPermission('edit', $this->testUserPost));
+
         $this->assertEquals(
-            collect(['edit-articles']),
+            collect(['edit']),
             $this->testUser->getDirectPermissions()->pluck('name')
         );
 
-        $this->testUser->revokePermissionTo('edit-articles');
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
+        $this->testUser->revokePermissionTo('edit');
+        $this->assertFalse($this->testUser->hasDirectPermission('edit'));
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', Post::class));
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', $this->testUserPost));
 
         $this->testUser->assignRole('testUserRole');
-        $this->testUserRole->givePermissionTo('edit-articles');
-        $this->assertFalse($this->testUser->hasDirectPermission('edit-articles'));
+        $this->testUserRole->givePermissionTo('edit');
+        $this->assertFalse($this->testUser->hasDirectPermission('edit'));
+    }
+
+    /** @test */
+    public function it_can_determine_that_user_has_direct_permission_to_class()
+    {
+        $this->testUser->givePermissionTo('edit', Post::class);
+        $this->assertTrue($this->testUser->hasDirectPermission('edit', Post::class));
+        $this->assertTrue($this->testUser->hasDirectPermission('edit', $this->testUserPost));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', '*'));
+
+        $userDirectPermissions = $this->testUser->getDirectPermissions();
+
+        $this->assertEquals(
+            collect(['edit', Post::class]),
+            $this->testUser->getDirectPermissions()->larakeyPluckMultiple(['name', 'to_type'])
+        );
+
+        $this->testUser->revokePermissionTo('edit', Post::class);
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', Post::class));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', $this->testUserPost));
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', '*'));
+
+        $this->testUser->assignRole('testUserRole');
+        $this->testUserRole->givePermissionTo('edit', Post::class);
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', Post::class));
+    }
+
+    /** @test */
+    public function it_can_determine_that_user_has_direct_permission_to_model_instance()
+    {
+        $this->testUser->givePermissionTo('edit', $this->testUserPost);
+        $this->assertTrue($this->testUser->hasDirectPermission('edit', $this->testUserPost));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', '*'));
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', Post::class));
+
+        $userDirectPermissions = $this->testUser->getDirectPermissions();
+
+        $this->assertEquals(
+            collect(['edit', get_class($this->testUserPost), $this->testUserPost->id]),
+            $this->testUser->getDirectPermissions()->larakeyPluckMultiple(['name', 'to_type', 'to_id'])
+        );
+
+        $this->testUser->revokePermissionTo('edit', $this->testUserPost);
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', $this->testUserPost));
+
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', '*'));
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', Post::class));
+
+        $this->testUser->assignRole('testUserRole');
+        $this->testUserRole->givePermissionTo('edit', $this->testUserPost);
+        $this->assertFalse($this->testUser->hasDirectPermission('edit', $this->testUserPost));
     }
 
     /** @test */
