@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Oslllo\Larakey\Larakey;
 use Oslllo\Larakey\Padlock\Cache;
 use Oslllo\Larakey\Traits\HasPermissions;
+use Oslllo\Larakey\Traits\HasRoles;
 use Oslllo\Larakey\Exceptions\RoleDoesNotExist;
-use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
 use Oslllo\Larakey\Exceptions\RoleAlreadyExists;
 use Oslllo\Larakey\Contracts\Role as RoleContract;
 use Oslllo\Larakey\Traits\RefreshesLarakeyCache;
@@ -19,6 +19,7 @@ use Oslllo\Larakey\Traits\LarakeyHelpers;
 
 class Role extends Model implements RoleContract
 {
+    use HasRoles;
     use HasPermissions;
     use LarakeyHelpers;
     use RefreshesLarakeyCache;
@@ -191,33 +192,5 @@ class Role extends Model implements RoleContract
         app(Larakey::class)->setRoleClass(static::class);
 
         return app(Cache::class)->getCachedRoles($params);
-    }
-
-    /**
-     * Determine if the user may perform the given permission.
-     *
-     * @param string|Permission $permission
-     *
-     * @return bool
-     *
-     * @throws \Oslllo\Larakey\Exceptions\GuardDoesNotMatch
-     */
-    public function hasPermissionTo($permission): bool
-    {
-        $permissionClass = $this->getPermissionClass();
-
-        if (is_string($permission)) {
-            $permission = $permissionClass->findByName($permission, $this->getDefaultGuardName());
-        }
-
-        if (is_int($permission)) {
-            $permission = $permissionClass->findById($permission, $this->getDefaultGuardName());
-        }
-
-        if (! $this->getGuardNames()->contains($permission->guard_name)) {
-            throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
-        }
-        
-        return $this->hasDirectPermission($permission);
     }
 }

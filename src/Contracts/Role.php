@@ -46,13 +46,4 @@ interface Role
      * @return \Oslllo\Larakey\Contracts\Role
      */
     public static function findOrCreate(string $name, $guardName): self;
-
-    /**
-     * Determine if the user may perform the given permission.
-     *
-     * @param string|\Oslllo\Larakey\Contracts\Permission $permission
-     *
-     * @return bool
-     */
-    public function hasPermissionTo($permission): bool;
 }
