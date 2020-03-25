@@ -65,7 +65,7 @@ class LarakeyServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(Combination::class, function ($app, $parameters) {
-            return new Combination($parameters['arguments'], $parameters['multiplePermissions']);
+            return new Combination($parameters['arguments']);
         });
 
         $this->registerModelBindings();
