@@ -180,8 +180,12 @@ abstract class TestCase extends Orchestra
         $app[Permission::class]->create(['name' => 'Edit News']);
 
         $app[Permission::class]->create(['name' => 'manage']);
-        $app[Permission::class]->create(['name' => 'view']);
         $app[Permission::class]->create(['name' => 'comment']);
+        $app[Permission::class]->create(['name' => 'comment-on']);
+        
+        $app[Permission::class]->create(['name' => 'delete']);
+        $app[Permission::class]->create(['name' => 'create']);
+        $app[Permission::class]->create(['name' => 'view']);
         $app[Permission::class]->create(['name' => 'edit']);
     }
 

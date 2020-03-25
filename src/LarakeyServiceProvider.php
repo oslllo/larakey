@@ -2,6 +2,7 @@
 
 namespace Oslllo\Larakey;
 
+use Exception;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
@@ -64,7 +65,7 @@ class LarakeyServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(Combination::class, function ($app, $parameters) {
-            return new Combination($parameters['arguments']);
+            return new Combination($parameters['arguments'], $parameters['multiplePermissions']);
         });
 
         $this->registerModelBindings();
@@ -203,6 +204,39 @@ class LarakeyServiceProvider extends ServiceProvider
             }
 
             return collect($results);
+        });
+
+        Collection::macro('larakeyMapInto', function ($type) {
+            switch ($type) {
+                case 'array':
+                    return $this->map(function ($item) {
+                        if (! is_array($item)) {
+                            return [$item];
+                        }
+            
+                        return $item;
+                    });
+                break;
+                default:
+                    throw Exception('Unknown type argument');
+            }
+        });
+
+        Collection::macro('larakeyAllAre', function ($type) {
+            switch ($type) {
+                case 'arrays':
+                    return $this->every(function ($value) {
+                        return is_array($value);
+                    });
+                break;
+                case 'strings':
+                    return $this->every(function ($value) {
+                        return is_string($value);
+                    });
+                break;
+                default:
+                    throw Exception('Unknown type argument');
+            }
         });
     }
 

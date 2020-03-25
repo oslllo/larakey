@@ -84,7 +84,7 @@ class RoleTest extends TestCase
     {
         $this->testUserRole->givePermissionTo('edit-articles');
 
-        $this->testUserRole->syncPermissions('edit-news');
+        $this->testUserRole->syncPermissions(['edit-news']);
 
         $this->assertFalse($this->testUserRole->hasPermissionTo('edit-articles'));
 
@@ -98,7 +98,7 @@ class RoleTest extends TestCase
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->syncPermissions('permission-does-not-exist');
+        $this->testUserRole->syncPermissions(['permission-does-not-exist']);
     }
 
     /** @test */
@@ -108,11 +108,11 @@ class RoleTest extends TestCase
 
         $this->expectException(PermissionDoesNotExist::class);
 
-        $this->testUserRole->syncPermissions('admin-permission');
+        $this->testUserRole->syncPermissions(['admin-permission']);
 
         $this->expectException(GuardDoesNotMatch::class);
 
-        $this->testUserRole->syncPermissions($this->testAdminPermission);
+        $this->testUserRole->syncPermissions([$this->testAdminPermission]);
     }
 
     /** @test */
@@ -125,7 +125,7 @@ class RoleTest extends TestCase
         $this->testUserRole->syncPermissions([]);
 
         $this->assertFalse($this->testUserRole->hasPermissionTo('edit-articles'));
-
+        
         $this->assertFalse($this->testUserRole->hasPermissionTo('edit-news'));
     }
 

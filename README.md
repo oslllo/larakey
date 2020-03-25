@@ -65,13 +65,3 @@ $user->hasAnyPermission(['edit articles', 'publish articles', 'unpublish article
 ```php
 $user->hasAllPermissions(['edit articles', 'publish articles', 'unpublish articles']);
 ```
-
-You may also pass integers to lookup by permission id
-
-```php
-$user->hasAnyPermission(['edit articles', 1, 5]);
-``` -->
-
-
-
-

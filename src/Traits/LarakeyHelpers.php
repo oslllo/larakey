@@ -120,8 +120,11 @@ trait LarakeyHelpers
      * @param array $arguments
      * @return \Oslllo\Larakey\Padlock\Combination
      */
-    private function combination(array $arguments): Combination
+    private function combination(array $arguments, bool $multiplePermissions = false): Combination
     {
-        return app()->makeWith(Combination::class, ['arguments' => $arguments]);
+        return app()->makeWith(Combination::class, [
+            'arguments' => $arguments,
+            'multiplePermissions' => $multiplePermissions
+        ]);
     }
 }

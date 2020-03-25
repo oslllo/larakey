@@ -63,9 +63,24 @@ class Combination
      */
     protected $arguments;
 
-    public function __construct(array $arguments)
+    /**
+     * Should be set to true if $arguments contains more that one permission
+     *
+     * @var boolean
+     */
+    protected $multiplePermissions;
+
+    /**
+     * Combination constructor.
+     *
+     * @param array $arguments
+     * @param boolean $multiplePermissions
+     */
+    public function __construct(array $arguments, bool $multiplePermissions = false)
     {
         $this->arguments = $arguments;
+        
+        $this->multiplePermissions = $multiplePermissions;
 
         $this->initialize();
     }
@@ -76,6 +91,22 @@ class Combination
      * @return void
      */
     public function initialize()
+    {
+        if ($this->multiplePermissions) {
+            $this->multiplePermissionSetup();
+        } else {
+            $this->singlePermissionSetup();
+        }
+
+        $this->set();
+    }
+
+    /**
+     * When $arguments contains one permisson of an array with permissions.
+     *
+     * @return void
+     */
+    protected function singlePermissionSetup()
     {
         if (count($this->arguments) > 5) {
             throw InvalidArguments::tooMany();
@@ -111,8 +142,40 @@ class Combination
         if (is_null($this->recursive)) {
             $this->setRecursive(config(Config::$recursionOnPermissionRevoke));
         }
+    }
 
-        $this->set();
+    /**
+     * When $arguments contains multiple arrays with permissons.
+     *
+     * @return void
+     */
+    protected function multiplePermissionSetup()
+    {
+        $arguments = collect($this->arguments);
+
+        if ($arguments->larakeyAllAre('arrays') && count($arguments) > 1) {
+            $permissions = $arguments->all();
+        } elseif (! is_array($arguments->first())) {
+            $permissions = [$arguments->all()];
+        } else {
+            if (! $arguments->get(1)) {
+                if (collect($arguments->first())->larakeyAllAre('arrays')) {
+                    $permissions = $arguments->first();
+                } else {
+                    $permissions = collect($arguments->first())->map(function ($item) {
+                        if (! is_array($item)) {
+                            return [$item];
+                        }
+
+                        return $item;
+                    });
+                }
+            } else {
+                $permissions = [$arguments->all()];
+            }
+        }
+
+        $this->setPermissions($permissions);
     }
 
     /**

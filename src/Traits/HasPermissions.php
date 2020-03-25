@@ -87,17 +87,13 @@ trait HasPermissions
      */
     public function scopePermission(Builder $query, ...$arguments): Builder
     {
-        // dd($arguments);
-        // $permissions, $model = null
         $combination = $this->combination($arguments);
-        // dd($combination);
+
         extract($combination->get(['permissions', 'model']));
 
         $permissionKey = $this->getPermissionKey($model);
-        // dd($permissions);
-        $permissions = $this->convertToPermissionModels($permissions);
 
-        // dd($permissions);
+        $permissions = $this->convertToPermissionModels($permissions);
 
         $rolesWithPermissions = array_unique(array_reduce($permissions, function ($result, $permission) {
             return array_merge($result, $permission->roles->all());
@@ -148,7 +144,7 @@ trait HasPermissions
         }, $permissions);
     }
 
-    // get one permission only
+    // get only one permission
     private function getPermission($permission, $guard = null): Permission
     {
         $permissionClass = $this->getPermissionClass();
@@ -211,14 +207,12 @@ trait HasPermissions
      * @return bool
      * @throws \Exception
      */
-    public function hasAnyPermission($permissions): bool
+    public function hasAnyPermission(array $permissions): bool
     {
-        if (is_string($permissions)) {
-            $permissions = (array) $permissions;
-        }
+        $permissions = collect($permissions)->larakeyMapInto('array');
 
         foreach ($permissions as $permission) {
-            if ($this->checkPermissionTo($permission)) {
+            if (call_user_func_array(array($this, 'checkPermissionTo'), $permission)) {
                 return true;
             }
         }
@@ -229,19 +223,17 @@ trait HasPermissions
     /**
      * Determine if the model has all of the given permissions.
      *
-     * @param array ...$permissions
+     * @param array ...$arguments
      *
      * @return bool
      * @throws \Exception
      */
-    public function hasAllPermissions($permissions): bool
+    public function hasAllPermissions(array $permissions): bool
     {
-        if (is_array($permissions[0])) {
-            $permissions = $permissions[0];
-        }
+        $permissions = collect($permissions)->larakeyMapInto('array');
 
         foreach ($permissions as $permission) {
-            if (! $this->hasPermissionTo($permission)) {
+            if (! call_user_func_array(array($this, 'checkPermissionTo'), $permission)) {
                 return false;
             }
         }
@@ -313,11 +305,22 @@ trait HasPermissions
 
         extract($combination->get(['permissions', 'model', 'guard']));
 
-        $permission = $this->getPermission($permissions, $guard);
+        if (! $permissions) {
+            throw new PermissionDoesNotExist;
+        }
 
-        $key = $this->getPermissionKey($model);
+        return collect($permissions)->every(function ($item) use ($guard, $model) {
 
-        return $key->unlocks($this, $permission);
+            $permission = $this->getPermission($item, $guard);
+
+            if (! $this->getGuardNames()->contains($permission->guard_name)) {
+                throw GuardDoesNotMatch::create($permission->guard_name, $this->getGuardNames());
+            }
+
+            $key = $this->getPermissionKey($model);
+
+            return $key->unlocks($this, $permission) == true;
+        });
     }
 
     /**
@@ -364,7 +367,24 @@ trait HasPermissions
     }
 
     /**
-     * Grant the given permission(s) to a role.
+     * Grant the given permissions to a model.
+     *
+     * @param array $permissions
+     * @return $this
+     */
+    public function giveMultiplePermissionsTo(array $permissions)
+    {
+        $permissions = collect($permissions)->larakeyMapInto('array');
+
+        foreach ($permissions as $permission) {
+            call_user_func_array(array($this, 'givePermissionTo'), $permission);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Grant the given permission to a model.
      *
      * @param array $arguments
      *
@@ -378,7 +398,7 @@ trait HasPermissions
 
         $permissions = collect($permissions)
             ->flatten()
-            ->map(function ($permission) use ($model) {
+            ->map(function ($permission) {
                 if (empty($permission)) {
                     return false;
                 }
@@ -397,18 +417,18 @@ trait HasPermissions
             throw StrictPermission::assignment();
         }
 
-        $permissions = collect($permissions)->map(function ($permission, $key) use ($model) {
+        $permissions = collect($permissions)->map(function ($permissionId, $key) use ($model) {
             $permissionKey = $this->getPermissionKey($model);
 
             if ($this->permissions()
-                    ->where('id', $permission)
+                    ->where('id', $permissionId)
                     ->wherePivot('to_id', $permissionKey->to_id)
                     ->wherePivot('to_type', $permissionKey->to_type)
                     ->first()) {
                 return false;
             }
 
-            return array($permission => $permissionKey->getPivot());
+            return array($permissionId => $permissionKey->getPivot());
         })
         ->reject(function ($value) {
             return $value === false;
@@ -462,11 +482,15 @@ trait HasPermissions
      *
      * @return $this
      */
-    public function syncPermissions($permissions)
+    public function syncPermissions(array $permissions)
     {
         $this->permissions()->detach();
 
-        return $this->givePermissionTo($permissions);
+        if (! count($permissions)) {
+            $this->load('permissions');
+        }
+
+        return $this->giveMultiplePermissionsTo($permissions);
     }
 
     /**
