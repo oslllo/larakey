@@ -1,9 +1,9 @@
 <?php
 
-namespace Oslllo\Larakey\Test\Models;
+namespace Oslllo\Larakey\Test\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\App\Models\User;
 
 class Post extends Model
 {

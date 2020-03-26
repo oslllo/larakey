@@ -1,11 +1,12 @@
 <?php
 
-namespace Oslllo\Larakey\Test;
+namespace Oslllo\Larakey\Test\Cache;
 
+use Oslllo\Larakey\Test\TestCase;
 use Illuminate\Support\Facades\DB;
 use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Support\Facades\Artisan;
-use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\App\Models\User;
 use Oslllo\Larakey\LarakeyRegistrar;
 use Oslllo\Larakey\Contracts\Permission;
 use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
@@ -42,11 +43,9 @@ class CacheTest extends TestCase
 
         $this->cache_run_count = $this->cache_permissions_run_count + $this->cache_roles_run_count;
 
-        switch (true) {
-            case $cacheStore instanceof \Illuminate\Cache\DatabaseStore:
-                $this->cache_init_count = 1;
-                $this->cache_load_count = 1;
-            default:
+        if ($cacheStore instanceof \Illuminate\Cache\DatabaseStore) {
+            $this->cache_init_count = 1;
+            $this->cache_load_count = 1;
         }
     }
 

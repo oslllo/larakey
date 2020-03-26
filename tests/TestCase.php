@@ -6,26 +6,26 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Oslllo\Larakey\Contracts\Role;
 use Illuminate\Database\Schema\Blueprint;
-use Oslllo\Larakey\Test\Models\Post;
-use Oslllo\Larakey\Test\Models\User;
-use Oslllo\Larakey\Test\Models\Admin;
+use Oslllo\Larakey\Test\App\Models\Post;
+use Oslllo\Larakey\Test\App\Models\User;
+use Oslllo\Larakey\Test\App\Models\Admin;
 
 use Oslllo\Larakey\Padlock\Cache as LaraCache;
 
 use Oslllo\Larakey\Contracts\Permission;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Oslllo\Larakey\LarakeyServiceProvider;
-use Oslllo\Larakey\Test\Providers\RouteServiceProvider;
+use Oslllo\Larakey\Test\App\Providers\RouteServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
-    /** @var \Oslllo\Larakey\Test\Models\User */
+    /** @var \Oslllo\Larakey\Test\App\Models\User */
     protected $testUser;
 
-    /** @var \Oslllo\Larakey\Test\Models\Post */
+    /** @var \Oslllo\Larakey\Test\App\Models\Post */
     protected $testUserPost;
 
-    /** @var \Oslllo\Larakey\Test\Models\Admin */
+    /** @var \Oslllo\Larakey\Test\App\Models\Admin */
     protected $testAdmin;
 
     /** @var \Oslllo\Larakey\Models\Role */
@@ -107,7 +107,7 @@ abstract class TestCase extends Orchestra
             'prefix'   => '',
         ]);
 
-        $app['config']->set('view.paths', [__DIR__.'/resources/views']);
+        $app['config']->set('view.paths', [__DIR__.'/App/resources/views']);
 
         // Set-up admin guard
         $app['config']->set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);

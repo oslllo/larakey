@@ -3,6 +3,7 @@
 namespace Oslllo\Larakey\Test;
 
 use Illuminate\Http\Response;
+use Oslllo\Larakey\Test\TestCase;
 
 class RouteTest extends TestCase
 {

@@ -2,8 +2,9 @@
 
 namespace Oslllo\Larakey\Test;
 
+use Oslllo\Larakey\Test\TestCase;
 use Illuminate\Support\Facades\Auth;
-use Oslllo\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Test\App\Models\Post;
 
 class ControllerTest extends TestCase
 {

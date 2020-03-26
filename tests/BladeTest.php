@@ -3,9 +3,10 @@
 namespace Oslllo\Larakey\Test;
 
 use Artisan;
+use Oslllo\Larakey\Test\TestCase;
 use Oslllo\Larakey\Contracts\Role;
-use Oslllo\Larakey\Test\Models\Post;
-use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\App\Models\Post;
+use Oslllo\Larakey\Test\App\Models\User;
 
 class BladeTest extends TestCase
 {

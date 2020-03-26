@@ -2,6 +2,7 @@
 
 namespace Oslllo\Larakey\Test;
 
+use Oslllo\Larakey\Test\TestCase;
 use Illuminate\Contracts\Auth\Access\Gate;
 
 class GateTest extends TestCase

@@ -2,7 +2,8 @@
 
 namespace Oslllo\Larakey\Test;
 
-use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\TestCase;
+use Oslllo\Larakey\Test\App\Models\User;
 use Oslllo\Larakey\Contracts\Permission;
 use Oslllo\Larakey\Exceptions\PermissionAlreadyExists;
 

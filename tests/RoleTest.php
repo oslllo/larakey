@@ -2,8 +2,9 @@
 
 namespace Oslllo\Larakey\Test;
 
+use Oslllo\Larakey\Test\TestCase;
 use Oslllo\Larakey\Contracts\Role;
-use Oslllo\Larakey\Test\Models\User;
+use Oslllo\Larakey\Test\App\Models\User;
 use Oslllo\Larakey\Models\Permission;
 use Oslllo\Larakey\Exceptions\RoleDoesNotExist;
 use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;

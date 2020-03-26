@@ -3,6 +3,7 @@
 namespace Oslllo\Larakey\Test;
 
 use Oslllo\Larakey\Models\Role;
+use Oslllo\Larakey\Test\TestCase;
 use Illuminate\Support\Facades\Artisan;
 use Oslllo\Larakey\Models\Permission;
 

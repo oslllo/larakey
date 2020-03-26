@@ -2,10 +2,11 @@
 
 namespace Oslllo\Larakey\Test;
 
+use Oslllo\Larakey\Test\TestCase;
 use Oslllo\Larakey\Contracts\Role;
 use Oslllo\Larakey\Padlock\Config;
-use Oslllo\Larakey\Test\Models\User;
-use Oslllo\Larakey\Test\Models\Post;
+use Oslllo\Larakey\Test\App\Models\User;
+use Oslllo\Larakey\Test\App\Models\Post;
 use Oslllo\Larakey\Contracts\Permission;
 use Oslllo\Larakey\Exceptions\GuardDoesNotMatch;
 use Oslllo\Larakey\Exceptions\ClassDoesNotExist;
@@ -13,6 +14,7 @@ use Oslllo\Larakey\Exceptions\PermissionDoesNotExist;
 use Oslllo\Larakey\Exceptions\PermissionNotAssigned;
 use Oslllo\Larakey\Exceptions\StrictPermission;
 use Oslllo\Larakey\Exceptions\InvalidArguments;
+use Oslllo\Larakey\Test\App\Models\SoftDeletingUser;
 
 class HasPermissionsTest extends TestCase
 {

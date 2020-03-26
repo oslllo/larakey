@@ -2,6 +2,7 @@
 
 namespace Oslllo\Larakey\Test;
 
+use Oslllo\Larakey\Test\TestCase;
 use Oslllo\Larakey\Models\Permission;
 
 class MultipleGuardsTest extends TestCase

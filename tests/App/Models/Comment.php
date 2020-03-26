@@ -1,6 +1,6 @@
 <?php
 
-namespace Oslllo\Larakey\Test\Models;
+namespace Oslllo\Larakey\Test\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
