@@ -1,6 +1,6 @@
 {
     "name": "oslllo/larakey",
-    "description": "Permission and role handling for Laravel 5.8 and up inspired by laravel-permissions by Spatie",
+    "description": "Permissions and Roles For Laravel",
     "keywords": [
         "spatie",
         "laravel",
