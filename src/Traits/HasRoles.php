@@ -321,16 +321,6 @@ trait HasRoles
     }
 
     /**
-     * Returns all permissions directly coupled to the model.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getDirectPermissions(): Collection
-    {
-        return $this->permissions;
-    }
-
-    /**
      * Returns role name collection.
      *
      * @return \Illuminate\Support\Collection

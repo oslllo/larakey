@@ -101,7 +101,8 @@ class CommandTest extends TestCase
         // | edit-articles |  ·       |  ·        |
         $this->assertRegExp('/\|\s+edit-articles\s+\|\s+·\s+\|\s+·\s+\|/', $output);
 
-        Role::findByName('testUserRole')->givePermissionTo('edit-articles');
+        Role::where('name', '=', 'testUserRole')->first()->givePermissionTo('edit-articles');
+
         $this->reloadPermissions();
 
         Artisan::call('permission:show');

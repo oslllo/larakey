@@ -102,6 +102,36 @@ class HasPermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_assign_multiple_permissions_to_a_user()
+    {
+        $this->testUser->giveMultiplePermissionsTo([
+            'view',
+            ['view', '*'],
+            ['create', Post::class],
+            ['edit', Post::class, 1],
+            ['delete', $this->testUserPost],
+            [['view', 'create', 'edit', 'delete'], Post::class, 1],
+            [['view', 'create', 'edit', 'delete'], $this->testUserPost],
+            [['view', 'create', 'edit', 'delete'], User::class, 1, 'web']
+        ]);
+
+        $this->assertTrue($this->testUser->hasPermissionTo('view'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', '*'));
+        $this->assertTrue($this->testUser->hasPermissionTo('create', Post::class));
+        $this->assertTrue($this->testUser->hasPermissionTo('edit', Post::class, 1));
+        $this->assertTrue($this->testUser->hasPermissionTo('delete', $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo(['view', 'create', 'edit', 'delete'], Post::class, 1));
+        $this->assertTrue($this->testUser->hasPermissionTo(['view', 'create', 'edit', 'delete'], $this->testUserPost));
+        $this->assertTrue($this->testUser->hasPermissionTo(['view', 'create', 'edit', 'delete'], User::class, 1, 'web'));
+
+        $this->assertTrue($this->testUser->hasPermissionTo('view', 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', '*', 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', $this->testUserPost, 'web'));
+        $this->assertTrue($this->testUser->hasPermissionTo('view', Post::class, $this->testUserPost->id, 'web'));
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_assigning_a_permission_with_a_class_that_does_not_exist()
     {
         $this->expectException(ClassDoesNotExist::class);

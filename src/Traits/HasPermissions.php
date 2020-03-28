@@ -319,7 +319,7 @@ trait HasPermissions
 
             $key = $this->getPermissionKey($model);
 
-            return $key->unlocks($this, $permission) == true;
+            return $key->unlocks($this->getModel(), $permission) == true;
         });
     }
 
@@ -468,11 +468,21 @@ trait HasPermissions
 
         $this->forgetCachedPermissions();
 
-        if (\method_exists($this, 'forgetCachedRoles') && $this instanceof Role) {
-            $this->forgetCachedRoles();
+        if ($this instanceof Role) {
+            app(Cache::class)->forgetCachedRoles();
         }
 
         return $this;
+    }
+
+    /**
+     * Returns all permissions directly coupled to the model.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getDirectPermissions(): Collection
+    {
+        return $this->permissions;
     }
 
     /**
@@ -504,7 +514,7 @@ trait HasPermissions
     {
         $combination = $this->combination($arguments);
 
-        extract($combination->get(['permissions', 'model', 'recursive']));
+        extract($combination->get(['permissions', 'model', 'recursive', 'guard']));
 
         if (! $model && config(Config::$strictPermissionRevoke)) {
             throw StrictPermission::revoke();
@@ -512,16 +522,17 @@ trait HasPermissions
 
         $permissionKey = $this->getPermissionKey($model);
 
-        collect($permissions)->each(function ($permission) use ($recursive, $permissionKey) {
+        collect($permissions)->each(function ($permission) use ($recursive, $permissionKey, $guard) {
 
             if (! $permission instanceof Permission) {
-                $permission = $this->getPermission($permission);
+                $permission = $this->getPermission($permission, $guard);
             }
 
             $detach = $permission->id;
 
             if ($permissionKey->hasFullAccess()) {
-                $permission = $this->permissions()->where('id', $permission->id);
+                $permission = $this->permissions()
+                                   ->where('id', $permission->id);
 
                 if (! $recursive) {
                     $permission = $permission->wherePivot('to_id', Larakey::WILDCARD_TOKEN)
@@ -567,35 +578,31 @@ trait HasPermissions
 
     /**
      * @param string|array|\Oslllo\Larakey\Contracts\Permission|\Illuminate\Support\Collection $permissions
+     * @param string|null $guard
      *
      * @return \Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Contracts\Permission[]|\Illuminate\Support\Collection
      */
-    protected function getStoredPermission($permission)
+    protected function getStoredPermission($permission, $guard = null)
     {
         $permissionClass = $this->getPermissionClass();
+        $guard = $this->getGuard($guard);
 
         if ($permission instanceof Permission) {
             return $permission;
         }
 
         if (is_numeric($permission)) {
-            return $permissionClass->findById(
-                $permission,
-                $this->getDefaultGuardName()
-            );
+            return $permissionClass->findById($permission, $guard);
         }
 
         if (is_string($permission)) {
-            return $permissionClass->findByName(
-                $permission,
-                $this->getDefaultGuardName()
-            );
+            return $permissionClass->findByName($permission, $this->getDefaultGuardName());
         }
 
         if (is_array($permission)) {
-            return $permissionClass
+            return app(Permission::class)
             ->whereIn('name', $permission)
-            ->whereIn('guard_name', $this->getGuardNames())
+            ->whereIn('guard_name', $guard)
             ->get();
         }
     }

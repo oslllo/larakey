@@ -22,6 +22,13 @@ class Combination
     protected $modelId;
 
     /**
+     * The model instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $modelInstance;
+
+    /**
      * Model class or instance for the permission.
      *
      * @var string|\Illuminate\Database\Eloquent\Model
@@ -68,9 +75,11 @@ class Combination
      *
      * @param array $arguments
      */
-    public function __construct(array $arguments)
+    public function __construct(array $arguments, Model $modelInstance)
     {
         $this->arguments = $arguments;
+
+        $this->modelInstance = $modelInstance;
 
         $this->initialize();
     }
@@ -123,6 +132,10 @@ class Combination
 
         if ($this->modelIdIsSetAndModelDoesNotExist()) {
             $this->setModel(get_class($this->model)::find($this->modelId));
+        }
+
+        if (is_null($this->guard)) {
+            $this->setGuard($this->modelInstance->getGuard());
         }
 
         if (is_null($this->recursive)) {
@@ -198,7 +211,7 @@ class Combination
      * @param string $guard
      * @return void
      */
-    private function setGuard(string $guard): void
+    private function setGuard(string $guard = null): void
     {
         $this->guard = $this->getGuard($guard);
     }

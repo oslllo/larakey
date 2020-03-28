@@ -13,38 +13,38 @@
 - Assign a permission to a model instances to a user.
 - Permission caching.
 
-# Documentation, Installation, and Usage Instructions
+## Documentation, Installation, and Usage Instructions
 
 
-# Testing
+## Testing
 
 ``` bash
 composer test
 ```
 
-# Questions and issues
+## Questions and issues
 
 For any questions and issues feel free to [create an issue on GitHub](https://github.com/Oslllo/larakey/issues), we’ll try to address it as soon as possible.
 
 If you’ve found a bug regarding security please mail ghustavh97@gmail.com instead of using the issue tracker.
 
-# Changelog
+## Changelog
 
 Please see [CHANGELOG](https://github.com/Oslllo/larakey/blob/master/CHANGELOG.md) for more information what has changed recently.
 
-# Contributing
+## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-# Security
+## Security
 
 If you discover any security-related issues, please email [ghustavh97@gmail.com](mailto:ghustavh97@gmail.com) instead of using the issue tracker.
 
-# Credits
+## Credits
 
 This package is a fork of [laravel-permissions](https://github.com/spatie/laravel-permission) by [Freek Van der Herten](https://github.com/freekmurze) and [All Contributors](https://github.com/spatie/laravel-permission/contributors).
 
-# License
+## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 

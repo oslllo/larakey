@@ -1,6 +1,6 @@
 <?php
 
-namespace Oslllo\Larakey\Test\Cache;
+namespace Oslllo\Larakey\Test;
 
 use Oslllo\Larakey\Test\TestCase;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +37,7 @@ class CacheTest extends TestCase
 
         $this->cache->forgetCachedRoles();
 
-        DB::connection()->enableQueryLog();
+        DB::enableQueryLog();
 
         $cacheStore = $this->cache->getCacheStore();
 

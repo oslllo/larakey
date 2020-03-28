@@ -54,7 +54,7 @@ class Role extends Model implements RoleContract
      *
      * @throws \Oslllo\Larakey\Exceptions\RoleAlreadyExists
      */
-    public static function create(array $attributes = []): RoleContract
+    public static function create(array $attributes = []): Role
     {
         $attributes['guard_name'] = $attributes['guard_name'] ?? Guard::getDefaultName(static::class);
 

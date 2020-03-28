@@ -97,7 +97,7 @@ trait LarakeyHelpers
      * @param string|null $guard
      * @return string
      */
-    private function getGuard($guard): string
+    public function getGuard($guard = null): string
     {
         return $guard ? $guard : $this->getDefaultGuardName();
     }
@@ -124,6 +124,7 @@ trait LarakeyHelpers
     {
         return app()->makeWith(Combination::class, [
             'arguments' => $arguments,
+            'modelInstance' => $this
         ]);
     }
 }

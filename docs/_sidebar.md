@@ -1,7 +1,10 @@
+
+#  
+
 * Home
     * [Home](/)
     * [Introduction](introduction.md)
-        - [Features](introduction.md#features)
+    * [Features](introduction.md#features)
 
 * Installation
     * [⚠️ Prerequisites](installation/prerequisites.md)
@@ -14,25 +17,51 @@
 
     * Using Permissions
         * [⚠️ Using Permissions](basic-usage/using-permissions/using-permissions.md)
-        * [Assigning Permissions](basic-usage/using-permissions/assigning-permissions.md)
-        * [Revoking Permissions](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md)
-            * [〽️ With Recursion](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
-        * [Checking For Permissions](basic-usage/using-permissions/checking-for-permissions.md)
-        * [Checking For Direct Permissions](basic-usage/using-permissions/checking-for-direct-permissions.md)
-        * [⛔ Checking For Any Direct Permission](basic-usage/using-permissions/checking-for-any-direct-permission.md)
-        * [⛔ Get Direct Permission](basic-usage/using-permissions/get-direct-permissions.md)
-        * [Checking Permissions Via Roles](basic-usage/using-permissions/checking-permissions-via-roles.md)
-        * [⛔ Get All Permissions](basic-usage/using-permissions/get-all-permissions.md)
+
+        * Assigning Permissions
+            * [Assigning Permissions](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#assigning-permissions)
+            * [Give User Permission (to all classes and model instances)](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#give-permission)
+            * [Give User Permission To A Class](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#give-permission-to-a-class)
+            * [Give User Permission To A Model Instance](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#give-permission-to-a-model-instance)
+            * [Give User Multiple Permissions To Something](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#give-multiple-permissions-to-something)
+            * [Sync Permissions](basic-usage/using-permissions/assigning-permissions/sync-permissions.md)
+
+        * Revoking Permissions
+            * [⚠️ Revoking Permissions](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md)
+                * [Revoke User Permission (to all classes and model instances)](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md#revoke-permissions)
+                * [Revoke User Permission To A Class](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md#revoke-permission-to-class)
+                * [Revoke User Permission To A Model Instance](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md#revoke-permission-to-instance)
+                * [Revoke User Multiple Permissions To Something](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md#revoke-multiple-permissions-to-something)
+                * [〽️ Revoke With Recursion](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
+
+        * Checking For Permissions
+            * [Checking For Permissions](basic-usage/using-permissions/checking-for-permissions/checking-for-permissions.md)
+            * [Checking For Direct Permissions](basic-usage/using-permissions/checking-for-permissions/checking-for-direct-permissions.md)
+            * [Checking For Any Permissions](basic-usage/using-permissions/checking-for-permissions/checking-for-any-permissions.md)
+            * [Checking For All Permissions](basic-usage/using-permissions/checking-for-permissions/checking-for-all-permissions.md)
+            * [Checking Permissions Via Roles](basic-usage/using-permissions/checking-for-permissions/checking-permissions-via-roles.md)
+
+        * Getting Permissions
+            * [Get Direct Permissions](basic-usage/using-permissions/getting-permissions/get-direct-permissions.md)
+            * [Get All Permissions](basic-usage/using-permissions/getting-permissions/get-all-permissions.md)
+            * [Get Permission Role](basic-usage/using-permissions/getting-permissions/get-permission-role.md)
+            * [Get Permissions Via Role](basic-usage/using-permissions/getting-permissions/get-permissions-via-rolea.md)
 
     * Using Roles
         * [Using Roles](basic-usage/using-roles/using-roles.md)
-        * [Assigning Roles](basic-usage/using-roles/assigning-roles.md)
-        * [Revoking Roles](basic-usage/using-roles/revoking-roles.md)
-        * [Syncing Roles](basic-usage/using-roles/syncing-roles.md)
-        * [Checking For Roles](basic-usage/using-roles/checking-for-roles.md)
-        * [Checking For Any Role](basic-usage/using-roles/checking-for-any-role.md)
-        * [Checking For All Roles](basic-usage/using-roles/checking-for-all-roles.md)
         * [Using permissions with roles](basic-usage/using-roles/using-permissions-with-roles.md)
+
+        * Assigning Roles
+            * [Assigning Roles](basic-usage/using-roles/assigning-roles.md)
+            * [Syncing Roles](basic-usage/using-roles/syncing-roles.md)
+
+        * Revoking Roles
+            * [Revoking Roles](basic-usage/using-roles/revoking-roles.md)
+
+        * Checking For Roles
+            * [Checking For Roles](basic-usage/using-roles/checking-for-roles.md)
+            * [Checking For Any Role](basic-usage/using-roles/checking-for-any-role.md)
+            * [Checking For All Roles](basic-usage/using-roles/checking-for-all-roles.md)
 
     * Blade directives
         * [Blade Permissions](basic-usage/blade-directives/blade-permissions.md)
@@ -66,7 +95,7 @@
         * [Extending User Models](advanced-usage/extending/extending-user-models.md)
         * [Extending Role and Permission Models](advanced-usage/extending/extending-role-and-permission-models.md)
         * [Replacing Role and Permission Models](advanced-usage/extending/replacing-role-and-permission-models.md)
-        
+
     * Migrations
         * [Adding fields to your models](advanced-usage/migrations/adding-fields-to-your-models.md)
 
@@ -87,10 +116,10 @@
     * [Model Policies](best-practices/model-policies.md)
 
 * Miscellaneous
-    - [Testing](miscellaneous.md#testing)
-    - [Questions and issues](miscellaneous.md#questions-and-issues)
-    - [Changelog](miscellaneous.md#changelog)
-    - [Contributing](miscellaneous.md#contributing)
-    - [Security](miscellaneous.md#security)
-    - [Credits](miscellaneous.md#credits)
-    - [License](miscellaneous.md#license)
+    * [Testing](miscellaneous.md#testing)
+    * [Questions and issues](miscellaneous.md#questions-and-issues)
+    * [Changelog](miscellaneous.md#changelog)
+    * [Contributing](miscellaneous.md#contributing)
+    * [Security](miscellaneous.md#security)
+    * [Credits](miscellaneous.md#credits)
+    * [License](miscellaneous.md#license)

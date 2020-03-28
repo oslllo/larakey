@@ -1,10 +1,15 @@
 # <u>Revoking Permissions</u>
+
 > The function `revokePermissionTo()` is used to revoke/remove permissions from a user.
-#### Description
+
+## Description
+
 ```php
 revokePermissionTo(mixed $permission, [mixed $model = null, mixed $modelId = null], [bool $recursive = false]): $this
 ```
-#### Arguments
+
+### Arguments
+
 - ***$permission***
     - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
     - Description : The permission to be removed from the user.
@@ -21,22 +26,27 @@ revokePermissionTo(mixed $permission, [mixed $model = null, mixed $modelId = nul
     - More info : [here](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
 
 #### Returns
+
 returns `$this`.
 
 ---
 
 ## Examples
->Revoke permission from user
+
+### Revoke User Permission (to all classes and model instances) <a id="revoke-permissions"></a>
+
 ```php
 // Give permissions
 $user->givePermissionTo('edit');
 $user->givePermissionTo('edit', Post::class);
 $user->givePermissionTo('edit', Post::class, 1);
 ```
+
 ```php
 // Revoke permission
 $user->revokePermissionTo('edit', '*');
 ```
+
 ```php
 // Check permissions
 $user->hasPermissionTo('edit'); // FALSE
@@ -49,16 +59,19 @@ $user->hasPermissionTo('edit', Post::class, 1); // TRUE
 
 ---
 
->Revoke permission with class from user
+### Revoke User Permission To A Class <a id="revoke-permission-to-class"></a>
+
 ```php
 // Give permission to class and model instance
 $user->givePermissionTo('edit', Post::class);
 $user->givePermissionTo('edit', Post::class, 1);
 ```
+
 ```php
-// Give class permission
+// Revoke permission
 $user->revokePermissionTo('edit', Post::class);
 ```
+
 ```php
 // Check permissions
 $user->hasPermissionTo('edit'); // FALSE
@@ -72,7 +85,8 @@ $user->hasPermissionTo('edit', Post::class, $post->id); // TRUE
 
 ---
 
->Revoke permission with model instance from user
+### Revoke Permission To A Model Instance <a id="revoke-permission-to-instance"></a>
+
 ```php
 // Give user permission to model instance
 $user->givePermissionTo('edit', Post::class, 1) // OR;
@@ -81,6 +95,13 @@ $post = Post::find(1);
 $user->givePermissionTo('edit', $post); // OR;
 $user->givePermissionTo('edit', Post::class, $post->id);
 ```
+
+```php
+// Revoke permission
+$user->revokePermissionTo('edit', $post); // OR
+$user->revokePermissionTo('edit', Post::class, $post->id);
+```
+
 ```php
 // Check permissions
 $user->hasPermissionTo('edit'); // FALSE
@@ -94,15 +115,16 @@ $user->hasPermissionTo('edit', Post::class, $post->id); // TRUE
 
 ---
 
->Give user multiple permission at once
+### Revoke User Multiple Permissions To Something <a id="revoke-multiple-permissions-to-something"></a>
+
 ```php
-$user->givePermissionTo(['edit', 'delete', 'read']); // OR;
-$user->givePermissionTo(['edit', 'delete', 'read'], '*'); // OR;
-$user->givePermissionTo(['edit', 'delete', 'read'], Post::class); // OR;
+$user->revokePermissionTo(['edit', 'delete', 'read']); // OR;
+$user->revokePermissionTo(['edit', 'delete', 'read'], '*'); // OR;
+$user->revokePermissionTo(['edit', 'delete', 'read'], Post::class); // OR;
 
 $post = Post::find(1);
-$user->givePermissionTo(['edit', 'delete', 'read'], $post); // OR;
-$user->givePermissionTo(['edit', 'delete', 'read'], Post::class, $post->id); // OR;
+$user->revokePermissionTo(['edit', 'delete', 'read'], $post); // OR;
+$user->revokePermissionTo(['edit', 'delete', 'read'], Post::class, $post->id); // OR;
 ```
 
 ---
