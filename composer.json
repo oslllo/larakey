@@ -2,7 +2,6 @@
     "name": "oslllo/larakey",
     "description": "Permissions and Roles For Laravel",
     "keywords": [
-        "spatie",
         "laravel",
         "permission",
         "permissions",
@@ -46,7 +45,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Oslllo\\Larakey\\Test\\": "tests"
+            "Oslllo\\Larakey\\Test\\": "tests",
+            "Oslllo\\Larakey\\Test\\App\\": "tests/_dependences"
         }
     },
     "extra": {
