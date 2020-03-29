@@ -1,15 +1,15 @@
-# <u>Blade Roles</u>
+# Blade Roles
 
 As discussed in the Best Practices section of the docs, **it is strongly recommended to always use permission directives**, instead of role directives.
 
-Additionally, if your reason for testing against Roles is for a Super-Admin, see the [Defining A Super-Admin](basic-usage/defining-a-super-admin.md) section of the docs.
+Additionally, if your reason for testing against Roles is for a Super-Admin, see the [Defining A Super-Admin](advanced-usage/defining-a-super-admin.md) section of the docs.
 
-If you actually need to test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles. 
+If you actually need to test for Roles, this package offers some Blade directives to verify whether the currently logged in user has all or any of a given list of roles.
 
 Optionally you can pass in the `guard` that the check will be performed on as a second argument.
 
-
 >Check for a specific role:
+
 ```php
 @role('writer')
     I am a writer!
@@ -17,7 +17,9 @@ Optionally you can pass in the `guard` that the check will be performed on as a 
     I am not a writer...
 @endrole
 ```
+
 is the same as
+
 ```php
 @hasrole('writer')
     I am a writer!
@@ -27,6 +29,7 @@ is the same as
 ```
 
 >Check for any role in a list:
+
 ```php
 @hasanyrole($collectionOfRoles)
     I have one or more of these roles!
@@ -40,6 +43,7 @@ is the same as
     I have none of these roles...
 @endhasanyrole
 ```
+
 >Check for all roles:
 
 ```php

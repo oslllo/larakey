@@ -1,4 +1,4 @@
-# <u>Using Roles</u>
+# Using Roles
 
 * [Using permissions With Roles](#using-permissions-with-roles)
 
@@ -9,9 +9,9 @@
 
 ---
 
-# <u>Using permissions with roles</u>
+## Using permissions with roles
 
-> Any function found in the [Using Permissions](basic-usage/using-permissions/using-permissions.md) can be used on a `Role` instance since it inherits the `HasPermissions` trait. So you can do stuff like:
+> Any function found in the [Using Permissions](permissions/using-permissions.md) can be used on a `Role` instance since it inherits the `HasPermissions` trait. So you can do stuff like:
 
 ```php
 // Get writer role

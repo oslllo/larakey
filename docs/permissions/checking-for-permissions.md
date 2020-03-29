@@ -1,11 +1,11 @@
-# <u>Checking For Permissions</u>
+# Checking For Permissions
 
 * [Checking For Direct Permissions](#checking-for-direct-permissions)
 * [Checking For Any Permissions](#checking-for-any-permissions)
 * [Checking For All Permissions](#checking-for-all-permissions)
 * [Checking Permissions Via Roles](#checking-for-permissions-via-roles)
 
- > The function `hasPermissionTo()` OR `can()` can be used to check if a user has direct permission or permission via role.
+> The function `hasPermissionTo()` OR `can()` can be used to check if a user has direct permission or permission via role.
 
 ## Description
 
@@ -15,19 +15,19 @@ hasPermissionTo(mixed $permission, [mixed $model = null, [mixed $modelId = null]
 
 ### Arguments
 
-- ***$permission***
-    - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
-    - Description : The permission to give to the user.
-- ***$model***
-    - Type : `string` | `\Illuminate\Database\Eloquent\Model`
-    - Description : The model class or instance to be used with the permission to limit scope.
-- ***$modelId***
-    - Type : `string` | `int`
-    - Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
-    - Note : ***`$model` must be present when this value is used.***
-- ***$guard***
-    - Type : `string`
-    - Description : The guard to be used with `$permission`.
+* ***$permission***
+    * Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
+    * Description : The permission to give to the user.
+* ***$model***
+    * Type : `string` | `\Illuminate\Database\Eloquent\Model`
+    * Description : The model class or instance to be used with the permission to limit scope.
+* ***$modelId***
+    * Type : `string` | `int`
+    * Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
+    * Note : ***`$model` must be present when this value is used.***
+* ***$guard***
+    * Type : `string`
+    * Description : The guard to be used with `$permission`.
 
 #### Returns
 
@@ -49,7 +49,7 @@ $user->hasPermissionTo('edit', Post::class, $post->id);
 $user->hasPermissionTo(['edit', 'delete'], Post::class, $post->id);
 ```
 
-Also see [Assigning Permissions Examples](basic-usage/using-permissions/assigning-permissions/assigning-permissions.md#examples) OR [Revoking Permissions Examples](basic-usage/using-permissions/revoking-permissions/revoking-permissions.md#examples)
+Also see [Assigning Permissions Examples](permissions/assigning-permissions.md) OR [Revoking Permissions Examples](permissions/revoking-permissions.md)
 
 You may pass an integer representing the permission id.
 
@@ -70,7 +70,7 @@ $user->can('edit', Article::class);
 
 ---
 
-# <u>Checking For Direct Permissions</u>
+## Checking For Direct Permissions
 
  > The function `hasDirectPermission()` can be used to check if a user has a direct permission.
 
@@ -82,19 +82,19 @@ hasDirectPermission(mixed $permission, [mixed $model = null, [mixed $modelId = n
 
 ### Arguments
 
-- ***$permission***
-    - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
-    - Description : The permission to give to the user.
-- ***$model***
-    - Type : `string` | `\Illuminate\Database\Eloquent\Model`
-    - Description : The model class or instance to be used with the permission to limit scope.
-- ***$modelId***
-    - Type : `string` | `int`
-    - Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
-    - Note : ***`$model` must be present when this value is used.***
-- ***$guard***
-    - Type : `string`
-    - Description : The guard to be used with `$permission`.
+* ***$permission***
+    * Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
+    * Description : The permission to give to the user.
+* ***$model***
+    * Type : `string` | `\Illuminate\Database\Eloquent\Model`
+    * Description : The model class or instance to be used with the permission to limit scope.
+* ***$modelId***
+    * Type : `string` | `int`
+    * Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
+    * Note : ***`$model` must be present when this value is used.***
+* ***$guard***
+    * Type : `string`
+    * Description : The guard to be used with `$permission`.
 
 #### Returns
 
@@ -115,7 +115,7 @@ $user->hasDirectPermission(['edit', 'delete'], Post::class, $post->id);
 
 ---
 
-# <u>Checking For Any Permissions</u>
+## Checking For Any Permissions
 
  > The function `hasAnyPermission()` can be used to check if a user has any of the permissions.
 
@@ -127,9 +127,9 @@ hasAnyPermission(array $permissions): bool
 
 ### Arguments
 
-- ***$permissions***
-    - Type :  `array`
-    - Description : The array of permissions to check.
+* ***$permissions***
+    * Type :  `array`
+    * Description : The array of permissions to check.
 
 #### Returns
 
@@ -155,7 +155,7 @@ $user->hasAnyPermission([
 
 ---
 
-# <u>Checking For All Permissions</u>
+## Checking For All Permissions
 
  > The function `hasAllPermissions()` can be used to check if a user has all of the given permissions.
 
@@ -167,9 +167,9 @@ hasAllPermissions(array $permissions): bool
 
 ### Arguments
 
-- ***$permissions***
-    - Type :  `array`
-    - Description : The array of permissions to check.
+* ***$permissions***
+    * Type :  `array`
+    * Description : The array of permissions to check.
 
 #### Returns
 
@@ -195,7 +195,7 @@ $user->hasAllPermissions([
 
 ---
 
-# <u>Checking For Permissions Via Roles</u>
+## Checking For Permissions Via Roles
 
  > The function `hasPermissionViaRole()` can be used to check if a user has a role that has a permission.
 
@@ -207,19 +207,19 @@ hasPermissionViaRole(mixed $permission, [mixed $model = null, [mixed $modelId = 
 
 ### Arguments
 
-- ***$permission***
-    - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
-    - Description : The permission to give to the user.
-- ***$model***
-    - Type : `string` | `\Illuminate\Database\Eloquent\Model`
-    - Description : The model class or instance to be used with the permission to limit scope.
-- ***$modelId***
-    - Type : `string` | `int`
-    - Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
-    - Note : ***`$model` must be present when this value is used.***
-- ***$guard***
-    - Type : `string`
-    - Description : The guard to be used with `$permission`.
+* ***$permission***
+    * Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
+    * Description : The permission to give to the user.
+* ***$model***
+    * Type : `string` | `\Illuminate\Database\Eloquent\Model`
+    * Description : The model class or instance to be used with the permission to limit scope.
+* ***$modelId***
+    * Type : `string` | `int`
+    * Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
+    * Note : ***`$model` must be present when this value is used.***
+* ***$guard***
+    * Type : `string`
+    * Description : The guard to be used with `$permission`.
 
 #### Returns
 
@@ -229,7 +229,7 @@ Returns `boolean`.
 
 ## Examples
 
-> You can read about roles [here](basic-usage/using-roles/using-roles.md)
+> You can read about roles [here](roles/using-roles.md)
 
 ```php
 // Create role

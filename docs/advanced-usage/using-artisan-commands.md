@@ -1,10 +1,10 @@
 # Using artisan commands
 
-* [Creating roles and permissions with Artisan Commands](basic-usage/using-artisan-commands/creating-roles-and-permissions-with-artisan-commands.md)
-* [Displaying roles and permissions in the console](basic-usage/using-artisan-commands/displaying-roles-and-permissions-in-the-console.md)
-* [Resetting the Cache](basic-usage/using-artisan-commands/resetting-the-cache.md)
+* [Creating Roles And Permissions With Artisan Commands](#creating-roles-and-permissions-with-artisan-commands)
+* [Displaying Roles And Permissions In The Console](#displaying-roles-and-permissions-in-the-console)
+* [Resetting The Cache](#resetting-the-cache)
 
-# <u>Creating roles and permissions with Artisan Commands</u>
+## Creating Roles And Permissions With Artisan Commands
 
 >You can create a role or permission from the console with artisan commands.
 
@@ -34,7 +34,7 @@ php artisan permission:create-role writer web "create articles|edit articles"
 
 ---
 
-# <u>Displaying roles and permissions in the console</u>
+## Displaying roles and permissions in the console
 
 There is also a `show` command to show a table of roles and permissions per guard:
 
@@ -44,11 +44,11 @@ php artisan permission:show
 
 ---
 
-# <u>Resetting the Cache</u>
+## Resetting the Cache
 
 When you use the built-in functions for manipulating roles and permissions, the cache is automatically reset for you, and relations are automatically reloaded for the current model record.
 
-See the [Advanced-Usage/Cache](advanced-usage/cache/cache.md) section of these docs for detailed specifics.
+See the [Cache](advanced-usage/cache.md) section of these docs for detailed specifics.
 
 If you need to manually reset the cache for this package, you may use the following artisan command:
 

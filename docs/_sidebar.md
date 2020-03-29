@@ -1,12 +1,14 @@
 
 #  
 
-* [Home](/)
-* [Introduction](introduction.md)
-* [Getting Started](getting-started.md)
-* [Basic Usage](basic-usage.md)
+* Getting Started
+
+    * [Introduction](getting-started/introduction.md)
+    * [Installation](getting-started/installation.md)
+    * [Basic Usage](getting-started/basic-usage.md)
 
 * Permissions
+
     * [Using Permissions](permissions/using-permissions.md)
     * [Assigning Permissions](permissions/assigning-permissions.md)
     * [Revoking Permissions](permissions/revoking-permissions.md)
@@ -14,21 +16,23 @@
     * [Getting Permissions](permissions/getting-permissions.md)
 
 * Roles
+
     * [Using Roles](roles/using-roles.md)
     * [Assigning Roles](roles/assigning-roles.md)
     * [Revoking Roles](roles/revoking-roles.md)
     * [Checking For Roles](roles/checking-for-roles.md)
 
 * Blade directives
+
     * [Blade Permissions](blade-directives/blade-permissions.md)
     * [Blade Roles](blade-directives/blade-roles.md)
 
-* [Defining a Super-Admin](defining-a-super-admin.md)
-* [Using multiple guards](basic-usage/using-multiple-guards.md)
-* [Using a middleware](using-a-middleware.md)
-* [Using artisan commands](using-artisan-commands.md)
-
 * Advanced Usage
+
+    * [Defining A Super-Admin](advanced-usage/defining-a-super-admin.md)
+    * [Using Multiple Guards](advanced-usage/using-multiple-guards.md)
+    * [Using A Middleware](advanced-usage/using-a-middleware.md)
+    * [Using Artisan Commands](advanced-usage/using-artisan-commands.md)
     * [Unit Testing](advanced-usage/unit-testing.md)
     * [Database Seeding](advanced-usage/database-seeding.md)
     * [Exceptions](advanced-usage/exceptions.md)
@@ -38,14 +42,16 @@
     * [UUID](advanced-usage/uuid.md)
 
 * Best Practices
+
     * [Roles vs Permissions](best-practices/roles-vs-permissions.md)
     * [Model Policies](best-practices/model-policies.md)
 
 * Miscellaneous
-    * [Testing](miscellaneous.md#testing)
-    * [Questions and issues](miscellaneous.md#questions-and-issues)
-    * [Changelog](miscellaneous.md#changelog)
-    * [Contributing](miscellaneous.md#contributing)
-    * [Security](miscellaneous.md#security)
-    * [Credits](miscellaneous.md#credits)
-    * [License](miscellaneous.md#license)
+
+    * [Testing](miscellaneous/miscellaneous.md#testing)
+    * [Questions And Issues](miscellaneous/miscellaneous.md#questions-and-issues)
+    * [Changelog](miscellaneous/miscellaneous.md#changelog)
+    * [Contributing](miscellaneous/miscellaneous.md#contributing)
+    * [Security](miscellaneous/miscellaneous.md#security)
+    * [Credits](miscellaneous/miscellaneous.md#credits)
+    * [License](miscellaneous/miscellaneous.md#license)

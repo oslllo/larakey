@@ -16,7 +16,7 @@
 - Permission caching.
 
 [GitHub](https://github.com/oslllo/larakey/)
-[Get Started](/introduction)
+[Get Started](/getting-started/introduction)
 
 <!-- background color -->
 

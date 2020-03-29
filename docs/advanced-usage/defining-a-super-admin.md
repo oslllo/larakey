@@ -1,12 +1,16 @@
-# <u>Defining a Super-Admin</u>
+# Defining a Super-Admin
 
-We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` or `Gate::after` rule which checks for the desired role. 
+* [Gate::before](#gate-before)
+* [Gate::after](#gate-after)
+
+We strongly recommend that a Super-Admin be handled by setting a global `Gate::before` or `Gate::after` rule which checks for the desired role.
 
 Then you can implement the best-practice of primarily using permission-based controls (@can and $user->can, etc) throughout your app, without always having to check for "is this a super-admin" everywhere. Best not to use role-checking (ie: `hasRole`) when you have Super Admin features like this.
 
 ---
 
 ## `Gate::before` <a id="gate-before"></a>
+
 If you want a "Super Admin" role to respond `true` to all permissions, without needing to assign all those permissions to a role, you can use Laravel's `Gate::before()` method. For example:
 
 ```php
@@ -32,7 +36,7 @@ NOTE: `Gate::before` rules need to return `null` rather than `false`, else it wi
 Jeffrey Way explains the concept of a super-admin (and a model owner, and model policies) in the [Laravel 6 Authorization Filters](https://laracasts.com/series/laravel-6-from-scratch/episodes/51) video and some related lessons in that chapter.
 
 ---
- 
+
 ## `Gate::after` <a id="gate-after"></a>
 
 Alternatively you might want to move the Super Admin check to the `Gate::after` phase instead, particularly if your Super Admin shouldn't be allowed to do things your app doesn't want "anyone" to do, such as writing more than 1 review, or bypassing unsubscribe rules, etc.

@@ -1,9 +1,6 @@
-# <u>Introduction</u>
+# Introduction
 
-## Features
-
-Once [installed](/installation/installation.md) you can:
-
+Once [installed](/getting-started/installation.md) you can:
 
 >✅ GIve user permission (to any class or model instance).
 
@@ -14,7 +11,6 @@ $user->givePermissionTo('edit articles', '*') // Explicitly saying that they can
 ```
 
 ---
-
 
 >✅ Give user permission to a class.
 
@@ -38,7 +34,6 @@ $user->givePermissionTo('edit', Article::class, $article->id);
 ---
 
 >✅ Assign roles to users.
-
 
 ```php
 // Assign user a role.

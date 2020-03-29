@@ -1,24 +1,24 @@
 # UUID
 
-* [Migrations](advanced-usage/uuid/uuid-migrations.md)
-* [Configuration (morph key)](advanced-usage/uuid/uuid-configuration.md)
-* [Models](advanced-usage/uuid/uuid-models.md)
-* [User Models](advanced-usage/uuid/uuid-user-models.md)
+* [Migrations](#migrations)
+* [Configuration (morph key)](#configuration)
+* [Models](#models)
+* [User Models](#user-models)
 
 If you're using UUIDs or GUIDs for your User models there are a few considerations which various users have contributed. As each UUID implementation approach is different, some of these may or may not benefit you. As always, your implementation may vary.
 
 ---
 
-# <u>Migrations</u>
+## Migrations
 
 You will probably want to update the `create_permission_tables.php` migration:
 
-- Replace `$table->unsignedBigInteger($columnNames['model_morph_key'])` with `$table->uuid($columnNames['model_morph_key'])`.
+* Replace `$table->unsignedBigInteger($columnNames['model_morph_key'])` with `$table->uuid($columnNames['model_morph_key'])`.
 
 ---
 
 
-# <u>Configuration (Morph Key)</u>
+## Configuration (Morph Key) <a id="configuration"></a>
 
 You will probably also want to update the configuration `column_names.model_morph_key`:
 
@@ -37,17 +37,17 @@ You will probably also want to update the configuration `column_names.model_morp
 
 ---
 
-# <u>Models</u>
+## Models
 
 You will probably want to Extend the default Role and Permission models into your own namespace, to set some specific properties (see the Extending section of the docs):
 
-- You may want to set `protected $keyType = "string";` so Laravel doesn't cast it to integer.
-- You may want to set `protected $primaryKey = 'guid';` (or `uuid`, etc) if you changed the column name in your migrations.
-- Optional: Some people have reported value in setting `public $incrementing = false;`, but others have said this caused them problems. Your implementation may vary.
+* You may want to set `protected $keyType = "string";` so Laravel doesn't cast it to integer.
+* You may want to set `protected $primaryKey = 'guid';` (or `uuid`, etc) if you changed the column name in your migrations.
+* Optional: Some people have reported value in setting `public $incrementing = false;`, but others have said this caused them problems. Your implementation may vary.
 
 ---
 
-# <u>User Models</u>
+## User Models
 
 Troubleshooting tip: In the ***Prerequisites*** section of the docs we remind you that your User model must implement the `Illuminate\Contracts\Auth\Access\Authorizable` contract so that the Gate features are made available to the User object.
 In the default User model provided with Laravel, this is done by extending another model (aliased to `Authenticatable`), which extends the base Eloquent model. However, your UUID implementation may need to override that in order to set some of the properties mentioned in the Models section above. If you are running into difficulties, you may want to double-check whether your User model is doing UUIDs consistent with other parts of your app.

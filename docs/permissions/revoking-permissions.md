@@ -1,10 +1,10 @@
 # Revoking Permissions
 
-* [Revoke User Permission (to all classes and model instances)](#revoke-permissions)
-* [Revoke User Permission To A Class](#revoke-permission-to-class)
-* [Revoke User Permission To A Model Instance](#revoke-permission-to-instance)
-* [Revoke User Multiple Permissions To Something](#revoke-multiple-permissions-to-something)
-* [〽️ Revoke With Recursion](#with-recursion.md)
+* [Revoke User Permission (to all classes and model instances)](#revoke-user-permission)
+* [Revoke User Permission To A Class](#revoke-user-permission-to-a-class)
+* [Revoke User Permission To A Model Instance](#revoke-user-permission-to-a-model-instance)
+* [Revoke User Multiple Permissions To Something](#revoke-user-multiple-permissions-to-something)
+* [Revoking Permissions With Recursion](#revoking-permissions-with-recursion)
 
 > The function `revokePermissionTo()` is used to revoke/remove permissions from a user.
 
@@ -16,20 +16,20 @@ revokePermissionTo(mixed $permission, [mixed $model = null, mixed $modelId = nul
 
 ### Arguments
 
-- ***$permission***
-    - Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
-    - Description : The permission to be removed from the user.
-- ***$model***
-    - Type : `string` | `\Illuminate\Database\Eloquent\Model`
-    - Description : The model class or instance to be used with the
-- ***$modelId***
-    - Type : `string` | `int`
-    - Description : Used to indicate the id of a model when only a class name string is provided to `$model`. 
-    - Note : ***`$model` must be present when this value is used.***
-- ***$recursive***
-    - Type : `boolean`
-    - Description : Determines whether or not to revoke a permission recursively/also remove permissions with a lower scope.
-    - More info : [here](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
+* ***$permission***
+    * Type : `int` | `string` | `array` | `\Oslllo\Larakey\Contracts\Permission`
+    * Description : The permission to be removed from the user.
+* ***$model***
+    * Type : `string` | `\Illuminate\Database\Eloquent\Model`
+    * Description : The model class or instance to be used with the
+* ***$modelId***
+    * Type : `string` | `int`
+    * Description : Used to indicate the id of a model when only a class name string is provided to `$model`.
+    * Note : ***`$model` must be present when this value is used.***
+* ***$recursive***
+    * Type : `boolean`
+    * Description : Determines whether or not to revoke a permission recursively/also remove permissions with a lower scope.
+    * More info : [here](basic-usage/using-permissions/revoking-permissions/with-recursion.md)
 
 #### Returns
 
@@ -39,7 +39,9 @@ returns `$this`.
 
 ## Examples
 
-### Revoke User Permission (to all classes and model instances) <a id="revoke-permissions"></a>
+<a id="revoke-user-permission"></a>
+
+### Revoke User Permission (to all classes and model instances)
 
 ```php
 // Give permissions
@@ -65,7 +67,7 @@ $user->hasPermissionTo('edit', Post::class, 1); // TRUE
 
 ---
 
-### Revoke User Permission To A Class <a id="revoke-permission-to-class"></a>
+### Revoke User Permission To A Class
 
 ```php
 // Give permission to class and model instance
@@ -91,7 +93,7 @@ $user->hasPermissionTo('edit', Post::class, $post->id); // TRUE
 
 ---
 
-### Revoke Permission To A Model Instance <a id="revoke-permission-to-instance"></a>
+### Revoke User Permission To A Model Instance
 
 ```php
 // Give user permission to model instance
@@ -121,7 +123,7 @@ $user->hasPermissionTo('edit', Post::class, $post->id); // TRUE
 
 ---
 
-### Revoke User Multiple Permissions To Something <a id="revoke-multiple-permissions-to-something"></a>
+### Revoke User Multiple Permissions To Something
 
 ```php
 $user->revokePermissionTo(['edit', 'delete', 'read']); // OR;
@@ -135,23 +137,26 @@ $user->revokePermissionTo(['edit', 'delete', 'read'], Post::class, $post->id); /
 
 ---
 
-# <u>Revoking Permissions With Recursion</u>
+## Revoking Permissions With Recursion
 
 > To Revoke a permission from a user (using recursion), pass in a boolean of `true` in the `revokePermissionTo()` function. This will remove the permission with those with a lower scope that it.
 
 ---
 
 ## Examples
+
 ```php
 // Give user permissions
 $user->givePermissionTo('edit');
 $user->givePermissionTo('edit', Post::class);
 $user->givePermissionTo('edit', Post::class, 1);
 ```
+
 ```php
 // Revoke permission with recursion
 $user->revokePermissionTo('edit', '*', true);
 ```
+
 ```php
 // Check permissions
 $user->hasPermissionTo('edit'); // FALSE

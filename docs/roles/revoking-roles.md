@@ -1,20 +1,27 @@
-# <u>Revoking Roles</u>
+# Revoking Roles
+
  > The function `removeRole()` can be used to revoke a role from a user.
-#### Description
+
+## Description
+
 ```php
 removeRole(mixed $role): $this
 ```
-#### Arguments
+
+### Arguments
+
 - ***$role***
     - Type : `string` | `\Oslllo\Larakey\Contracts\Role`
     - Description : The role to remove from user.
 
 #### Returns
+
 Returns `$this`.
 
 ---
 
 #### Examples
+
 ```php
 $user->removeRole('writer');
 ```

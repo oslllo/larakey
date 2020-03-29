@@ -1,5 +1,10 @@
 # Basic Usage
 
+* [Introduction](#introduction)
+* [Eloquent](#eloquent)
+
+## Introduction
+
 First, add the ```Oslllo\Larakey\Traits\HasLarakey``` trait to your ```User``` model(s):
 
 ```php
@@ -44,7 +49,7 @@ $role->revokePermissionTo($permission);
 $permission->removeRole($role);
 ```
 
-> ⚠️ If you’re using multiple guards the ```guard_name``` attribute needs to be set as well. Read about it in the [using multiple guards](basic-usage/using-multiple-guards.md) section.
+> ⚠️ If you’re using multiple guards the ```guard_name``` attribute needs to be set as well. Read about it in the [using multiple guards](advanced-usage/using-multiple-guards.md) section.
 
 The ```Larakey``` trait adds Eloquent relationships to your models, which can be accessed directly or used as a base query:
 
@@ -83,6 +88,7 @@ The scope can accept a string, a ```\Oslllo\Larakey\Models\Permission``` object 
 ## Eloquent
 
 Since ```Role``` and ```Permission``` models are extended from Eloquent models, basic Eloquent calls can be used as well:
+
 ```php
 $all_users_with_all_their_roles = User::with('roles')->get();
 $all_users_with_all_direct_permissions = User::with('permissions')->get();

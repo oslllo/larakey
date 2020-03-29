@@ -5,7 +5,7 @@
 * [Get Permission Role](#get-permission-role)
 * [Get Permissions Via Role](#get-permissions-via-roles)
 
-# <u>Get All Permissions</u>
+## Get All Permissions
 
  > The function `getAllPermissions()` can be used to return all permissions coupled to the model.
 
@@ -38,8 +38,7 @@ $role->getAllPermissions();
 
 ---
 
-
-# <u>Get Direct Permissions</u>
+## Get Direct Permissions
 
  > The function `getDirectPermissions()` can be used to return all direct permissions coupled to the model.
 
@@ -72,7 +71,7 @@ $role->getDirectPermissions();
 
 ---
 
-# <u>Get Permission Role</u>
+## Get Permission Role
 
  > The function `getPermissionRole()` can be used to the first permission role. Returns new `Role` instance if none are found.
 
@@ -84,9 +83,9 @@ getPermissionRole(mixed $permission): \Oslllo\Larakey\Contracts\Role|\Oslllo\Lar
 
 ### Arguments
 
-- ***$permission***
-    - Type : `\Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Models\Permission`
-    - Description : The permission to use.
+* ***$permission***
+    * Type : `\Oslllo\Larakey\Contracts\Permission|\Oslllo\Larakey\Models\Permission`
+    * Description : The permission to use.
 
 #### Returns
 
@@ -102,8 +101,7 @@ $user->getPermissionRole($permission);
 
 ---
 
-
-# <u>Get Permissions Via Roles</u>
+## Get Permissions Via Roles
 
  > The function `getPermissionsViaRoles()` can be used to return all the permissions the model has via roles.
 

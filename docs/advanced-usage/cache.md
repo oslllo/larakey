@@ -1,8 +1,7 @@
 # Cache
 
-* [Cache](advanced-usage/cache/cache.md)
-* [Manual Cache Reset](advanced-usage/cache/manual-cache-reset.md)
-* [Cache Identifier](advanced-usage/cache/cache-identifier.md)
+* [Manual Cache Reset](#manual-cache-reset)
+* [Cache Identifier](#cache-identifier)
 
 Role and Permission data are cached to speed up performance.
 
@@ -26,24 +25,27 @@ HOWEVER, if you manipulate permission/role data directly in the database instead
 
 ---
 
-# <u>Manual Cache Reset</u>
+## Manual Cache Reset
+
 To manually reset the cache for this package, you can run the following in your app code:
+
 ```php
 app()->make(\Oslllo\Larakey\Padlock\Cache::class)->forgetCachedPermissions();
 ```
 
 Or you can use an Artisan command:
+
 ```bash
 php artisan permission:cache-reset
 ```
 
 ---
 
-# <u>Cache Identifier</u>
+## Cache Identifier
 
-TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites 
-running on your server, you could run into cache clashes between apps. It is prudent to set your own 
-cache `prefix` in Laravel's `/config/cache.php` to something unique for each application. 
+TIP: If you are leveraging a caching service such as `redis` or `memcached` and there are other sites
+running on your server, you could run into cache clashes between apps. It is prudent to set your own
+cache `prefix` in Laravel's `/config/cache.php` to something unique for each application.
 This will prevent other applications from accidentally using/changing your cached data.
 
 ---

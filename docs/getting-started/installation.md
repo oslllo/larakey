@@ -1,10 +1,10 @@
-# Getting Started
+# Installation
 
-* [⚠️ Prerequisites](installation.md#prerequisites)
-* [Installation](installation.md#installation)
-* [Default config file contents](installation.md#default-config-file-contents)
+- [Prerequisites](#prerequisites)
+- [Installation Process](#installation-process)
+- [Default config file contents](#default-config-file-contents)
 
-## ⚠️ Prerequisites
+## Prerequisites
 
 This package can be used in Laravel 5.8 or higher.
 
@@ -34,11 +34,11 @@ This package publishes a ```config/larakey.php``` file. If you already have a fi
 
 ---
 
-## Installation
+## Installation Process
 
 This package can be used with Laravel 5.8 or higher.
 
-1. Consult the [Prerequisites](installation/prerequisites.md) page for important considerations regarding your ```User``` models!
+1. Consult the [Prerequisites](#prerequisites) page for important considerations regarding your ```User``` models!
 
 2. This package publishes a ```config/larakey.php``` file. If you already have a file by that name, you must rename or remove it.
 
@@ -59,7 +59,7 @@ This package can be used with Laravel 5.8 or higher.
 php artisan vendor:publish --provider="Oslllo\Larakey\LarakeyServiceProvider::class"
 ```
 
-6. ⚠️ **NOTE:** If you are using UUIDs, see the [UUID](advanced-usage/uuid/uuid.md) section under **Advanced Usage** of the docs on steps before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package’s models for UUID capability.
+6. ⚠️ **NOTE:** If you are using UUIDs, see the [UUID](advanced-usage/uuid.md) section under **Advanced Usage** of the docs on steps before you continue. It explains some changes you may want to make to the migrations and config file before continuing. It also mentions important considerations after extending this package’s models for UUID capability.
 
 7. Run the migrations: After the config and migration have been published and configured, you can create the tables for this package by running:
 
@@ -67,7 +67,7 @@ php artisan vendor:publish --provider="Oslllo\Larakey\LarakeyServiceProvider::cl
     php artisan migrate
     ```
 
-8. Add the necessary trait to your ```User``` model: Consult the [Basic Usage](basic-usage/basic-usage.md) section of the docs for how to get started using the features of this package.
+8. Add the necessary trait to your ```User``` model: Consult the [Basic Usage](getting-started/basic-usage.md) section of the docs for how to get started using the features of this package.
 
 ---
 

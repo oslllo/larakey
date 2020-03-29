@@ -1,6 +1,6 @@
-# <u>Blade Permissions</u>
+# Blade Permissions
 
-This package doesn't add any **permission**-specific Blade directives. 
+This package doesn't add any **permission**-specific Blade directives.
 Instead, use Laravel's native `@can` directive to check if a user has a certain permission.
 
 ```php
@@ -8,7 +8,9 @@ Instead, use Laravel's native `@can` directive to check if a user has a certain 
   //
 @endcan
 ```
+
 or
+
 ```php
 @if(auth()->user()->can('edit articles') && $some_other_condition)
   //

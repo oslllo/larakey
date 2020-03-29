@@ -44,6 +44,6 @@ Massive thanks to [Freek Van der Herten](https://github.com/freekmurze) and [All
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](https://github.com/oslllo/larakey/blob/master/LICENSE.md) for more information.
 
 ---
