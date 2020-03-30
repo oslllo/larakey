@@ -2,7 +2,7 @@
 
 - [Prerequisites](#prerequisites)
 - [Installation Process](#installation-process)
-- [Default config file contents](#default-config-file-contents)
+- [Default Config File Contents](#default-config-file-contents)
 
 ## Prerequisites
 

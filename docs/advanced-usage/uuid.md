@@ -17,12 +17,11 @@ You will probably want to update the `create_permission_tables.php` migration:
 
 ---
 
-
 ## Configuration (Morph Key) <a id="configuration"></a>
 
 You will probably also want to update the configuration `column_names.model_morph_key`:
 
-- Change to `model_uuid` instead of the default `model_id`. (The default of `model_id` is shown in this snippet below. Change it to match your needs.)
+* Change to `model_uuid` instead of the default `model_id`. (The default of `model_id` is shown in this snippet below. Change it to match your needs.)
 
         'column_names' => [    
             /*
