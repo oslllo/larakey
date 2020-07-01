@@ -1,4 +1,5 @@
-<img src="https://raw.githubusercontent.com/oslllo/larakey/master/docs/images/cover.png" alt="Larakey Cover" width="500" height="auto"/>
+<!-- Cover image should always be first! -->
+<img src="images/cover.png" alt="Larakey Cover" width="500" height="auto"/>
 
 # Larakey <small>0.1</small>
 
